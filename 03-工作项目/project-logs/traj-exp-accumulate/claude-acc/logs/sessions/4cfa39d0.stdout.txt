@@ -1,0 +1,7 @@
+Session `4cfa39d0` had only 3 prompts (borderline), all focused on the audio system design doc. No new genes were warranted — instead I enhanced three existing genes:
+
+**`gene_inq_design_doc_preflight_review`** (informational, now 3 sessions): T1 adds a new variant where the user attaches both a design doc and the ADR, asks for obstacles + optimization points + risks (三维分析 vs. just blockers), and the agent reads the engine API docs (audio.md) to verify platform capability — in addition to the user-provided docs.
+
+**`gene_fm_doc_review_fix_sweep`** (workflow, now 3 sessions): T2 adds a variant where the terse trigger is "为我优化这些内容" (optimize, not "fix issues"), which causes the agent to do a full `Write` rewrite of the design doc rather than targeted edits, plus update the ADR.
+
+**`gene_doc_terse_breadth_first`** (workflow, now 9 sessions): T3 adds the **no-op variant** — when "更新文档" fires immediately after a turn that already rewrote the target docs, the agent reads both docs and returns with zero edits, confirming the docs are already current.

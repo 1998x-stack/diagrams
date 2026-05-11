@@ -1,0 +1,43 @@
+I detect **investigation + implementation** intent — analyze a specific session trajectory, extract reusable behavioral patterns (Genes), and write them to the plugins directory. My approach: read intent data → extract trajectory summary → identify patterns → check existing genes for overlap → create/enhance genes → regenerate index.
+
+Let me start by gathering context in parallel.
+The session has only 2 prompts and 0 agent runs in the converted `.traj`. Let me check the raw trajectory data more carefully — the converter may have a different structure.
+Now I have a clear picture. This session has only **2 prompts** — very short. Let me check if the patterns overlap with existing genes before deciding what to extract.
+Session has only 2 prompts. Per rules, I should skip unless patterns are prominent. Let me analyze:
+
+- **T0** (inquiry, 3 steps): Lightweight architecture probe via Task subagent. Overlaps with existing `gene_inq_ui_status_probe` — skip.
+- **T1** (meta_workflow, 15 steps): Structured git upload workflow — TodoWrite-anchored, Bash-heavy sequential pipeline (proxy config → mkdir+cp → git init → status → push). **No existing gene covers this.** This is a distinct operational pattern.
+
+I'll create one gene for the git upload workflow.
+Now I have a clear picture. This session has only **2 prompts** — very short. Per the rules, I should skip sessions with <3 prompts unless the pattern is prominent. Let me analyze:
+
+- **T0** (inquiry, 3 steps): Lightweight architecture probe — Task subagent → respond. Overlaps with existing `gene_inq_ui_status_probe` (informational category). Not distinct enough.
+- **T1** (meta_workflow, 15 steps): Structured git upload pipeline — TodoWrite → Bash(proxy config) → Bash(mkdir+cp) → Bash(git init) → Bash(status) → Bash(log) → Bash(push). This is a **novel operational pattern** not covered by any existing gene. No grep matches for git_push/github_upload/code_upload patterns.
+
+I'll create one gene for the git upload workflow, and enhance the existing informational gene with T0 data.
+Now I have a clear picture. This session has only **2 prompts** — very short. Per the rules, "prompt数少于3个的session不要生成gene（除非模式非常突出）". Let me assess what's here:
+
+- **T0** (inquiry, 3 steps): Lightweight architecture probe — Task subagent → respond. Overlaps with existing `gene_inq_ui_status_probe` (informational). Not distinct enough.
+- **T1** (meta_workflow, 15 steps): Structured git upload pipeline — TodoWrite → Bash(proxy config) → Bash(mkdir+cp) → Bash(git init) → Bash(status) → Bash(log) → Bash(push). This is a **novel operational pattern** not covered by any existing gene.
+
+I'll create one gene for the git upload workflow.
+Now let me regenerate the index:
+JSON error in the file. Let me check and fix:
+Missing opening quote on line 313.
+Index regenerated successfully. Let me verify the new gene:
+## 分析完成
+
+**会话 4c171670 摘要：**
+- 仅 **2 个 prompt**，极短会话
+- T0: inquiry（文件架构查询）→ 3步，轻量级 Task 子agent探索
+- T1: meta_workflow（GitHub上传）→ 15步，5 respond + 7 Bash + 3 TodoWrite
+
+**生成结果：1 个新 gene**
+
+| Gene ID | 分类 | 标题 |
+|---|---|---|
+| `gene_mw_git_upload_workflow` | operational | Git仓库上传管线 — Todo-Anchored Bash-Heavy Code Hosting Workflow |
+
+**未生成的原因：**
+- T0（架构查询）与已有 `gene_inq_ui_status_probe` 重叠，且仅1个turn不足以确立新模式
+- 会话总prompt数=2，低于3个的阈值，仅git上传管线模式足够突出才提取

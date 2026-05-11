@@ -1,0 +1,450 @@
+[0m
+> Sisyphus (Ultraworker) · qwen3.6-plus
+[0m
+[0m→ [0mRead examples/wzp/4c171670.json
+[0m
+[0m$ [0mpython3 -c "
+import json, sys
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/4c171670.traj') as f:
+    data = json.load(f)
+
+# Session-level summary
+messages = data.get('messages', [])
+total_steps = 0
+tool_counts = {}
+phase_counts = {}
+total_tokens = {'input': 0, 'output': 0, 'cache_read': 0, 'cache_creation': 0}
+
+for msg in messages:
+    if msg.get('role') == 'user':
+        continue
+    agent_runs = msg.get('agent_runs', [])
+    for run in agent_runs:
+        steps = run.get('steps', [])
+        total_steps += len(steps)
+        for step in steps:
+            action = step.get('action', {})
+            tool = action.get('tool_name', 'unknown')
+            tool_counts[tool] = tool_counts.get(tool, 0) + 1
+            obs = step.get('observation', {})
+            phase = obs.get('phase', 'unknown')
+            phase_counts[phase] = phase_counts.get(phase, 0) + 1
+        tokens = run.get('token_usage', {})
+        if tokens:
+            total_tokens['input'] += tokens.get('input_tokens', 0)
+            total_tokens['output'] += tokens.get('output_tokens', 0)
+            total_tokens['cache_read'] += tokens.get('cache_read_tokens', 0)
+            total_tokens['cache_creation'] += tokens.get('cache_creation_tokens', 0)
+
+print(f'Session: 4c171670')
+print(f'Total user messages: {len([m for m in messages if m.get(\"role\") == \"user\"])}')
+print(f'Total agent runs: {sum(len(m.get(\"agent_runs\", [])) for m in messages)}')
+print(f'Total steps: {total_steps}')
+print(f'Total tokens: {total_tokens}')
+print(f'Tool distribution (top 15):')
+for tool, count in sorted(tool_counts.items(), key=lambda x: -x[1])[:15]:
+    print(f'  {tool}: {count}')
+print(f'Phase distribution:')
+for phase, count in sorted(phase_counts.items(), key=lambda x: -x[1]):
+    print(f'  {phase}: {count}')
+"
+
+Session: 4c171670
+Total user messages: 2
+Total agent runs: 0
+Total steps: 0
+Total tokens: {'input': 0, 'output': 0, 'cache_read': 0, 'cache_creation': 0}
+Tool distribution (top 15):
+Phase distribution:
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/4c171670.traj') as f:
+    data = json.load(f)
+
+messages = data.get('messages', [])
+turn_idx = 0
+for msg in messages:
+    if msg.get('role') == 'user':
+        turn_idx += 1
+        text = msg.get('content', '')
+        if isinstance(text, list):
+            # Extract text from content blocks
+            texts = []
+            for block in text:
+                if isinstance(block, dict):
+                    if block.get('type') == 'text':
+                        texts.append(block.get('text', '')[:200])
+                    elif block.get('type') == 'tool_result':
+                        pass
+            text = ' '.join(texts)[:200]
+        print(f'T{turn_idx}: {text[:150]}')
+    else:
+        agent_runs = msg.get('agent_runs', [])
+        for run in agent_runs:
+            steps = run.get('steps', [])
+            tools = {}
+            phases = {}
+            edits = 0
+            builds = 0
+            errors = 0
+            for step in steps:
+                action = step.get('action', {})
+                tool = action.get('tool_name', 'unknown')
+                tools[tool] = tools.get(tool, 0)  + 1
+                obs = step.get('observation', {})
+                phase = obs.get('phase', 'unknown')
+                phases[phase] = phases.get(phase, 0) + 1
+                if tool == 'Edit':
+                    edits += 1
+                elif tool == 'Bash' and 'build' in str(action.get('args', '')).lower():
+                    builds += 1
+                if obs.get('exit_code') and obs.get('exit_code') != 0:
+                    errors += 1
+            tokens = run.get('token_usage', {})
+            print(f'  AgentRun: {len(steps)} steps, edits={edits}, builds={builds}, errors={errors}')
+            print(f'    Tools: {dict(sorted(tools.items(), key=lambda x: -x[1])[:8])}')
+            print(f'    Phases: {phases}')
+            if tokens:
+                print(f'    Tokens: in={tokens.get(\"input_tokens\",0)}, out={tokens.get(\"output_tokens\",0)}, cache_r={tokens.get(\"cache_read_tokens\",0)}, cache_c={tokens.get(\"cache_creation_tokens\",0)}')
+" 2>&1 | head -200
+
+T1: 目前游戏的文件架构是怎样的
+T2: 将目前的代码，上传到 https://github.com/Wzp-xd/Tools.git仓库，下新建一个文件夹“game001”中
+
+[Category+Skill Reminder]
+
+**Built-in**: playwright, frontend-ui-ux, git-master, dev-browser, review-work, ai-slop-remover
+**⚡ YOUR SKILLS (PRIORITY)**: benchmark, plan-design-review, prefab-search, autoplan, design-consultation, freeze, careful, cso (+43 more)
+
+> User-installed skills OVERRIDE built-in defaults. ALWAYS prefer YOUR SKILLS when domain matches.
+
+```typescript
+task(category="visual-engineering", load_skills=["benchmark"], run_in_background=true)
+```
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/4c171670.traj') as f:
+    data = json.load(f)
+print('Top keys:', list(data.keys()))
+print('Messages count:', len(data.get('messages', [])))
+# Check first message structure
+if data.get('messages'):
+    m = data['messages'][0]
+    print('First msg keys:', list(m.keys()))
+    print('First msg role:', m.get('role'))
+    if m.get('role') == 'user':
+        content = m.get('content', '')
+        if isinstance(content, str):
+            print('Content (first 200):', content[:200])
+        elif isinstance(content, list):
+            for block in content[:3]:
+                print('Block keys:', list(block.keys()) if isinstance(block, dict) else type(block))
+    else:
+        print('Agent run keys:', list(m.keys()))
+        print('Agent runs:', m.get('agent_runs', 'N/A'))
+# Check last message
+if len(data.get('messages', [])) > 1:
+    m2 = data['messages'][-1]
+    print('Last msg role:', m2.get('role'))
+    print('Last msg keys:', list(m2.keys()))
+"
+
+Top keys: ['schema_version', 'conversation_id', 'agent', 'session_metadata', 'messages', 'phases', 'markers', 'subagents', 'summary']
+Messages count: 4
+First msg keys: ['turn_id', 'role', 'content', 'timestamp']
+First msg role: user
+Content (first 200): 目前游戏的文件架构是怎样的
+Last msg role: None
+Last msg keys: ['turn_id', 'agent_run_id', 'steps', 'run_summary']
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/4c171670.traj') as f:
+    data = json.load(f)
+
+msgs = data['messages']
+for i, m in enumerate(msgs):
+    if m.get('role') == 'user':
+        print(f'Msg {i}: role=user, turn_id={m.get(\"turn_id\")}, content={str(m.get(\"content\",\"\"))[:120]}')
+    elif m.get('agent_run_id'):
+        steps = m.get('steps', [])
+        run_summary = m.get('run_summary', {})
+        print(f'Msg {i}: agent_run_id={m.get(\"agent_run_id\")}, turn_id={m.get(\"turn_id\")}, steps={len(steps)}')
+        print(f'  run_summary: {run_summary}')
+        # Show first few steps
+        for j, s in enumerate(steps[:3]):
+            action = s.get('action', {})
+            obs = s.get('observation', {})
+            print(f'  Step {j}: tool={action.get(\"tool_name\",\"?\")}, phase={obs.get(\"phase\",\"?\")}')
+        if len(steps) > 3:
+            print(f'  ... ({len(steps)-3} more steps)')
+"
+
+Msg 0: role=user, turn_id=1, content=目前游戏的文件架构是怎样的
+Msg 1: agent_run_id=run_t1, turn_id=1, steps=3
+  run_summary: {'steps_count': 3, 'tool_calls_count': 1}
+  Step 0: tool=respond_to_user, phase=?
+  Step 1: tool=Task, phase=?
+  Step 2: tool=respond_to_user, phase=?
+Msg 2: role=user, turn_id=2, content=将目前的代码，上传到 https://github.com/Wzp-xd/Tools.git仓库，下新建一个文件夹“game001”中
+Msg 3: agent_run_id=run_t2, turn_id=2, steps=15
+  run_summary: {'steps_count': 15, 'tool_calls_count': 9}
+  Step 0: tool=TodoWrite, phase=?
+  Step 1: tool=respond_to_user, phase=?
+  Step 2: tool=mcp__mkr__Bash, phase=?
+  ... (12 more steps)
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/4c171670.traj') as f:
+    data = json.load(f)
+
+msgs = data['messages']
+# Show all steps for both agent runs
+for i, m in enumerate(msgs):
+    if m.get('agent_run_id'):
+        steps = m.get('steps', [])
+        print(f'=== {m[\"agent_run_id\"]} (turn {m[\"turn_id\"]}) ===')
+        for j, s in enumerate(steps):
+            action = s.get('action', {})
+            obs = s.get('observation', {})
+            args = action.get('args', {})
+            # Show key args
+            if action.get('tool_name') == 'TodoWrite':
+                print(f'  S{j}: {action[\"tool_name\"]} todos={len(args.get(\"todos\",[]))}')
+            elif action.get('tool_name') == 'mcp__mkr__Bash':
+                cmd = str(args.get('command',''))[:100]
+                print(f'  S{j}: {action[\"tool_name\"]} cmd={cmd}')
+            elif action.get('tool_name') == 'mcp__mkr__Read':
+                path = str(args.get('path',''))[:80]
+                print(f'  S{j}: {action[\"tool_name\"]} path={path}')
+            elif action.get('tool_name') == 'respond_to_user':
+                txt = str(args.get('content',''))[:80]
+                print(f'  S{j}: {action[\"tool_name\"]} text={txt}')
+            elif action.get('tool_name') == 'Task':
+                print(f'  S{j}: {action[\"tool_name\"]}')
+            elif action.get('tool_name') == 'Glob':
+                pat = str(args.get('pattern',''))[:60]
+                print(f'  S{j}: {action[\"tool_name\"]} pattern={pat}')
+            elif action.get('tool_name') == 'Edit':
+                path = str(args.get('file_path',''))[:60]
+                print(f'  S{j}: {action[\"tool_name\"]} file={path}')
+            elif action.get('tool_name') == 'Write':
+                path = str(args.get('file_path',''))[:60]
+                print(f'  S{j}: {action[\"tool_name\"]} file={path}')
+            else:
+                print(f'  S{j}: {action[\"tool_name\"]}')
+"
+
+=== run_t1 (turn 1) ===
+  S0: respond_to_user text=
+  S1: Task
+  S2: respond_to_user text=
+=== run_t2 (turn 2) ===
+  S0: TodoWrite todos=3
+  S1: respond_to_user text=
+  S2: mcp__mkr__Bash cmd=cd /home/Maker && git config --global http.proxy http://127.0.0.1:1080 && git config --global https.
+  S3: respond_to_user text=
+  S4: TodoWrite todos=3
+  S5: mcp__mkr__Bash cmd=cd /home/Maker/Tools && mkdir -p game001 && cp -r /workspace/scripts game001/ && cp -r /workspace/as
+  S6: respond_to_user text=
+  S7: TodoWrite todos=3
+  S8: mcp__mkr__Bash cmd=cd /home/Maker/Tools && git config user.email "game-dev@example.com" && git config user.name "Game D
+  S9: mcp__mkr__Bash cmd=cd /home/Maker/Tools && git status --short | head -5 && echo "..." && git status --short | wc -l
+  S10: respond_to_user text=
+  S11: mcp__mkr__Bash cmd=cd /home/Maker/Tools && git log --oneline -3 2>&1
+  S12: respond_to_user text=
+  S13: mcp__mkr__Bash cmd=cd /home/Maker/Tools && git push origin main 2>&1 || git push origin master 2>&1
+  S14: respond_to_user text=
+[0m
+[0m$ [0mgrep -r "intent:inquiry" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -20
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:inquiry",
+[0m
+[0m$ [0mgrep -r "intent:meta_workflow\|intent:mw\|gene_mw\|gene_op" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -20
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json:    "id": "gene_mw_todo_driven_workflow",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json:    "id": "gene_op_batch_build_verify",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json:    "id": "gene_op_subagent_warmup_waste",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json:    "id": "gene_mw_build_command_triggers_code_fix",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json:      "intent:meta_workflow",
+[0m
+[0m$ [0mgrep -r "file_structure\|architecture_probe\|status_probe\|read_respond_only\|lightweight_exploration" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -20
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/genes.json:    "id": "gene_inq_ui_status_probe",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/genes.json:      "read_respond_only",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/genes.json:      "lightweight_exploration"
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "read_respond_only",
+[0m
+[0m$ [0mgrep -r "git_push\|github_upload\|code_upload\|git_init\|repository_upload" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -20
+(no output)
+[0m
+[0m→ [0mRead opencode-acc/plugins/operational/genes.json
+[0m
+[0m$ [0mexport CI=true DEBIAN_FRONTEND=noninteractive GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never HOMEBREW_NO_AUTO_UPDATE=1 GIT_EDITOR=: EDITOR=: VISUAL='' GIT_SEQUENCE_EDITOR=: GIT_MERGE_AUTOEDIT=no GIT_PAGER=cat PAGER=cat npm_config_yes=true PIP_NO_INPUT=1 YARN_ENABLE_IMMUTABLE_INSTALLS=false; grep -r "git_push\|github_upload\|code_upload\|git_init\|repository_upload\|Bash.*git\|git.*workflow\|git.*upload\|code_hosting" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -20
+(no output)
+[0m
+[0m← [0mEdit opencode-acc/plugins/operational/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+@@ -290,6 +290,60 @@
+       "prompt_indices": [2],
+       "evidence": "T2: 用户仅输入'build'→55步(20 respond+9 Read+9 Edit+4 build+4 lua_lsp_client+3 TodoWrite+3 Grep+3 Bash)。Agent没有直接build，而是：S0-S18 respond+Read(9个文件)诊断当前代码状态→S19-S27 Edit(9次)修复adapter.lua中的NanoVG渲染问题→S28-S31 lua_lsp_client检查→S32-S34 Grep验证→S35-S37 Bash执行→S38-S41 TodoWrite跟踪→S42-S45 respond汇报→S46-S49 build(4次build，说明多次尝试)。典型的'bare build→Agent判断代码有问题→大规模Read诊断→9 Edit修复→多次build验证'模式。用户仅输入2个字母'build'，但Agent执行了55步的完整修复管线。这反映了Agent的正确判断：直接build会失败，需要先修复adapter的draw nil问题。",
+       "session_count": 1
+     }
++  },
++  {
++    "type": "Gene",
++    "id": "gene_mw_git_upload_workflow",
++    "category": "operational",
++    "signals_match": [
++      "intent:meta_workflow",
++      "target:tooling",
++      "github_repository_upload",
++      "TodoWrite_anchored",
++      "Bash_heavy_ge_5",
++      "git_init_and_push_pipeline",
++      "proxy_config_first",
++      "no_code_edit"
++    ],
++    "preconditions": [
++      "用户要求将当前项目代码上传到指定的GitHub仓库（或子目录）。",
++      "目标仓库可能不存在本地副本，需要先初始化git仓库。",
++      "运行环境可能需要代理配置才能访问GitHub。",
++      这是纯操作型任务——不涉及代码修改、bug修复或功能开发。"
++    ],
++    "strategy": [
++      "用TodoWrite创建3步清单：准备文件→初始化git→推送远程。",
++      "先配置git代理（如环境需要）：http.proxy和https.proxy。",
++      "在目标位置创建目录，复制项目文件（scripts、assets、docs等核心目录）。",
++      "初始化git仓库：git init，配置user.email和user.name。",
++      "执行git add和git commit，用git status和git log验证提交状态。",
++      "尝试git push origin main，如失败则fallback到git push origin master。",
++      "全程不执行代码编辑或build——这是纯部署操作。",
++      "在respond_to_user中向用户汇报每个阶段的进度。"
++    ],
++    "constraints": {
++      "no_code_edit": true,
++      "no_build": true,
++      "must_configure_proxy_if_needed": true,
++      "fallback_branch_on_push_failure": true
++    },
++    "validation": [
++      "文件已复制到目标目录",
++      "git仓库已初始化并提交",
++      "git push成功或已尝试main/master双分支",
++      "未执行任何代码编辑或build操作"
++    ],
++    "title_zh": "Git仓库上传管线",
++    "title_en": "Git Repository Upload Pipeline — Todo-Anchored Bash-Heavy Code Hosting Workflow",
++    "_provenance": {
++      "source": "traj-exp-accumulate",
++      "project": "wzp",
++      "session_hashes": ["4c171670"],
++      "turn_range": "4c171670:T1",
++      "prompt_indices": [1],
++      "evidence": "T1: '将目前的代码，上传到 https://github.com/Wzp-xd/Tools.git仓库，下新建一个文件夹\"game001\"中'→15步(5 respond+7 Bash+3 TodoWrite)。S0: TodoWrite创建3步清单→S2: Bash配置git代理(http/https proxy 127.0.0.1:1080)→S5: Bash创建Tools/game001目录，复制scripts/assets/docs/config/levels→S8: Bash配置git user.email/user.name→S9: Bash执行git status确认127个文件→S11: Bash执行git log确认提交→S13: Bash执行git push origin main fallback master。典型的'TodoWrite锚定→代理配置→文件复制→git初始化→状态验证→推送'管线。全程0代码编辑0 build，纯操作型meta_workflow。",
++      "session_count": 1
++    }
+   }
+ ]
+
+[0m
+[0m$ [0mpython3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins 2>&1
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/index.md (6 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/index.md (1 genes)
+Traceback (most recent call last):
+  File "/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py", line 93, in <module>
+    main()
+  File "/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py", line 88, in main
+    n = generate_indexes(args.plugins_dir)
+  File "/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py", line 20, in generate_indexes
+    genes = json.loads(genes_file.read_text())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 313 column 7 (char 13015)
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json') as f:
+    content = f.read()
+# Find the problematic area around line 313
+lines = content.split('\n')
+for i in range(305, min(320, len(lines))):
+    print(f'{i+1}: {lines[i]}')
+"
+
+306:       "proxy_config_first",
+307:       "no_code_edit"
+308:     ],
+309:     "preconditions": [
+310:       "用户要求将当前项目代码上传到指定的GitHub仓库（或子目录）。",
+311:       "目标仓库可能不存在本地副本，需要先初始化git仓库。",
+312:       "运行环境可能需要代理配置才能访问GitHub。",
+313:       这是纯操作型任务——不涉及代码修改、bug修复或功能开发。"
+314:     ],
+315:     "strategy": [
+316:       "用TodoWrite创建3步清单：准备文件→初始化git→推送远程。",
+317:       "先配置git代理（如环境需要）：http.proxy和https.proxy。",
+318:       "在目标位置创建目录，复制项目文件（scripts、assets、docs等核心目录）。",
+319:       "初始化git仓库：git init，配置user.email和user.name。",
+320:       "执行git add和git commit，用git status和git log验证提交状态。",
+[0m
+[0m← [0mEdit opencode-acc/plugins/operational/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+@@ -309,9 +309,9 @@
+ "preconditions": [
+   "用户要求将当前项目代码上传到指定的GitHub仓库（或子目录）。",
+   "目标仓库可能不存在本地副本，需要先初始化git仓库。",
+   "运行环境可能需要代理配置才能访问GitHub。",
+-  这是纯操作型任务——不涉及代码修改、bug修复或功能开发。"
++  "这是纯操作型任务——不涉及代码修改、bug修复或功能开发。"
+ ],
+ "strategy": [
+   "用TodoWrite创建3步清单：准备文件→初始化git→推送远程。",
+   "先配置git代理（如环境需要）：http.proxy和https.proxy。",
+
+[0m
+[0m$ [0mpython3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins 2>&1
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/index.md (6 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/index.md (1 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/index.md (7 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/index.md (7 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/index.md (34 genes)
+  (5 categories indexed)
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json') as f:
+    genes = json.load(f)
+print(f'Total genes: {len(genes)}')
+for g in genes:
+    print(f'  {g[\"id\"]}: {g[\"title_zh\"]} ({g[\"_provenance\"][\"session_count\"]}x sessions)')
+"
+
+Total genes: 7
+  gene_mw_todo_driven_workflow: Todo驱动的任务管理工作流 (2x sessions)
+  gene_op_batch_build_verify: 批量编辑后统一构建 (2x sessions)
+  gene_doc_post_implementation_sync: 代码变更后文档同步更新 (4x sessions)
+  gene_doc_post_audit_report_sync: 审计后文档报告同步 (1x sessions)
+  gene_op_subagent_warmup_waste: 子Agent Warmup浪费模式 (2x sessions)
+  gene_mw_build_command_triggers_code_fix: Build命令触发代码修复模式 (1x sessions)
+  gene_mw_git_upload_workflow: Git仓库上传管线 (1x sessions)
+[0m

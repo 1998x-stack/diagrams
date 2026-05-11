@@ -1,0 +1,105 @@
+Now let me check the existing genes for overlap and the output directory structure.
+Based on my analysis, this session is a **single-turn, single-prompt** session (1 prompt only). The rule states "prompt数少于3个的session不要生成gene（除非模式非常突出）". 
+
+However, the pattern here — **reference-driven multi-document synthesis** — is distinct from existing genes. Let me check if it can enhance any existing gene instead.
+Now I have a clear picture of the session. Let me analyze the pattern:
+
+**Session fba2ad17 summary:**
+- **1 turn, 1 prompt**: "参考AI开发规范.md, P1-推箱子关卡详细设计.md, P2-记忆翻牌.md，为我生成 P4-连连看 的策划文档"
+- **Intent**: content_creation (primary), planning_design (secondary)
+- **Target**: documentation
+- **18 steps**: 6 Read → 3 Bash → 4 respond → 2 TodoWrite → 1 Write
+- **3 subagents** dispatched
+- **Duration**: 254 seconds (~4 min)
+- **Phase**: editing (entire session)
+- **Markers**: drift-start at step 4 (4 consecutive edits without verification)
+
+**Pattern**: Read 5-6 reference docs (AI规范, P1, P2, P3, 策划案-大厅, 架构决策) → Bash explore project structure → TodoWrite track → Write new doc → done. Single-turn, single-pass document synthesis from multiple references.
+
+Let me check the closest existing gene for overlap:
+Now I have a clear picture of the session. Let me analyze the pattern:
+
+**Session fba2ad17 Summary:**
+- **1 turn, 1 prompt** — single-turn session
+- **Intent:** `content_creation` (primary), `planning_design` (secondary)
+- **Target:** `documentation`
+- **18 steps:** 6 Read → 3 Bash → 4 respond → 2 TodoWrite → 1 Write
+- **3 subagents** dispatched (per summary)
+- **Duration:** ~4 minutes (254s)
+- **Flow:** Read 3 referenced docs → Bash explore project → Read 3 more docs for context → TodoWrite → Write new P4-连连看.md → done
+
+**Pattern identified:** Multi-document reference reading → project structure exploration → single-pass new document creation with TodoWrite tracking. This is a **reference-driven document synthesis** pattern — distinct from `gene_pd_doc_supplement_with_exploration` (which supplements an *existing* doc) and `gene_cc_doc_driven_content_creation` (which creates narrative content from *one* attached doc with iteration).
+
+The session has only 1 prompt (below the 3-prompt threshold), but the pattern is distinctive enough to warrant a gene. I'll create it with appropriate evidence notes.
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+Now I have a clear picture of this session. Let me analyze:
+
+**Session fba2ad17 Summary:**
+- **1 turn, 1 prompt** — content_creation request to generate P4-连连看 planning doc
+- **18 steps**: 6 Read → 3 Bash → 4 respond → 2 TodoWrite → 1 Write
+- **3 subagents** dispatched, **254 seconds** duration
+- **Flow**: Read reference docs (AI规范, P1, P2, P3, 策划案-大厅, 架构决策) → Bash explore project structure → TodoWrite → Write new doc → done
+- **Markers**: drift-start at step 4 (4 consecutive edits without verification)
+
+**Pattern**: Reference-driven document synthesis — read multiple existing docs as templates, explore project structure, write new doc following established format. Single-pass, no iteration.
+
+**Overlap check**: The closest existing gene is `gene_cc_doc_driven_content_creation` (attached-doc-first narrative design), but that's about creating narrative content (角色设计, NPC设计) from ONE attached doc with iteration. This session reads **6 reference docs** as structural templates and writes a new game design doc in **single pass** — a distinct pattern.
+
+However, the rule says "prompt数少于3个的session不要生成gene（除非模式非常突出）". This session has only 1 prompt. The pattern IS distinctive (multi-doc reference synthesis), but with only 1 session it's weak evidence. I'll create this gene but mark it appropriately — it can be strengthened when more sessions confirm the pattern.
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+Now I have a clear picture. This session has only **1 turn, 1 prompt** — `content_creation` intent asking to generate a P4-连连看 planning doc by referencing 3 existing docs. The trajectory shows: Read 6 docs → Bash explore → TodoWrite → Write new doc → done. 18 steps, 3 subagents, 254 seconds, single-pass doc creation.
+
+Let me check if this pattern overlaps with existing genes:
+
+**Closest matches:**
+1. `gene_cc_doc_driven_content_creation` — attached-doc-first narrative design. But this session creates a NEW game design doc (P4-连连看.md) by referencing MULTIPLE existing docs (AI规范, P1, P2, P3, 策划案-大厅, 架构决策), not creating narrative content from one attached doc.
+2. `gene_pd_doc_supplement_with_exploration` — supplements an existing doc with missing content. This session creates a brand new doc, not supplementing an existing one.
+3. `gene_nf_reference_driven_architecture_replication` — replicates code architecture from reference modules. This session replicates DOC structure/format from reference docs.
+
+The pattern here is distinct: **multi-doc reference reading → project structure exploration → single-pass new doc creation with TodoWrite tracking**. This is a "reference-driven document synthesis" pattern — read multiple existing docs as templates, understand their structure/format, then write a new doc following the same conventions.
+
+The session has only 1 prompt (below the 3-prompt threshold), but the pattern is distinctive enough to warrant a gene. I'll create it with appropriate evidence notes.
+Now let me verify the JSON is valid and run the index generator:
+Analysis complete. Here's the summary:
+
+## Session fba2ad17 Analysis
+
+**Session Profile:**
+- **Project:** wzp (脑力大冒险)
+- **Prompts:** 1 (single-turn session)
+- **Intent:** `content_creation` → `planning_design`
+- **Target:** `documentation`
+- **Duration:** 254 seconds (~4 min)
+- **Steps:** 18 (6 Read → 3 Bash → 4 respond → 2 TodoWrite → 1 Write)
+- **Subagents:** 3 dispatched
+- **Exit:** end_of_conversation (completed)
+
+**Pattern Identified:**
+The session follows a clean **reference-driven document synthesis** pipeline:
+1. Read 3 user-specified reference docs (AI开发规范, P1-推箱子, P2-记忆翻牌)
+2. Bash explore project structure (docs/, scripts/games/, config/games/)
+3. Read 3 more contextual docs (P3-消消乐, 策划案-大厅, 架构决策记录)
+4. TodoWrite → Write new P4-连连看.md → TodoWrite complete → respond
+
+**Gene Created:**
+- **ID:** `gene_cc_reference_driven_doc_synthesis`
+- **Category:** `workflow`
+- **Distinctive from:** `gene_cc_doc_driven_content_creation` (single-doc narrative iteration), `gene_pd_doc_supplement_with_exploration` (supplementing existing doc), `gene_nf_reference_driven_architecture_replication` (code architecture replication)
+
+**Note:** Only 1 prompt in this session (below the 3-prompt threshold), but the pattern is distinctive enough — multi-doc reference reading → project exploration → single-pass doc creation with TodoWrite tracking. The gene can be strengthened when more sessions confirm the pattern.

@@ -1,0 +1,16 @@
+All 4 genes are written and indexed. Here's a summary of what was extracted from session `0997e370`:
+
+---
+
+**Session character:** Pure planning/design session (88 min, 9 prompts, 0 code edits) — the agent spent the entire session on feasibility analysis, document generation, character design, image generation, and blocker auditing. No builds.
+
+**4 new genes created:**
+
+| Gene | Category | Turns | Pattern |
+|---|---|---|---|
+| `gene_inq_new_system_feasibility` | informational | T01 | User proposes new system + asks "is it feasible?" → Explore subagent maps existing architecture → structured feasibility answer (ready / to-add / risks) + recommended next step |
+| `gene_pd_design_doc_generation_workflow` | workflow | T02, T09 | "先根据计划生成文档" → read game configs + existing docs + code → TodoWrite → write design doc → append ADR entry → register in doc index |
+| `gene_cc_image_gen_sequential_fallback` | workflow | T05 | batch_generate_images → MCP timeout → read character doc for prompts → sequential generate_image per character with per-character TodoWrite → Bash move to target path |
+| `gene_inq_pre_impl_blocker_audit` | informational | T06 | Post-planning "是否有阻碍" → read design docs → dispatch separate subagents per technical dependency → structured blocker/pending-item split + recommended start order |
+
+**Running totals:** informational: 2→4 genes, workflow: 10→12 genes.

@@ -1,0 +1,45 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_pd_design_doc_then_implement",
+    "category": "workflow",
+    "signals_match": [
+      "intent:planning_design",
+      "target:game_logic",
+      "design_doc_first_keyword",
+      "cn_check_then_start_pattern",
+      "followed_by_start_command"
+    ],
+    "preconditions": [
+      "用户明确要求先写设计文档，等检查无误后再开始制作。",
+      "请求中包含系统性的功能描述（入口位置、UI结构、数据流、扩展性考虑）。",
+      "用户对质量有明确预期：先规划再实现，不希望AI直接动手写代码。"
+    ],
+    "strategy": [
+      "第一轮：使用 Read/Grep 了解项目现状（已有页面、导航结构、代码架构），然后产出设计文档。",
+      "设计文档应包含：功能概述、UI结构（页面/组件层级）、数据模型、交互流程、技术实现要点。",
+      "文档写入项目的 docs/ 目录，不直接修改代码文件。",
+      "等待用户确认后才进入实现阶段（用户通常会说'开始制作'、'可以了'、'没问题'）。",
+      "实现阶段应严格按照设计文档执行，不自行扩展或修改设计。"
+    ],
+    "constraints": {
+      "no_code_edits_in_design_phase": true,
+      "wait_for_user_approval": true
+    },
+    "validation": [
+      "产出了完整的设计文档",
+      "文档结构清晰覆盖用户提出的所有要素",
+      "未在设计阶段修改任何代码文件"
+    ],
+    "title_zh": "先设计文档后实现（规划-确认-执行）",
+    "title_en": "Design Document Then Implement — Plan-Approve-Execute Pattern",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["374e4eb7"],
+      "turn_range": "T01-T02",
+      "prompt_indices": [0, 1],
+      "evidence": "T01: 24 steps, 0 edits, 0 builds — pure design doc output (EnterPlanMode→ExitPlanMode). T02: '开始制作' triggers 56 steps, 11 edits, 1 build. Clear 2-phase pattern: design→approve→implement."
+    }
+  }
+]

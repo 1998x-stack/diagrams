@@ -1,0 +1,31 @@
+Now let me check for overlaps with existing genes:
+Now I have a comprehensive picture. Let me analyze the patterns and create genes. I identified 3 new genes plus 1 enhancement:
+
+**New genes:**
+1. `gene_meta_rapid_context_switch` (session_rhythm) — 9 turns, 5 intent types, surgical per-turn focus
+2. `gene_meta_per_turn_build_verify` (session_rhythm) — every implementation turn ends with build
+3. `gene_fm_feature_triggers_bug_cascade` (workflow) — new feature → user tests → multiple bugs reported
+
+**Enhancement:**
+- `gene_br_minimal_bug_fix` — add game_logic bugs with Grep-based diagnosis
+All done. Here's a summary of the analysis for session `13683faf` (wzp project, 9 prompts):
+
+## Session Profile
+- **9 turns**, 65 total steps, 15 edits, 7 builds, 0 errors
+- **5 intent types interleaved**: 4× feature_modification, 3× bug_report, 1× documentation, 1× feature_modification(target=documentation)
+- **Avg 7.2 steps/turn** — lightweight, surgical per-turn focus
+- **Pattern**: User builds a feature → immediately tests → reports bugs → Agent fixes → next feature
+
+## 3 New Genes Created
+
+| Gene | Category | Key Signals |
+|---|---|---|
+| `gene_meta_rapid_context_switch` | session_rhythm | 5+ intent types, surgical per-turn focus, no cross-turn contamination |
+| `gene_meta_per_turn_build_verify` | session_rhythm | 1 build at end of each code turn, 0 intermediate builds, skip build for doc turns |
+| `gene_fm_feature_triggers_bug_cascade` | workflow | feature→test→3 consecutive bug reports, same-feature-related bugs, user tests while building |
+
+## 1 Gene Enhanced
+
+| Gene | Change |
+|---|---|
+| `gene_br_minimal_bug_fix` (diagnostic) | Added `target:game_logic`, `grep_for_root_cause` signals. Expanded evidence from 1→2 sessions. Updated preconditions to cover game logic bugs (chapter display, click penetration). |

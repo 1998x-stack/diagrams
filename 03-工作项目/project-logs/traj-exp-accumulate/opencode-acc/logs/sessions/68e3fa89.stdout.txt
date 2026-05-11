@@ -1,0 +1,21 @@
+I detect **investigation/analysis** intent — analyzing a trajectory session to extract reusable behavioral patterns (Genes). My approach: read intent data → extract trajectory summary → identify patterns → check overlap with existing genes → generate/enhance genes.
+
+Let me start by gathering context in parallel.
+The session has only 1 prompt ("build") and 0 steps in the trajectory. This is an extremely minimal session. Let me check the raw .traj structure more carefully.
+This is a very short session — 1 prompt ("build"), ~29 seconds duration. Let me get the complete step list.
+This session is extremely minimal: **1 prompt, 6 steps, 29 seconds**. The user typed "build", the agent did 2 Globs for project structure verification, then built successfully. No edits, no code changes, no errors.
+
+Per the rules: "prompt数少于3个的session不要生成gene（除非模式非常突出）". This session has only 1 prompt and no distinctive pattern that isn't already covered by existing genes (e.g., `gene_mw_build_command_triggers_code_fix` covers bare build scenarios, but this is the trivial case where nothing needed fixing).
+
+**No genes to extract from this session.** The trajectory is too thin — it's a bare build command that succeeded immediately without any diagnostic, editing, or workflow pattern worth capturing.
+
+Let me verify there's nothing I missed by checking the session summary and markers:
+Confirmed: this session is extremely thin — **1 prompt, 6 steps, 3 subagents (all warmup-only), 0 edits, 1 successful build, 29 seconds**.
+
+The only observable patterns are:
+1. **3 subagents dispatched for a bare "build" command** — all returned warmup only. This is already covered by `gene_op_subagent_warmup_waste` (4 sessions, warmup rates 43%-75%).
+2. **Bare build → direct success** — no code fix needed, unlike `gene_mw_build_command_triggers_code_fix` which covers the case where build triggers diagnostic repair.
+
+Neither pattern is distinctive enough to warrant a new gene, and the session has only 1 prompt (below the 3-prompt threshold).
+
+**Conclusion: No genes to extract from session 68e3fa89.** The trajectory is too minimal — a bare "build" command that succeeded immediately with no edits, no errors, and no workflow complexity.

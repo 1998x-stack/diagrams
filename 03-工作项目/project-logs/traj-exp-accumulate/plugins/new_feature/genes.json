@@ -1,0 +1,178 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_nf_level_data_batch_injection",
+    "category": "workflow",
+    "signals_match": [
+      "intent:new_feature",
+      "target:game_logic",
+      "structured_data_in_prompt",
+      "level_config_lua_table",
+      "consecutive_level_injection",
+      "cn_level_apply_keywords"
+    ],
+    "preconditions": [
+      "用户在prompt中直接粘贴完整的关卡配置数据（Lua table格式），包含地图尺寸、玩家位置、墙壁、箱子、目标等。",
+      "连续多次(2+)提交同类型的关卡数据，属于批量关卡导入场景。",
+      "每次数据注入的步骤数极少(5-6步)：Read→Edit→Build，效率极高。"
+    ],
+    "strategy": [
+      "定位关卡配置文件中目标关卡序号的位置（如第9关、第10关）。",
+      "将用户粘贴的Lua table数据直接替换到对应关卡配置项中，保持格式与相邻关卡一致。",
+      "不对用户提供的数据做验证或修改（用户已在外部工具设计好关卡），直接应用。",
+      "每次注入后 build，确认关卡可加载。",
+      "若用户连续提交多关卡，保持相同的 Read→Edit→Build 节奏，每关一个turn。"
+    ],
+    "constraints": {
+      "max_steps_per_turn": 8,
+      "must_build_after_edit": true,
+      "do_not_modify_user_data": true
+    },
+    "validation": [
+      "关卡数据精确匹配用户粘贴的内容（不修改任何坐标或参数）",
+      "build 通过",
+      "关卡序号正确对应"
+    ],
+    "title_zh": "批量关卡数据注入（外部设计导入）",
+    "title_en": "Batch Level Data Injection — External Design Import",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T42-T45",
+      "prompt_indices": [41, 42, 43, 44],
+      "evidence": "4 consecutive turns pasting Sokoban level configs (levels 9-12), each exactly 5-6 steps (Read→Edit→Build), zero errors"
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_nf_settings_feature_cascade",
+    "category": "workflow",
+    "signals_match": [
+      "intent:new_feature",
+      "target:ui_layout|game_logic",
+      "settings_ui_keywords",
+      "volume_control_keywords",
+      "feature_then_polish_chain",
+      "cn_settings_cascade"
+    ],
+    "preconditions": [
+      "用户请求添加一个包含UI+逻辑+持久化的完整功能（如设置页面）。",
+      "初始请求后会紧跟多轮迭代：bug修复→UX打磨→数据持久化→再验证。",
+      "属于单session内从0到完成的完整功能构建。"
+    ],
+    "strategy": [
+      "第一轮实现核心UI和基本逻辑（设置按钮→弹窗→滑块），步骤较多(42步)。",
+      "预判用户会要求：音量变化时的即时反馈、数据持久化到存档、边界案例处理。",
+      "但不要预先实现未提出的需求，等用户在后续turn中逐步提出。",
+      "每轮迭代聚焦用户当前反馈，保持 Edit→Build 的紧凑循环。",
+      "当用户报告bug（如'百分比没有改变'）时，优先定位UI数据绑定问题。"
+    ],
+    "constraints": {
+      "must_build_after_edit": true,
+      "incremental_delivery": true
+    },
+    "validation": [
+      "设置功能在UI上可操作",
+      "数值变化即时反映在显示和音频上",
+      "关闭后重开设置值保持"
+    ],
+    "title_zh": "设置功能级联构建（UI→逻辑→持久化）",
+    "title_en": "Settings Feature Cascade — UI → Logic → Persistence Build",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T35-T39",
+      "prompt_indices": [34, 35, 36, 37, 38],
+      "evidence": "5-turn cascade: BGM setup → settings UI (42 steps) → bug fix slider (30 steps) → UX polish (5 steps) → persistence (24 steps)"
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_nf_audio_event_first_binding",
+    "category": "workflow",
+    "signals_match": [
+      "intent:new_feature",
+      "target:audio",
+      "sfx_name_plus_game_event",
+      "first_time_audio_for_event",
+      "cn_play_sound_on_event"
+    ],
+    "preconditions": [
+      "用户首次为某个游戏事件（关卡失败、关卡成功、角色移动、翻牌点击）添加音效。",
+      "prompt中同时指定了音效名称和触发事件，信息完整。",
+      "需要在事件处理函数中插入新的音效调用代码。"
+    ],
+    "strategy": [
+      "使用 Grep 搜索事件相关关键词（如 onLevelFail, onLevelWin, onMove）定位事件处理函数。",
+      "在事件处理函数中插入音效播放代码，使用项目已有的音效API。",
+      "当用户指定条件逻辑时（如'成功配对则不播放'），需要添加条件判断分支。",
+      "如果是'所有游戏'范围，需要遍历每个游戏模块的事件处理。",
+      "当指定延迟播放（如'等待0.5秒后播放'），使用引擎提供的定时器/延迟调用机制。"
+    ],
+    "constraints": {
+      "must_build_after_edit": true,
+      "check_sfx_exists_in_assets": true
+    },
+    "validation": [
+      "事件触发时音效成功播放",
+      "条件逻辑（如不播放情况）按预期工作",
+      "build 通过"
+    ],
+    "title_zh": "首次音效事件绑定",
+    "title_en": "First-Time Audio Event Binding — SFX on Game Event",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T25-T28, T30-T32, T35",
+      "prompt_indices": [24, 25, 27, 30, 31, 34],
+      "evidence": "Multiple first-time SFX bindings: bounce_boing on fail, success_fanfare on win, level_complete with 0.5s delay, bloop_bounce on move/flip, BGM loop"
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_nf_character_system_with_progression_unlock",
+    "category": "workflow",
+    "signals_match": [
+      "intent:new_feature",
+      "target:game_logic",
+      "costume_outfit_keywords",
+      "unlock_condition_keywords",
+      "content_generation_in_feature",
+      "cn_character_customization"
+    ],
+    "preconditions": [
+      "用户要求构建角色自定义系统（换装/皮肤/角色变体），包含多个子系统。",
+      "通常包含：UI入口、预览展示、解锁条件（关卡进度/购买）、状态持久化。",
+      "可能伴随内容生成需求：每套装扮对应不同的台词/对话/行为。"
+    ],
+    "strategy": [
+      "先使用设计文档梳理系统结构（如果用户要求planning_design），再分步实现。",
+      "核心实现顺序：1.UI页面和选择逻辑 → 2.立绘/图片显示 → 3.解锁条件判断 → 4.装扮关联内容（台词/对话）。",
+      "解锁条件通常与游戏进度挂钩（通关第N关），需要在存档系统中持久化解锁状态。",
+      "锁定状态的装扮需要显示提示信息（如'未购买'、'通关第N关解锁'）。",
+      "当伴随内容生成（如每套装扮的随机聊天台词），需要为每套装扮生成5-10条多样化文本。"
+    ],
+    "constraints": {
+      "must_build_after_edit": true,
+      "persist_unlock_state": true
+    },
+    "validation": [
+      "换装UI可正常操作",
+      "解锁条件正确（已解锁的可使用，未解锁的显示提示）",
+      "切换装扮后游戏内立绘正确更新"
+    ],
+    "title_zh": "角色自定义系统（换装+进度解锁+内容关联）",
+    "title_en": "Character Customization System — Outfit + Progression Unlock + Content",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["374e4eb7"],
+      "turn_range": "T01-T13",
+      "prompt_indices": [0, 1, 2, 3, 5, 6, 8, 9, 10, 12],
+      "evidence": "Full costume system build across 13 turns: design doc → implement → delete outfit + fix white square → adjust layout → adjust height x2 → doc checkpoint → add outfit-specific compliments → add portrait chat → unlock conditions. 280+ steps total."
+    }
+  }
+]

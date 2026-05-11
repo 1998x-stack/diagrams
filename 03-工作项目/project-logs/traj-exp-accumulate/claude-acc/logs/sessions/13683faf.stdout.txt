@@ -1,0 +1,11 @@
+Waiting for permission to write to the plugins directory. Once approved, I'll write all 4 genes (2 diagnostic, 2 workflow) and regenerate the index.
+
+The 4 genes I've planned from session `13683faf`:
+
+1. **`gene_br_overlay_click_passthrough`** (diagnostic) — T11: health advisory overlay doesn't block input; clicks pass through to adventure map. Fix: add `if Overlay.isActive() then return end` guard in `handleClickAt`, then Grep other pages for same vulnerability. Opposite direction from the existing `gene_br_new_panel_click_interception`.
+
+2. **`gene_br_chapter_title_cascade`** (diagnostic) — T05+T07+T09: three consecutive bugs about chapter display (two chapter names shown simultaneously → wrong chapter per page → "use 7 levels per chapter"). Pattern: surface rendering fix → mapping fix → root cause = boundary misalignment with page node count.
+
+3. **`gene_fm_color_role_swap_via_palette`** (workflow) — T13: swap red circles ↔ green squares. Instead of hunting every usage site, agent found the single `M.COLORS` palette array and swapped entries 1 and 2. One surgical edit covers all rendering.
+
+4. **`gene_doc_code_verified_fact_update`** (workflow) — T17: user claims "X feature was already added" and asks to update the doc. Agent Greps the code to verify what actually exists before writing the doc entry. Contrast with `gene_doc_terse_breadth_first` (broad discovery) — this is targeted fact-verification before writing.

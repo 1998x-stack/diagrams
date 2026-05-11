@@ -1,0 +1,51 @@
+Now let me read the existing workflow and session_rhythm genes files to understand the exact format for appending.
+Now I have a thorough understanding of the session. Let me analyze the patterns:
+
+**Session 11e7ed86 Summary:**
+- 5 turns, 18.3 min, 91 steps, **0 builds** (pure doc/design session)
+- Tools: 28 respond, 27 reads, 15 edits (mcp__mkr__Edit), 14 TodoWrite, 2 writes
+- Intent sequence: `inspection_review` → `feature_modification(doc)` → `inquiry` → `inquiry` → `inspection_review(fragmented)`
+
+**Key patterns identified:**
+
+1. **T1→T2**: Multi-doc review → systematic implementation of findings (config + design doc + ADR) with TodoWrite tracking and encoding-error→Write fallback
+2. **T3**: Infrastructure readiness verification — reads 13 code files to confirm all needed components exist (pause-menu, screen-transition, lifecycle, save system) before declaring "ready to build"
+3. **T4→T5**: Minimal confirmation trigger — "要" (1 char) cascades into 9-TodoWrite + 7-edit structured implementation
+4. **Cross-turn**: Review→Implement→Verify three-phase pre-implementation workflow
+
+**Overlap analysis:**
+- `gene_ir_pre_implementation_doc_review` (06335c24): lightweight Read+respond only. 11e7ed86 T1 shows **deep multi-doc comparison** (7 docs read, structured gap report). → **Enhance existing**
+- `gene_sr_respond_think_before_act` (056c0fdf): T2/T5 confirm the announce-before-edit pattern. → **Enhance existing**
+- `gene_inq_pre_implementation_blocker_probe` (0997e370): uses parallel subagents. 11e7ed86 T3 is **sequential code reading** (no subagents). → **New gene**
+
+I'll create **3 new genes** and **enhance 2 existing**.
+Now let me create the 3 new genes and enhance the 2 existing ones. I'll write the new genes to their respective files and edit the existing ones.
+Now let me enhance the two existing genes with 11e7ed86 evidence:
+## 会话 11e7ed86 分析完成
+
+**会话概览**: `wzp/11e7ed86` — P2-记忆翻牌 策划案审查与完善
+- 5 turns, 18.3 min, 91 steps, **0 builds** (纯文档/设计会话)
+- 工具分布: 28 respond, 27 reads, 15 edits, 14 TodoWrite, 2 writes
+- 意图链: `inspection_review` → `feature_modification(doc)` → `inquiry` → `inquiry` → `inspection_review(fragmented)`
+
+---
+
+### 新建 3 个 Gene
+
+| # | ID | Category | 描述 |
+|---|---|---|---|
+| 1 | `gene_wf_doc_standards_implementation_cycle` | workflow | 文档标准实施循环 — 多文件协调（配置→注册→策划案→ADR），含编码错误→Write fallback |
+| 2 | `gene_wf_infrastructure_readiness_verification` | workflow | 基础设施就绪验证 — 顺序读取13个代码文件逐个确认组件存在性，给出"可以开始制作"结论 |
+| 3 | `gene_sr_minimal_confirmation_trigger` | session_rhythm | 最小确认词触发 — "要"(1字)级联为9项TodoWrite+7次announce/edit的结构化实施 |
+
+### 增强 2 个已有 Gene
+
+| # | ID | 增强内容 |
+|---|---|---|
+| 4 | `gene_ir_pre_implementation_doc_review` | 加入11e7ed86 T1证据：深度多文档比较模式（7文档交叉比对→结构化gap报告），与原06335c24的轻量Read+respond形成对比 |
+| 5 | `gene_sr_respond_think_before_act` | 加入11e7ed86 T2(31% respond)和T5(32% respond)证据，确认announce-before-edit模式在纯文档场景中同样适用 |
+
+### 索引已更新
+
+- `workflow/index.md`: 13 → **15 genes**
+- `session_rhythm/index.md`: 2 → **3 genes**

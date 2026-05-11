@@ -1,0 +1,66 @@
+I detect **investigation/analysis** intent — analyzing a session trajectory to extract reusable behavioral patterns (Genes). My approach: gather context from both input files → analyze patterns → check against existing genes → write new/enhanced genes.
+
+Let me start by gathering context from both input files in parallel.
+The traj file structure seems different. Let me inspect it more carefully.
+Now let me check for existing gene overlaps and get deeper details on the key turns.
+Now let me read the existing genes that might overlap, and get T1/T3 details.
+Now I have a thorough understanding of the session. Let me analyze patterns and check for overlaps systematically.
+Now I have complete understanding. Let me analyze patterns and execute the gene generation.
+
+**Analysis Summary for 212062a8:**
+
+| Turn | Intent | Steps | Tools | Edits | Builds |
+|------|--------|-------|-------|-------|--------|
+| T0 | inspection_review | 2 | Read+respond | 0 | 0 |
+| T1 | bug_report | 8 | Task+Grep×2+Glob+Read+respond×3 | 0 | 0 |
+| T2 | feature_modification | 57 | Grep×18+Read×7+Edit×5+Todo×4+respond×20+build×1 | 5 | 1 |
+| T3 | documentation | 8 | Read+Edit×4+respond×3 | 4 | 0 |
+| T4 | feature_modification | 4 | Read+Edit+respond×2 | 1 | 0 |
+
+**Identified patterns:**
+
+1. **NEW: `gene_fm_ui_overlap_fix_via_grep_heavy_investigation`** (workflow) — T2's 18 Grep calls across rendering/text/component dimensions before 5 surgical edits + 1 build. Distinct from text_localization_pipeline (which targets copy text replacement) — this targets UI z-order/layering/position overlap.
+
+2. **NEW: `gene_ir_inspection_to_investigation_cascade`** (workflow) — T0→T1: lightweight doc inspection (Read+respond, 0 edits) immediately followed by bug investigation (Task+Grep, also 0 edits). Two consecutive investigation-only turns with zero code changes.
+
+3. **ENHANCE: `gene_sr_respond_think_before_act`** (session_rhythm) — T2: 20/57=35% respond ratio, consistent announce-before-edit pattern. Add 212062a8 to session_hashes.
+
+4. **NEW: `gene_mw_single_build_heavy_investigation_session`** (session_rhythm) — Session with 4 intent types but one massively dominant turn (T2=57 of 79 total steps). Unlike rapid_context_switch (avg ≤10 steps/turn), this is asymmetric: one deep investigation turn dominates.
+
+Let me write the genes:
+Now I have complete context. Let me create the new genes and update existing ones.
+Now update the session_rhythm genes — enhance `gene_sr_respond_think_before_act` and add the asymmetric session pattern:
+Now add the asymmetric session rhythm gene:
+Now regenerate the index and validate JSON:
+Missing quote on line 1086. Let me fix it:
+Now regenerate the index:
+Let me verify the new genes appear correctly in the indexes:
+All genes generated and indexed successfully. Here's the summary:
+
+## 会话 212062a8 分析结果
+
+**会话概况：** 5 turns, 4 intent types, 79 total steps
+
+| Turn | Intent | Steps | Key Pattern |
+|------|--------|-------|-------------|
+| T0 | inspection_review | 2 | 轻量文档检查 (Read+respond) |
+| T1 | bug_report | 8 | 纯调查 (Task+Grep+Read, 0 edits) |
+| T2 | feature_modification | 57 | 重度Grep调查→精准修复 |
+| T3 | documentation | 8 | 文档更新 |
+| T4 | feature_modification | 4 | 文档精简 |
+
+### 新建基因 (3个)
+
+1. **`gene_fm_ui_overlap_fix_via_grep_heavy_investigation`** (workflow)
+   - T2: 18次Grep覆盖6个维度(鼓励文字/浮动文本/渲染函数/反馈文本/组件名/时间条) → 7次Read理解渲染管线 → 5处精准Edit → 1次build
+   - 与text_localization_pipeline的区别：目标是UI z-order/渲染顺序，非文案替换
+
+2. **`gene_ir_inspection_to_investigation_cascade`** (workflow)
+   - T0→T1: 文档检查(2步) → Bug调查(8步)，两个turn均为0 edits 0 builds的纯调查模式
+
+3. **`gene_meta_asymmetric_session_with_dominant_turn`** (session_rhythm)
+   - 4种intent但T2占72%步骤(57/79)，其余turn均≤8步
+
+### 增强基因 (1个)
+
+4. **`gene_sr_respond_think_before_act`** — 追加212062a8 T2证据 (20/57=35% respond ratio)，新增`intent:bug_report`到signals

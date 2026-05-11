@@ -1,0 +1,582 @@
+[0m
+> Sisyphus (Ultraworker) · qwen3.6-plus
+[0m
+[0m→ [0mRead examples/wzp/125a7a4a.json
+[0m
+[0m$ [0mpython3 -c "
+import json, sys
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/125a7a4a.traj', 'r') as f:
+    data = json.load(f)
+
+# Session-level summary
+print('=== SESSION LEVEL ===')
+print(f'Project: {data.get(\"project\", \"?\")}')
+print(f'Session hash: {data.get(\"session_hash\", \"?\")}')
+print(f'Total turns: {len(data.get(\"messages\", []))}')
+print(f'Total tool calls (all turns): {sum(len(m.get(\"agent_run\", {}).get(\"steps\", [])) for m in data.get(\"messages\", []) if m.get(\"type\") == \"agent_run\")}')
+
+# Per-turn summary
+total_steps = 0
+total_edits = 0
+total_builds = 0
+total_responds = 0
+total_errors = 0
+tool_dist = {}
+phase_dist = {}
+
+for msg in data.get('messages', []):
+    if msg['type'] == 'user_message':
+        print(f\"\\n--- {msg['turn_id']}: {msg.get('content', '')[:120]} ---\")
+    elif msg['type'] == 'agent_run':
+        steps = msg.get('steps', [])
+        n_steps = len(steps)
+        n_edits = sum(1 for s in steps if s.get('action', {}).get('tool_name') == 'Edit')
+        n_builds = sum(1 for s in steps if s.get('action', {}).get('tool_name') == 'Bash' and 'build' in str(s.get('action', {}).get('args', '')))
+        n_responds = sum(1 for s in steps if s.get('action', {}).get('tool_name') == 'respond_to_user')
+        n_errors = sum(1 for s in steps if s.get('observation', {}).get('exit_code') not in (None, 0) if s.get('observation'))
+        
+        total_steps += n_steps
+        total_edits += n_edits
+        total_builds += n_builds
+        total_responds += n_responds
+        total_errors += n_errors
+        
+        # Tool distribution
+        for s in steps:
+            tn = s.get('action', {}).get('tool_name', 'unknown')
+            tool_dist[tn] = tool_dist.get(tn, 0) + 1
+            ph = s.get('phase', 'unknown')
+            phase_dist[ph] = phase_dist.get(ph, 0) + 1
+        
+        print(f'  Steps: {n_steps}, Edits: {n_edits}, Builds: {n_builds}, Responds: {n_responds}')
+
+print(f'\\n=== TOTALS ===')
+print(f'Total steps: {total_steps}')
+print(f'Total edits: {total_edits}')
+print(f'Total builds: {total_builds}')
+print(f'Total responds: {total_responds}')
+print(f'Total errors: {total_errors}')
+print(f'\\nTool distribution: {dict(sorted(tool_dist.items(), key=lambda x: -x[1]))}')
+print(f'Phase distribution: {dict(sorted(phase_dist.items(), key=lambda x: -x[1]))}')
+"
+
+Traceback (most recent call last):
+  File "<string>", line 24, in <module>
+KeyError: 'type'
+=== SESSION LEVEL ===
+Project: ?
+Session hash: ?
+Total turns: 2
+Total tool calls (all turns): 0
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/125a7a4a.traj', 'r') as f:
+    data = json.load(f)
+
+print('Top-level keys:', list(data.keys()))
+print()
+
+# Check messages structure
+msgs = data.get('messages', [])
+for i, m in enumerate(msgs):
+    print(f'Message {i}: type={m.get(\"type\", \"?\")}, keys={list(m.keys())[:8]}')
+    if m.get('type') == 'user_message':
+        content = m.get('content', '')[:100]
+        print(f'  turn_id={m.get(\"turn_id\", \"?\")}, content={content}')
+    elif m.get('type') == 'agent_run':
+        steps = m.get('steps', [])
+        print(f'  steps={len(steps)}, parent_turn={m.get(\"parent_turn_id\", \"?\")}')
+        if steps:
+            print(f'  first step keys={list(steps[0].keys())[:10]}')
+"
+
+Top-level keys: ['schema_version', 'conversation_id', 'agent', 'session_metadata', 'messages', 'phases', 'markers', 'subagents', 'summary']
+
+Message 0: type=?, keys=['turn_id', 'role', 'content', 'timestamp']
+Message 1: type=?, keys=['turn_id', 'agent_run_id', 'steps', 'run_summary']
+
+[Category+Skill Reminder]
+
+**Built-in**: playwright, frontend-ui-ux, git-master, dev-browser, review-work, ai-slop-remover
+**⚡ YOUR SKILLS (PRIORITY)**: benchmark, plan-design-review, prefab-search, autoplan, design-consultation, freeze, careful, cso (+43 more)
+
+> User-installed skills OVERRIDE built-in defaults. ALWAYS prefer YOUR SKILLS when domain matches.
+
+```typescript
+task(category="visual-engineering", load_skills=["benchmark"], run_in_background=true)
+```
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/125a7a4a.traj', 'r') as f:
+    data = json.load(f)
+
+print('=== SESSION METADATA ===')
+meta = data.get('session_metadata', {})
+print(f'Conversation ID: {data.get(\"conversation_id\", \"?\")}')
+print(f'Schema version: {data.get(\"schema_version\", \"?\")}')
+print(f'Agent: {data.get(\"agent\", \"?\")}')
+print(f'Session metadata: {json.dumps(meta, indent=2)[:500]}')
+
+print()
+print('=== SUMMARY ===')
+print(json.dumps(data.get('summary', {}), indent=2)[:1000])
+
+print()
+msgs = data.get('messages', [])
+total_steps = 0
+total_edits = 0
+total_builds = 0
+total_responds = 0
+total_errors = 0
+tool_dist = {}
+phase_dist = {}
+
+for i, msg in enumerate(msgs):
+    role = msg.get('role', '?')
+    if role == 'user':
+        turn_id = msg.get('turn_id', '?')
+        content = msg.get('content', '')[:120]
+        print(f'--- {turn_id}: {content} ---')
+    elif role == 'assistant':
+        steps = msg.get('steps', [])
+        run_summary = msg.get('run_summary', {})
+        n_steps = len(steps)
+        n_edits = sum(1 for s in steps if s.get('action', {}).get('tool_name') == 'Edit')
+        n_builds = sum(1 for s in steps if s.get('action', {}).get('tool_name') == 'Bash' and 'build' in str(s.get('action', {}).get('args', '')))
+        n_responds = sum(1 for s in steps if s.get('action', {}).get('tool_name') == 'respond_to_user')
+        
+        total_steps += n_steps
+        total_edits += n_edits
+        total_builds += n_builds
+        total_responds += n_responds
+        
+        for s in steps:
+            tn = s.get('action', {}).get('tool_name', 'unknown')
+            tool_dist[tn] = tool_dist.get(tn, 0) + 1
+            ph = s.get('phase', 'unknown')
+            phase_dist[ph] = phase_dist.get(ph, 0) + 1
+            # Count errors
+            obs = s.get('observation', {})
+            if obs and obs.get('exit_code') not in (None, 0):
+                total_errors += 1
+        
+        print(f'  Steps: {n_steps}, Edits: {n_edits}, Builds: {n_builds}, Responds: {n_responds}')
+        if run_summary:
+            print(f'  Run summary: {json.dumps(run_summary)[:200]}')
+
+print(f'\\n=== TOTALS ===')
+print(f'Total steps: {total_steps}')
+print(f'Total edits: {total_edits}')
+print(f'Total builds: {total_builds}')
+print(f'Total responds: {total_responds}')
+print(f'Total errors: {total_errors}')
+print(f'\\nTool distribution: {dict(sorted(tool_dist.items(), key=lambda x: -x[1]))}')
+print(f'Phase distribution: {dict(sorted(phase_dist.items(), key=lambda x: -x[1]))}')
+"
+
+=== SESSION METADATA ===
+Conversation ID: 125a7a4a-6ee6-4f26-a1de-61b236683fb6
+Schema version: 2.0
+Agent: {'name': 'claude-code', 'model': 'claude-opus-4-6', 'environment': 'taptap-maker', 'tool_protocol': 'claude_tool_use'}
+Session metadata: {
+  "project": "wzp",
+  "project_name": "\u8111\u529b\u5927\u5192\u9669",
+  "session_id": "125a7a4a-6ee6-4f26-a1de-61b236683fb6",
+  "started_at": "2026-03-27T02:27:19.631Z",
+  "ended_at": "2026-03-27T02:28:01.702Z",
+  "duration_sec": 42.1,
+  "cwd": "/workspace",
+  "version": "2.1.4",
+  "git_branch": ""
+}
+
+=== SUMMARY ===
+{
+  "total_turns": 1,
+  "total_steps": 14,
+  "total_tool_calls": 9,
+  "total_subagents": 3,
+  "total_input_tokens": 41,
+  "total_output_tokens": 292,
+  "total_cache_read_tokens": 772908,
+  "total_cache_creation_tokens": 69011,
+  "exit_reason": "end_of_conversation",
+  "status": "completed",
+  "first_user_prompt": "\u4fee\u6539\u6362\u88c5\u9875\u9762\u201c\u901a\u5173\u4e3b\u5e2d\u7eb3\u7b2cx\u5173\u89e3\u9501\u201d\uff0c\u6539\u4e3a\u201c\u5b8c\u6210X\u5173\u201d",
+  "phase_labels": [
+    "editing",
+    "localization"
+  ],
+  "marker_count": 3
+}
+
+--- 1: 修改换装页面“通关主席纳第x关解锁”，改为“完成X关” ---
+
+=== TOTALS ===
+Total steps: 0
+Total edits: 0
+Total builds: 0
+Total responds: 0
+Total errors: 0
+
+Tool distribution: {}
+Phase distribution: {}
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/125a7a4a.traj', 'r') as f:
+    data = json.load(f)
+
+msgs = data.get('messages', [])
+for i, msg in enumerate(msgs):
+    print(f'=== Message {i} ===')
+    print(f'Keys: {list(msg.keys())}')
+    if 'role' in msg:
+        print(f'Role: {msg[\"role\"]}')
+    if 'turn_id' in msg:
+        print(f'Turn ID: {msg[\"turn_id\"]}')
+    if 'content' in msg:
+        content = msg['content']
+        if isinstance(content, str):
+            print(f'Content: {content[:150]}')
+        else:
+            print(f'Content type: {type(content)}')
+    if 'steps' in msg:
+        steps = msg['steps']
+        print(f'Steps: {len(steps)}')
+        for j, s in enumerate(steps[:5]):
+            action = s.get('action', {})
+            obs = s.get('observation', {})
+            print(f'  Step {j}: tool={action.get(\"tool_name\", \"?\")}, phase={s.get(\"phase\", \"?\")}')
+            if j < 3:
+                print(f'    args_keys={list(action.get(\"args\", {}).keys())[:5]}')
+    if 'run_summary' in msg:
+        print(f'Run summary: {json.dumps(msg[\"run_summary\"], indent=2)[:500]}')
+    print()
+"
+
+=== Message 0 ===
+Keys: ['turn_id', 'role', 'content', 'timestamp']
+Role: user
+Turn ID: 1
+Content: 修改换装页面“通关主席纳第x关解锁”，改为“完成X关”
+
+=== Message 1 ===
+Keys: ['turn_id', 'agent_run_id', 'steps', 'run_summary']
+Turn ID: 1
+Steps: 14
+  Step 0: tool=respond_to_user, phase=editing
+    args_keys=[]
+  Step 1: tool=Grep, phase=localization
+    args_keys=['pattern', 'path', 'output_mode', '-n']
+  Step 2: tool=Grep, phase=localization
+    args_keys=['pattern', 'path', 'output_mode', '-n']
+  Step 3: tool=respond_to_user, phase=localization
+  Step 4: tool=mcp__mkr__Read, phase=editing
+Run summary: {
+  "steps_count": 14,
+  "tool_calls_count": 9
+}
+[0m
+[0m$ [0mpython3 -c "
+import json
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/125a7a4a.traj', 'r') as f:
+    data = json.load(f)
+
+# Get the agent run (message 1)
+agent_run = data['messages'][1]
+steps = agent_run['steps']
+
+print(f'Total steps: {len(steps)}')
+print()
+
+tool_dist = {}
+phase_dist = {}
+edit_count = 0
+build_count = 0
+respond_count = 0
+error_count = 0
+
+for j, s in enumerate(steps):
+    action = s.get('action', {})
+    obs = s.get('observation', {})
+    tool = action.get('tool_name', '?')
+    phase = s.get('phase', '?')
+    
+    tool_dist[tool] = tool_dist.get(tool, 0) + 1
+    phase_dist[phase] = phase_dist.get(phase, 0) + 1
+    
+    if tool == 'Edit': edit_count += 1
+    if tool == 'Bash' and 'build' in str(action.get('args', '')): build_count += 1
+    if tool == 'respond_to_user': respond_count += 1
+    if obs and obs.get('exit_code') not in (None, 0): error_count += 1
+    
+    print(f'Step {j:2d}: tool={tool:25s} phase={phase:15s}')
+    args = action.get('args', {})
+    if tool == 'Edit':
+        print(f'         file={args.get(\"file_path\", \"?\")}')
+    elif tool == 'Grep':
+        print(f'         pattern={str(args.get(\"pattern\", \"\"))[:60]}')
+    elif tool == 'mcp__mkr__Read':
+        print(f'         file={args.get(\"file_path\", \"?\")}')
+    elif tool == 'respond_to_user':
+        text = str(args.get('text', ''))[:80] if args else ''
+        print(f'         text={text}')
+    elif tool == 'Bash':
+        cmd = str(args.get('command', ''))[:80]
+        print(f'         cmd={cmd}')
+
+print(f'\\n=== TOTALS ===')
+print(f'Edits: {edit_count}, Builds: {build_count}, Responds: {respond_count}, Errors: {error_count}')
+print(f'Tool dist: {dict(sorted(tool_dist.items(), key=lambda x: -x[1]))}')
+print(f'Phase dist: {dict(sorted(phase_dist.items(), key=lambda x: -x[1]))}')
+
+# Check markers
+print(f'\\n=== MARKERS ===')
+for m in data.get('markers', []):
+    print(json.dumps(m))
+
+# Check subagents
+print(f'\\n=== SUBAGENTS ===')
+for sa in data.get('subagents', []):
+    print(json.dumps(sa)[:300])
+"
+
+Total steps: 14
+
+Step  0: tool=respond_to_user           phase=editing        
+         text=
+Step  1: tool=Grep                      phase=localization   
+         pattern=通关主席纳
+Step  2: tool=Grep                      phase=localization   
+         pattern=关解锁
+Step  3: tool=respond_to_user           phase=localization   
+         text=
+Step  4: tool=mcp__mkr__Read            phase=editing        
+         file=/workspace/scripts/shared/outfit-manager.lua
+Step  5: tool=respond_to_user           phase=editing        
+         text=
+Step  6: tool=mcp__mkr__Edit            phase=editing        
+Step  7: tool=mcp__mkr__Edit            phase=editing        
+Step  8: tool=respond_to_user           phase=editing        
+         text=
+Step  9: tool=mcp__sce-urhox__build     phase=editing        
+Step 10: tool=Grep                      phase=localization   
+         pattern="entry"
+Step 11: tool=Glob                      phase=localization   
+Step 12: tool=mcp__sce-urhox__build     phase=editing        
+Step 13: tool=respond_to_user           phase=editing        
+         text=
+
+=== TOTALS ===
+Edits: 0, Builds: 0, Responds: 5, Errors: 0
+Tool dist: {'respond_to_user': 5, 'Grep': 3, 'mcp__mkr__Edit': 2, 'mcp__sce-urhox__build': 2, 'mcp__mkr__Read': 1, 'Glob': 1}
+Phase dist: {'editing': 9, 'localization': 5}
+
+=== MARKERS ===
+{"step": 1, "type": "milestone", "reason": "Session start"}
+{"step": 8, "type": "drift-start", "reason": "4 consecutive edits without verification"}
+{"step": 14, "type": "milestone", "reason": "Session end"}
+
+=== SUBAGENTS ===
+{"agent_id": "a442d48", "messages": [{"turn_id": 1, "role": "user", "content": "Warmup", "timestamp": "2026-03-27T02:26:26.799Z"}, {"turn_id": 1, "agent_run_id": "run_t1", "steps": [{"step_id": 1, "phase": "", "thinking": null, "thought": "Ready. I am in read-only planning mode. I can explore the co
+{"agent_id": "a4ad1b1", "messages": [{"turn_id": 1, "role": "user", "content": "Warmup", "timestamp": "2026-03-27T02:26:26.783Z"}, {"turn_id": 1, "agent_run_id": "run_t1", "steps": [{"step_id": 1, "phase": "", "thinking": null, "thought": "I'm ready to help you search and analyze the codebase. As a 
+{"agent_id": "a8958a7", "messages": [{"turn_id": 1, "role": "user", "content": "Warmup", "timestamp": "2026-03-27T02:26:26.812Z"}, {"turn_id": 1, "agent_run_id": "run_t1", "steps": [{"step_id": 1, "phase": "", "thinking": null, "thought": "Ready to go. Let me know what you need help with.", "action"
+[0m
+[0m$ [0m# Check for overlaps with existing genes
+echo "=== Checking workflow genes for feature_modification + ui_layout ==="
+grep -l "intent:feature_modification" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -5
+
+echo ""
+echo "=== Checking for localization/surgical patterns ==="
+grep -l "heavy_localization" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null
+
+echo ""
+echo "=== Checking for respond_think patterns ==="
+grep -l "respond_to_user_ratio" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null
+
+echo ""
+echo "=== Checking for batch_build patterns ==="
+grep -l "build_once_per_turn\|build_after_all" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null
+
+echo ""
+echo "=== Checking for text/copy_edit patterns ==="
+grep -rl "text_edit\|copy_edit\|文案" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null
+
+=== Checking workflow genes for feature_modification + ui_layout ===
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+
+=== Checking for localization/surgical patterns ===
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+
+=== Checking for respond_think patterns ===
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+
+=== Checking for batch_build patterns ===
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+
+=== Checking for text/copy_edit patterns ===
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json
+[0m→ [0mRead opencode-acc/plugins/session_rhythm/genes.json
+[0m→ [0mRead opencode-acc/plugins/operational/genes.json
+[0m
+[0m← [0mEdit opencode-acc/plugins/session_rhythm/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+@@ -134,12 +134,12 @@
+     "title_en": "Think-Announce-Act Cycle — respond_to_user as Thinking Buffer",
+     "_provenance": {
+       "source": "traj-exp-accumulate",
+       "project": "wzp",
+-      "session_hashes": ["056c0fdf", "11e7ed86"],
+-      "turn_range": "056c0fdf:T1-T4, 11e7ed86:T2,T5",
+-      "prompt_indices": [0, 1, 2, 3, 1, 4],
+-      "evidence": "056c0fdf: Turn 1: 6/20 steps (30%) respond_to_user — 'Let me first look at existing code' → Read levels.lua/board.lua → 'Now I'll design the new level' → Edit → 'Now let me find build params' → build → done. Turn 2: 12/32 steps (38%) — each of 6 edits preceded by explain-what-I-will-do. Turn 3: 13/34 steps (38%) — '思路清晰了，改动涉及三个文件，从底向上逐层修改' then systematic per-file announce/edit. Turn 4: 17/50 steps (34%) — doc update with per-doc announce. Pattern consistent across all 4 implementation turns. 11e7ed86 T2: 36步中11步respond(31%)——'先处理配置文件重命名'→Write→'接下来检查是否有其他文件引用了旧的demo-memory-flip'→Grep+Edit→'现在集中修改策划案文档'→Edit×4→'现在新增ADR-005'→Edit×3。T5: 25步中8步respond(32%)——'开始逐项修改'→'1.更新目录结构'→Edit→'2.更新渲染方案'→Edit→'3.暂停菜单改为NanoVG自绘'→Edit→...每步Edit前都有announce。两次turn均确认announce-before-edit模式在纯文档修改场景中同样适用。",
+-      "session_count": 2
++      "session_hashes": ["056c0fdf", "11e7ed86", "125a7a4a"],
++      "turn_range": "056c0fdf:T1-T4, 11e7ed86:T2,T5, 125a7a4a:T0",
++      "prompt_indices": [0, 1, 2, 3, 1, 4, 0],
++      "evidence": "056c0fdf: Turn 1: 6/20 steps (30%) respond_to_user — 'Let me first look at existing code' → Read levels.lua/board.lua → 'Now I'll design the new level' → Edit → 'Now let me find build params' → build → done. Turn 2: 12/32 steps (38%) — each of 6 edits preceded by explain-what-I-will-do. Turn 3: 13/34 steps (38%) — '思路清晰了，改动涉及三个文件，从底向上逐层修改' then systematic per-file announce/edit. Turn 4: 17/50 steps (34%) — doc update with per-doc announce. Pattern consistent across all 4 implementation turns. 11e7ed86 T2: 36步中11步respond(31%)——'先处理配置文件重命名'→Write→'接下来检查是否有其他文件引用了旧的demo-memory-flip'→Grep+Edit→'现在集中修改策划案文档'→Edit×4→'现在新增ADR-005'→Edit×3。T5: 25步中8步respond(32%)——'开始逐项修改'→'1.更新目录结构'→Edit→'2.更新渲染方案'→Edit→'3.暂停菜单改为NanoVG自绘'→Edit→...每步Edit前都有announce。两次turn均确认announce-before-edit模式在纯文档修改场景中同样适用。125a7a4a T0: 14步中5步respond(36%)——S0 respond(announce)→S1-S2 Grep定位→S3 respond(确认找到)→S4 Read→S5 respond(确认修改方案)→S6-S7 Edit×2→S8 respond(确认修改完成)→S9 Build→S10-S11 Grep+Glob验证→S12 Build→S13 respond(最终确认)。典型的'announce→localize→edit→confirm→verify→final-confirm'循环，即使在极小会话(1 turn, 2 edits)中也保持了announce-before-edit模式。",
++      "session_count": 3
+     }
+   }
+ ]
+
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [offset=770, limit=15][0m
+[0m
+[0m← [0mEdit opencode-acc/plugins/workflow/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+@@ -774,6 +774,63 @@
+       "prompt_indices": [1],
+       "evidence": "T1: '修复P1、p2问题'→170步(58 Read+52 Edit+42 respond+9 TodoWrite+8 Grep+1 build)。S1创建14项TodoWrite清单（3个P1+2个P2+其他）：P1包括story-13标题不一致、p4-link-match status=dev、推箱子音效未注册；P2包括ASCII!→全角！（84处/10文件）、英文句点→中文省略号（24处/4文件）。执行顺序：先P1(S1-S59修复3项)→再P2(S106-S151修复2项)→S164全部completed→S168最终build。涉及14个文件，52次编辑，仅1次build。5个drift-start标记（连续编辑漂移），但todo列表提供进度锚点防止遗漏。",
+       "session_count": 1
+     }
++  },
++  {
++    "type": "Gene",
++    "id": "gene_fm_text_localization_pipeline",
++    "category": "workflow",
++    "signals_match": [
++      "intent:feature_modification",
++      "target:ui_layout",
++      "text_or_copy_edit",
++      "grep_first_localization",
++      "read_before_edit",
++      "surgical_single_file_edit",
++      "double_build_verification",
++      "post_build_grep_verify"
++    ],
++    "preconditions": [
++      "用户要求修改界面中的文案/文本（如提示文字、按钮文字、解锁条件描述）。",
++      "修改目标是在已有代码中定位特定文本字符串并替换。",
++      用户提供了原文和新文的对照（如'把X改为Y'）。",
++      "修改量小（1-2处文本替换），但需要精确定位。"
++    ],
++    "strategy": [
++      "第一步：用Grep搜索用户提供的原文关键词，定位包含该文本的文件和行号。",
++      "第二步：如Grep结果不够精确，用第二个Grep搜索相邻关键词进一步缩小范围。",
++      "第三步：读取目标文件，确认文本所在位置的上下文，理解文本的使用场景。",
++      "第四步：用respond_to_user向用户确认找到的位置和即将执行的修改。",
++      "第五步：执行精准Edit，仅替换目标文本，不要修改 surrounding code。",
++      "第六步：执行build验证修改是否正确编译。",
++      "第七步：用Grep或Glob进行二次验证——确认原文已不存在、新文已正确写入、无遗漏的引用位置。",
++      "第八步：如二次验证发现遗漏（如其他文件也引用了该文本），执行第二次build。",
++      "第九步：用respond_to_user向用户报告修改完成，列出修改的文件和文本变更。",
++      "文本修改不需要TodoWrite——除非涉及5处以上的分散文本。"
++    ],
++    "constraints": {
++      "must_grep_before_reading": true,
++      "must_read_file_before_editing_text": true,
++      "edit_only_the_specified_text": true,
++      "verify_no_remaining_occurrences_of_old_text": true
++    },
++    "validation": [
++      "已用Grep定位原文所在位置",
++      "目标文件已被读取，确认了文本上下文",
++      "Edit仅修改了目标文本，未改动周围代码",
++      "build成功",
++      "二次验证确认原文已不存在（或已确认所有出现位置均为预期保留）"
++    ],
++    "title_zh": "文案精准定位修改管线",
++    "title_en": "Text Localization Pipeline — Grep-Read-Edit-Build-Verify for Copy Text Changes",
++    "_provenance": {
++      "source": "traj-exp-accumulate",
++      "project": "wzp",
++      "session_hashes": ["125a7a4a"],
++      "turn_range": "T0",
++      "prompt_indices": [0],
++      "evidence": "T0: '修改换装页面\"通关主席纳第x关解锁\"，改为\"完成X关\"'→14步(5 respond+3 Grep+1 Read+2 Edit+2 Build+1 Glob)。S0 respond(announce)→S1 Grep'通关主席纳'→S2 Grep'关解锁'→S3 respond(确认找到)→S4 Read outfit-manager.lua→S5 respond(确认修改方案)→S6-S7 Edit×2(替换两处文本)→S8 respond(确认修改完成)→S9 Build→S10 Grep'entry'验证→S11 Glob检查→S12 Build(第二次build)→S13 respond(最终确认)。典型的'Grep定位→Read确认→Edit替换→Build→Grep/Glob验证→二次Build'管线。drift-start标记在step 8(连续4步edit/respond无build)，但因修改量小(仅2处文本)风险低。",
++      "session_count": 1
++    }
+   }
+ ]
+
+[0m
+[0m$ [0mpython3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/index.md (2 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/index.md (1 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/index.md (4 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/index.md (3 genes)
+Traceback (most recent call last):
+  File "/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py", line 93, in <module>
+    main()
+  File "/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py", line 88, in main
+    n = generate_indexes(args.plugins_dir)
+  File "/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py", line 20, in generate_indexes
+    genes = json.loads(genes_file.read_text())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 796 column 7 (char 30183)
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [offset=785, limit=20][0m
+[0m
+[0m← [0mEdit opencode-acc/plugins/workflow/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+@@ -792,9 +792,9 @@
+ ],
+ "preconditions": [
+   "用户要求修改界面中的文案/文本（如提示文字、按钮文字、解锁条件描述）。",
+   "修改目标是在已有代码中定位特定文本字符串并替换。",
+-  用户提供了原文和新文的对照（如'把X改为Y'）。",
++  "用户提供了原文和新文的对照（如'把X改为Y'）。",
+   "修改量小（1-2处文本替换），但需要精确定位。"
+ ],
+ "strategy": [
+   "第一步：用Grep搜索用户提供的原文关键词，定位包含该文本的文件和行号。",
+
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [offset=793, limit=8][0m
+[0m
+[0m$ [0mpython3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/index.md (2 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/index.md (1 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/index.md (4 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/index.md (3 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/index.md (16 genes)
+  (5 categories indexed)
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/index.md
+[0m→ [0mRead opencode-acc/plugins/session_rhythm/index.md

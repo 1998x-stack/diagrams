@@ -1,0 +1,61 @@
+I detect **investigation/analysis** intent — you want me to analyze a specific session trajectory, extract behavioral patterns, and generate Gene objects. My approach: read input files → extract trajectory summary → identify patterns → check against existing genes → output new/enhanced genes.
+
+Let me start by gathering context in parallel.
+The .traj file structure seems different from expected. Let me check its actual schema.
+Now let me check for existing gene overlaps.
+Now I have the full picture. Let me check the existing operational genes file for the subagent warmup pattern to enhance it.
+Now I have a complete picture. Let me analyze the patterns and identify what to create vs enhance.
+
+**Session 870a5123 Analysis:**
+- 4 turns, 14 steps total — ultra-lightweight session
+- All documentation-focused, single file (总体进度总结.md)
+- No code edits, no builds, no Grep, no TodoWrite
+- MCP tools only (mcp__mkr__Read, mcp__mkr__Write, mcp__mkr__Edit)
+- 3 subagents dispatched → ALL warmup (100% waste rate, new record)
+- Sequential refinement: Generate → Remove technical → Add plans → Condense
+
+**Patterns identified:**
+
+1. **gene_doc_single_doc_refinement_cascade** (NEW — operational) — No existing gene covers iterative single-document refinement with Read→Write/Edit→Respond cycles, zero builds, zero TodoWrite. Distinct from `gene_doc_maintenance_rhythm` (multi-doc, dev-log updates) and `gene_doc_post_implementation_sync` (post-code-change multi-doc sync).
+
+2. **gene_op_subagent_warmup_waste** (ENHANCE) — 3 subagents, 100% warmup (3/3), new record surpassing 6346da75's 75%.
+
+Let me write the new gene and enhance the existing one.
+Now I'll make two edits: (1) enhance the existing subagent warmup gene with 870a5123's 100% warmup rate (new record), and (2) append the new single-document refinement cascade gene.
+Now add the new gene and update signals_match for the warmup gene:
+Now append the new gene to the operational genes.json:
+Now validate the JSON and run the index generator:
+Let me verify the updated index reflects the changes:
+Analysis complete. Here's the summary:
+
+## Session 870a5123 Analysis Results
+
+**Session Profile:** Ultra-lightweight documentation session — 4 turns, 14 steps, 0 code edits, 0 builds.
+
+### Pattern 1: NEW Gene — `gene_doc_single_doc_refinement_cascade`
+**单文档连续精简级联** / Single-Document Refinement Cascade
+
+The entire session is a clean "generate → refine → expand → condense" pipeline on a single document (总体进度总结.md):
+
+| Turn | Intent | Action | Steps |
+|------|--------|--------|-------|
+| T0 | content_creation | Read 总体进度.md → Write 总体进度总结.md | 5 |
+| T1 | feature_modification | Read → Write (delete technical content) | 3 |
+| T2 | planning_design | Read → Edit (add future plans) | 3 |
+| T3 | feature_modification | Read → Write (condense) | 3 |
+
+**Key distinction** from existing genes:
+- vs `gene_doc_maintenance_rhythm`: single file (not multi-doc), no TodoWrite, no dev-log context
+- vs `gene_doc_post_implementation_sync`: no code-change driver, no multi-doc sync
+- **New signal**: `consecutive_same_doc_ge_3` + `ultralight_turns_le_5_steps` + `no_todo_write`
+
+### Pattern 2: ENHANCED — `gene_op_subagent_warmup_waste`
+3 subagents dispatched (a23cbea, a834bdb, af4b3b3) → **100% warmup rate** (all 3 returned only 2 messages each, zero useful output). This is a new record, surpassing the previous 75% (6346da75).
+
+**New insight**: Warmup waste now occurs even in pure documentation sessions (content_creation → documentation) with zero code exploration needs — the Agent dispatches subagents reflexively regardless of task type.
+
+**Trend**: 43% → 57% → 60% → 75% → **100%** — complete degradation.
+
+### Files Modified
+- `opencode-acc/plugins/operational/genes.json` — 1 new gene appended, 1 existing gene enhanced
+- `opencode-acc/plugins/operational/index.md` — regenerated (now 9 genes, was 8)

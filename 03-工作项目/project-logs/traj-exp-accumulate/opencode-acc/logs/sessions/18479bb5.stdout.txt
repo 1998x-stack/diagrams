@@ -1,0 +1,60 @@
+Only 3 prompts. Let me extract trajectory summary from the .traj file to understand the full execution context.
+The structure seems different. Let me check the actual JSON structure:
+Now I understand the structure. Agent runs have `role=None`. Let me get the full step details:
+Now I have a comprehensive understanding of the session. Let me check for existing gene overlaps before creating new ones.
+Good. Now I have a clear picture. Let me identify the genes from this session:
+
+**Session 18479bb5 analysis:**
+- 3 prompts, 188 total steps, 13 subagents
+- T0 (planning_design): 94 steps, doc-driven supplement, 17 edits on 策划案-主线系统.md, 5 drift-start markers, 8 TodoWrite, 2 Tasks for exploration
+- T1 (feature_modification): 11 steps, surgical fix to settings-save.lua for unlock all levels, 2 edits, 1 build
+- T2 (new_feature): 83 steps, level expansion 20→35, EnterPlanMode→7 Tasks→Write plan→6 TodoWrite→15 edits across multiple docs, 1 build
+
+**Patterns identified:**
+
+1. **Doc-Driven Planning & Supplement** (planning_design + documentation) — T0: User opens doc, asks to supplement it. Agent explores via subagents, reads multiple docs, systematically edits the planning doc with version bump. This overlaps partially with `gene_cc_doc_driven_content_creation` but is distinctly about *supplementing an existing planning doc* rather than creating new content from scratch.
+
+2. **Surgical Settings Extension** (feature_modification → game_logic) — T1: Quick 11-step turn extending an existing settings feature to new content. Task→Read→Edit→Edit→Build→respond. Very clean pattern.
+
+3. **Plan-Mode Multi-Subagent Design Cascade** (new_feature) — T2: EnterPlanMode→7 parallel subagents for exploration→Write plan→ExitPlanMode→TodoWrite→multi-file edits→Build. Distinctive pattern of entering plan mode, delegating exploration, then executing.
+
+4. **Edit Drift with Todo Anchoring on Doc-Heavy Turns** (session_rhythm) — T0 has 5 drift-start markers across 94 steps with 17 edits but 0 builds. This extends the existing `gene_nf_edit_drift_without_verification` pattern but specifically for documentation-heavy editing (not code).
+
+Let me now check the existing genes more carefully and decide: enhance vs. create new.
+Now I have complete understanding of all existing genes. Let me decide which patterns from 18479bb5 are genuinely new vs. overlapping:
+
+**Decision matrix:**
+
+1. **Doc-Driven Planning Supplement** (T0: planning_design) — Overlaps partially with `gene_cc_doc_driven_content_creation` and `gene_inq_feasibility_to_planning_cascade` but is distinct: this is about *systematically supplementing an existing planning document* with missing data specs, dialogue content, and version bumps. The key pattern is: read attached doc → subagent exploration → gap analysis → systematic doc edits → version bump. **NEW gene** in workflow category.
+
+2. **Surgical Settings Extension** (T1: feature_modification → game_logic) — Very clean 11-step pattern: Task(subagent)→Read→Edit→Edit→Build→respond. This is a specific variant of feature_modification where an existing feature's scope is extended to cover newly-added content. Not covered by existing genes. **NEW gene** in workflow category.
+
+3. **Plan-Mode Multi-Subagent Design Cascade** (T2: new_feature) — EnterPlanMode→7 Tasks→Write plan→ExitPlanMode→TodoWrite→multi-doc edits→Build. This is a distinctive *plan-mode-first* workflow that's not covered by existing genes. **NEW gene** in workflow category.
+
+4. **Edit Drift on Doc-Heavy Turns** — The existing `gene_nf_edit_drift_without_verification` covers code edit drift. This session shows the same pattern but for *documentation editing* (策划案-主线系统.md), with 5 drift-start markers across a 94-step turn. I should **enhance** the existing gene rather than create new.
+
+Let me now create the 3 new genes and enhance 1 existing:
+Now I'll append 3 new genes to the workflow/genes.json file:
+Now enhance the existing `gene_nf_edit_drift_without_verification` in session_rhythm to include this session's evidence:
+Now update the session_hashes in the edit drift gene:
+Now regenerate the index:
+Let me verify the output is valid JSON:
+会话 `18479bb5` 分析完成。
+
+## 结果汇总
+
+**会话概况**: 3 prompts, 188 steps, 13 subagents, 0 builds on T0(doc-only), 1 build on T1, 1 build on T2
+
+### 新建 3 个 Gene (workflow 类别)
+
+| ID | 标题 | 来源 Turn |
+|---|---|---|
+| `gene_pd_doc_supplement_with_exploration` | 策划文档补充模式——探索差距后系统填补 | T0 (planning_design, 94步) |
+| `gene_fm_existing_feature_scope_extension` | 已有功能作用范围扩展 | T1 (feature_modification, 11步) |
+| `gene_nf_plan_mode_multi_subagent_cascade` | Plan Mode多子agent设计级联 | T2 (new_feature, 83步) |
+
+### 增强 1 个已有 Gene
+
+| ID | 变更 |
+|---|---|
+| `gene_nf_edit_drift_without_verification` | session_count 1→2, 新增 `intent:planning_design` signal 和 `doc_edit_drift` signal, evidence追加18479bb5 T0的5个drift-start标记（文档场景变体） |

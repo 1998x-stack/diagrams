@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEP · Specimen Archive — Vol. I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Inter+Tight:wght@300..800&family=JetBrains+Mono:wght@300..600&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ================================================================ tokens */
+  :root {
+    --bg:           #0c0a08;
+    --bg-rise:     #15120e;
+    --surface:      #1a1611;
+    --surface-2:    #221d16;
+    --rule-faint:   #2a241c;
+    --rule:         #3d3528;
+    --rule-bold:    #5a4a36;
+
+    --ink:         #ece1cd;
+    --ink-2:       #c0b39a;
+    --muted:       #8a7d68;
+    --subtle:      #5e5341;
+    --whisper:     #3a3329;
+
+    --rust:        #c2542a;
+    --ochre:       #b89456;
+    --sage:        #7a8b6f;
+    --oxide:       #5a7385;
+    --crimson:     #9a4a3f;
+    --gold:        #b88840;
+
+    --grain-rgba:  rgba(245,235,210,0.012);
+
+    --serif-display: 'Fraunces', 'Noto Serif SC', 'Songti SC', serif;
+    --sans:          'Inter Tight', system-ui, sans-serif;
+    --mono:          'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    --serif-zh:      'Noto Serif SC', 'Songti SC', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.55;
+  }
+  body {
+    /* film grain layer */
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(194,84,42,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(184,148,86,0.03) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.95 0 0 0 0 0.85 0 0 0 0 0.65 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  ::selection { background: var(--rust); color: var(--bg); }
+
+  /* ================================================================ scaffold */
+  .frame { max-width: 1480px; margin: 0 auto; padding: 0 56px; }
+
+  /* ================================================================ masthead */
+  header.masthead {
+    border-bottom: 1px solid var(--rule);
+    padding: 36px 0 28px;
+    position: relative;
+  }
+  header.masthead::after {
+    content: '';
+    position: absolute; left: 56px; right: 56px; bottom: -3px;
+    height: 1px; background: var(--rule-faint);
+  }
+
+  .masthead-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 24px;
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.18em; color: var(--muted);
+    text-transform: uppercase;
+  }
+  .masthead-row .badge {
+    border: 1px solid var(--rule-bold);
+    padding: 3px 9px;
+    color: var(--ink-2);
+    background: var(--bg-rise);
+  }
+  .masthead-row .dotline {
+    flex: 1;
+    border-bottom: 1px dotted var(--whisper);
+    margin: 0 14px;
+    transform: translateY(-3px);
+  }
+
+  h1.title {
+    font-family: var(--serif-display);
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50;
+    font-size: clamp(72px, 11vw, 168px);
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+    margin-top: 28px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 0.22em;
+    flex-wrap: wrap;
+  }
+  h1.title .accent { color: var(--rust); font-style: italic; font-weight: 500; font-variation-settings: 'opsz' 144, 'SOFT' 100; }
+  h1.title .small  { font-size: 0.18em; letter-spacing: 0.4em; color: var(--muted); font-weight: 400; font-style: normal; align-self: center; transform: translateY(-0.6em); font-family: var(--mono); text-transform: uppercase; }
+
+  .subhead {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: end;
+    padding-bottom: 4px;
+  }
+  .subhead .blurb {
+    font-family: var(--serif-display);
+    font-weight: 350;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 720px;
+  }
+  .subhead .blurb .marker { color: var(--rust); font-style: normal; font-weight: 500; }
+  .subhead .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+  }
+  .subhead .meta .row { display: block; margin-bottom: 4px; }
+  .subhead .meta strong { color: var(--ink-2); font-weight: 500; }
+
+  /* ================================================================ stats strip */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 56px 0 12px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .stats .cell {
+    padding: 28px 24px 22px;
+    border-right: 1px solid var(--rule-faint);
+    position: relative;
+  }
+  .stats .cell:last-child { border-right: none; }
+  .stats .cell .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .stats .cell .value {
+    font-family: var(--serif-display);
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144, 'SOFT' 0;
+    font-size: 88px;
+    line-height: 0.95;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+  }
+  .stats .cell .unit {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--subtle);
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .stats .cell .accent-bar {
+    position: absolute; top: 0; left: 0;
+    width: 32px; height: 4px;
+    background: var(--rust);
+  }
+  .stats .cell:nth-child(2) .accent-bar { background: var(--ochre); }
+  .stats .cell:nth-child(3) .accent-bar { background: var(--sage); }
+  .stats .cell:nth-child(4) .accent-bar { background: var(--oxide); }
+
+  /* ================================================================ category chart */
+  .chart-strip {
+    border-bottom: 1px solid var(--rule);
+    padding: 28px 0 32px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+  .chart-strip .legend-title {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.1;
+    color: var(--ink-2);
+  }
+  .chart-strip .legend-title small {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+    font-style: normal;
+  }
+  .signal-bars { display: flex; flex-direction: column; gap: 10px; }
+  .signal-bars .row {
+    display: grid;
+    grid-template-columns: 220px 1fr 48px;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .signal-bars .name { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .signal-bars .name.is-cn { color: var(--ochre); }
+  .signal-bars .bar { height: 6px; background: var(--surface); position: relative; overflow: hidden; }
+  .signal-bars .bar-fill { height: 100%; background: var(--rust); transition: width .6s cubic-bezier(.2,.7,.3,1); }
+  .signal-bars .row.is-cn .bar-fill { background: var(--ochre); }
+  .signal-bars .count { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ================================================================ filter bar */
+  .filters {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+    padding: 20px 0 18px;
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 28px;
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--rule-faint);
+  }
+  .filter-group .glabel {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--subtle);
+    padding: 8px 14px;
+    border-right: 1px solid var(--rule-faint);
+    background: var(--bg-rise);
+  }
+  .filter-group button {
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--rule-faint);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: color .12s, background .12s;
+  }
+  .filter-group button:last-child { border-right: none; }
+  .filter-group button:hover { color: var(--ink-2); background: var(--bg-rise); }
+  .filter-group button.active {
+    color: var(--bg);
+    background: var(--ink);
+  }
+  .filter-group button.active.cat-workflow { background: var(--sage); color: var(--bg); }
+  .filter-group button.active.cat-optimize { background: var(--oxide); color: var(--bg); }
+  .filter-group button.active.cat-repair   { background: var(--crimson); color: var(--ink); }
+  .filter-group button.active.cat-innovate { background: var(--gold); color: var(--bg); }
+
+  .search-box {
+    border: 1px solid var(--rule-faint);
+    background: var(--bg-rise);
+    display: flex;
+    align-items: center;
+  }
+  .search-box .glabel {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--subtle);
+    padding: 8px 12px;
+    border-right: 1px solid var(--rule-faint);
+  }
+  .search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 14px;
+    width: 240px;
+  }
+  .search-box input::placeholder { color: var(--whisper); }
+
+  .result-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: right;
+  }
+  .result-count strong {
+    color: var(--rust);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ================================================================ specimens */
+  .specimens {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    padding: 36px 0 80px;
+  }
+  @media (min-width: 1280px) {
+    .specimens { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .15s, transform .25s cubic-bezier(.2,.7,.3,1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--rust);
+    opacity: 0.7;
+  }
+  .card.cat-workflow::before { background: var(--sage); }
+  .card.cat-optimize::before { background: var(--oxide); }
+  .card.cat-repair::before   { background: var(--crimson); }
+  .card.cat-innovate::before { background: var(--gold); }
+  .card:hover { border-color: var(--rule-bold); transform: translateY(-2px); }
+  .card:hover::before { opacity: 1; }
+
+  .card .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 16px 24px 12px;
+    border-bottom: 1px dashed var(--rule-faint);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .card .head .specimen-no {
+    color: var(--rust);
+  }
+  .card.cat-workflow .head .specimen-no { color: var(--sage); }
+  .card.cat-optimize .head .specimen-no { color: var(--oxide); }
+  .card.cat-repair   .head .specimen-no { color: var(--crimson); }
+  .card.cat-innovate .head .specimen-no { color: var(--gold); }
+  .card .head .tags { color: var(--muted); display: flex; gap: 12px; }
+  .card .head .tags .div { color: var(--whisper); }
+
+  .card .id {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    color: var(--subtle);
+    padding: 8px 24px 0;
+    word-break: break-all;
+  }
+
+  .card .title-zh {
+    font-family: var(--serif-zh);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.2;
+    color: var(--ink);
+    padding: 12px 24px 6px;
+    letter-spacing: -0.005em;
+  }
+  .card .title-en {
+    font-family: var(--serif-display);
+    font-weight: 350;
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.35;
+    color: var(--muted);
+    padding: 0 24px 18px;
+  }
+
+  .card .strategy-preview {
+    padding: 0 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .card .strategy-preview .step {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 12px;
+    font-family: var(--serif-zh);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .card .strategy-preview .step .num {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+    padding-top: 4px;
+  }
+  .card.cat-workflow .strategy-preview .step .num { color: var(--sage); }
+  .card.cat-optimize .strategy-preview .step .num { color: var(--oxide); }
+  .card.cat-repair   .strategy-preview .step .num { color: var(--crimson); }
+  .card.cat-innovate .strategy-preview .step .num { color: var(--gold); }
+
+  .card .signals {
+    padding: 16px 24px 18px;
+    border-top: 1px dashed var(--rule-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .card .chip {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    padding: 3px 8px;
+    border: 1px solid var(--rule);
+    background: var(--bg-rise);
+    white-space: nowrap;
+  }
+  .card .chip.cn-extra {
+    color: var(--ochre);
+    border-color: var(--ochre);
+    background: rgba(184, 148, 86, 0.06);
+  }
+
+  .card .foot {
+    margin-top: auto;
+    padding: 12px 24px 14px;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-rise);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .card .foot .freq {
+    font-family: var(--serif-display);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-2);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .card .foot .freq small {
+    font-family: var(--mono);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--subtle);
+    margin-left: 4px;
+  }
+
+  /* ================================================================ modal */
+  .modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 32px;
+    overflow-y: auto;
+  }
+  .modal {
+    background: var(--bg);
+    border: 1px solid var(--rule-bold);
+    max-width: 920px;
+    width: 100%;
+    margin: auto;
+    position: relative;
+  }
+  .modal .close {
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border: 1px solid var(--rule);
+  }
+  .modal .close:hover { color: var(--rust); border-color: var(--rust); }
+
+  .modal-head {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  .modal-head .specimen-no {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+  .modal-head .id-line {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--subtle);
+    word-break: break-all;
+    margin-bottom: 18px;
+  }
+  .modal-head .title-zh {
+    font-family: var(--serif-zh);
+    font-weight: 700;
+    font-size: 38px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .modal-head .title-en {
+    font-family: var(--serif-display);
+    font-weight: 350;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .modal-body { padding: 28px 40px 36px; }
+  .section-h {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 8px;
+    margin: 28px 0 16px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .section-h:first-child { margin-top: 0; }
+  .section-h .marker {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--rust);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .field-list { display: flex; flex-direction: column; gap: 14px; }
+  .field-list .item {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 16px;
+    font-family: var(--serif-zh);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .field-list .item .n {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--rust);
+    padding-top: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  .modal .signals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal .signals .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    background: var(--bg-rise);
+  }
+  .modal .signals .chip.cn-extra {
+    color: var(--ochre);
+    border-color: var(--ochre);
+  }
+
+  .modal .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-top: 12px;
+  }
+  .modal .meta-grid .meta-cell {
+    padding: 16px 20px;
+    border-right: 1px solid var(--rule-faint);
+  }
+  .modal .meta-grid .meta-cell:last-child { border-right: none; }
+  .modal .meta-grid .meta-cell .lbl {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .modal .meta-grid .meta-cell .v {
+    font-family: var(--serif-display);
+    font-weight: 350;
+    font-style: italic;
+    font-size: 28px;
+    color: var(--ink);
+  }
+  .modal .meta-grid .meta-cell .vsmall {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+    word-break: break-all;
+  }
+  .modal .session-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .modal .session-list .h {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--ink-2);
+    padding: 3px 8px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+  }
+
+  /* ================================================================ footer */
+  footer.colophon {
+    border-top: 1px solid var(--rule);
+    padding: 36px 0 56px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer.colophon .l { display: flex; gap: 24px; flex-wrap: wrap; }
+  footer.colophon .l .pair { display: flex; gap: 8px; }
+  footer.colophon .l .pair .k { color: var(--subtle); }
+  footer.colophon .l .pair .v { color: var(--ink-2); }
+
+  /* ================================================================ states */
+  .empty {
+    padding: 100px 0;
+    text-align: center;
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--muted);
+  }
+
+  /* ================================================================ animations */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .specimens > .card { animation: rise .55s cubic-bezier(.2,.7,.3,1) backwards; }
+  .specimens > .card:nth-child(1)  { animation-delay: 0.02s; }
+  .specimens > .card:nth-child(2)  { animation-delay: 0.04s; }
+  .specimens > .card:nth-child(3)  { animation-delay: 0.06s; }
+  .specimens > .card:nth-child(4)  { animation-delay: 0.08s; }
+  .specimens > .card:nth-child(5)  { animation-delay: 0.10s; }
+  .specimens > .card:nth-child(6)  { animation-delay: 0.12s; }
+  .specimens > .card:nth-child(7)  { animation-delay: 0.14s; }
+  .specimens > .card:nth-child(8)  { animation-delay: 0.16s; }
+
+  @keyframes lift {
+    from { opacity: 0; transform: translateY(20px) scale(.99); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal { animation: lift .3s cubic-bezier(.2,.7,.3,1); }
+
+  /* responsive */
+  @media (max-width: 980px) {
+    .frame { padding: 0 24px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stats .cell:nth-child(2) { border-right: none; }
+    .stats .cell:nth-child(3), .stats .cell:nth-child(4) {
+      border-top: 1px solid var(--rule-faint);
+    }
+    .chart-strip { grid-template-columns: 1fr; }
+    .specimens { grid-template-columns: 1fr; }
+    .filters { grid-template-columns: 1fr; }
+    h1.title { font-size: 20vw; }
+    .modal-head, .modal-body { padding: 24px 22px; }
+    .modal .meta-grid { grid-template-columns: 1fr; }
+    .modal .meta-grid .meta-cell { border-right: none; border-bottom: 1px solid var(--rule-faint); }
+  }
+</style>
+</head>
+<body>
+<div id="app" class="frame">
+  <!-- masthead -->
+  <header class="masthead">
+    <div class="masthead-row">
+      <span class="badge">GEP · Specimen Archive</span>
+      <span class="dotline"></span>
+      <span>Vol. I · {{ romanYear }}</span>
+      <span class="dotline"></span>
+      <span>traj-gep / qwen3.6-plus</span>
+    </div>
+
+    <h1 class="title">
+      Genome <span class="accent">Evolution</span> Protocol
+      <span class="small">· catalogued specimens</span>
+    </h1>
+
+    <div class="subhead">
+      <p class="blurb">
+        A field catalogue of behavioral <span class="marker">Genes</span> mined from
+        Claude Code trajectories across two TapTap Maker game projects —
+        each specimen labelled with its category, signal preconditions,
+        and the recurring strategy a session-after-session pattern revealed.
+      </p>
+      <div class="meta">
+        <span class="row"><strong>Compiled</strong> · 2026·04·20</span>
+        <span class="row"><strong>Source</strong> · 73 + 5 sessions</span>
+        <span class="row"><strong>Engine</strong> · evolver/signals.js</span>
+        <span class="row"><strong>Curator</strong> · qwen3.6-plus</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- stats -->
+  <section class="stats" v-if="stats">
+    <div class="cell">
+      <div class="accent-bar"></div>
+      <div class="label">Total Specimens</div>
+      <div class="value">{{ stats.overall.genes }}</div>
+      <div class="unit">genes catalogued</div>
+    </div>
+    <div class="cell">
+      <div class="accent-bar"></div>
+      <div class="label">脑力大冒险 · WZP</div>
+      <div class="value">{{ stats.by_project.wzp.genes }}</div>
+      <div class="unit">cross-session patterns</div>
+    </div>
+    <div class="cell">
+      <div class="accent-bar"></div>
+      <div class="label">超时空要塞 · ZZJ</div>
+      <div class="value">{{ stats.by_project.zzj.genes }}</div>
+      <div class="unit">single-session patterns</div>
+    </div>
+    <div class="cell">
+      <div class="accent-bar"></div>
+      <div class="label">Cumulative Evidence</div>
+      <div class="value">{{ formatNumber(stats.overall.evidence_occurrences) }}</div>
+      <div class="unit">tool-call occurrences</div>
+    </div>
+  </section>
+
+  <!-- chart strip -->
+  <section class="chart-strip" v-if="stats">
+    <div class="legend-title">
+      Frequent <em>signals</em>
+      <small>combined matchings · top 12</small>
+    </div>
+    <div class="signal-bars">
+      <div class="row" :class="{ 'is-cn': isCnSignal(s[0]) }" v-for="s in topSignals" :key="s[0]">
+        <div class="name" :class="{ 'is-cn': isCnSignal(s[0]) }">{{ s[0] }}</div>
+        <div class="bar"><div class="bar-fill" :style="{width: signalBarWidth(s[1]) + '%'}"></div></div>
+        <div class="count">{{ s[1] }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- filters -->
+  <section class="filters">
+    <div class="filter-group">
+      <span class="glabel">Project</span>
+      <button :class="{active: projectFilter === 'all'}" @click="projectFilter = 'all'">All</button>
+      <button :class="{active: projectFilter === 'wzp'}" @click="projectFilter = 'wzp'">WZP</button>
+      <button :class="{active: projectFilter === 'zzj'}" @click="projectFilter = 'zzj'">ZZJ</button>
+    </div>
+    <div class="filter-group">
+      <span class="glabel">Category</span>
+      <button :class="{active: categoryFilter === 'all'}" @click="categoryFilter = 'all'">All</button>
+      <button v-for="c in availableCategories" :key="c"
+              :class="['cat-' + c, {active: categoryFilter === c}]"
+              @click="categoryFilter = c">{{ c }}</button>
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <div class="search-box">
+        <span class="glabel">Find</span>
+        <input v-model="search" placeholder="signal, title, id…" />
+      </div>
+      <span class="result-count"><strong>{{ filtered.length }}</strong> · of {{ allGenes.length }}</span>
+    </div>
+  </section>
+
+  <!-- specimens grid -->
+  <section class="specimens" v-if="filtered.length">
+    <article
+      class="card"
+      :class="'cat-' + g.category"
+      v-for="(g, i) in filtered"
+      :key="g.id"
+      @click="openGene(g, i)"
+    >
+      <div class="head">
+        <span class="specimen-no">№ {{ String(i + 1).padStart(3, '0') }}</span>
+        <span class="tags">
+          <span>{{ g.project.toUpperCase() }}</span>
+          <span class="div">·</span>
+          <span>{{ g.category }}</span>
+          <span class="div">·</span>
+          <span>{{ g.family }}</span>
+        </span>
+      </div>
+      <div class="id">{{ g.id }}</div>
+      <h2 class="title-zh">{{ g.title_zh || g.id }}</h2>
+      <p class="title-en">{{ g.title_en }}</p>
+
+      <div class="strategy-preview">
+        <div class="step" v-for="(s, idx) in g.strategy.slice(0, 2)" :key="idx">
+          <span class="num">{{ String(idx + 1).padStart(2, '0') }}</span>
+          <span>{{ truncate(s, 110) }}</span>
+        </div>
+      </div>
+
+      <div class="signals">
+        <span
+          class="chip"
+          :class="{ 'cn-extra': isCnSignal(s) }"
+          v-for="s in g.signals_match.slice(0, 6)" :key="s"
+        >{{ s }}</span>
+      </div>
+
+      <div class="foot">
+        <span>
+          <span class="freq">{{ g._provenance && g._provenance.frequency || 0 }}<small>occurrences</small></span>
+        </span>
+        <span>
+          {{ g._provenance && g._provenance.session_count || 0 }} sessions
+        </span>
+      </div>
+    </article>
+  </section>
+
+  <div v-else class="empty">
+    No specimens match the current filters.
+  </div>
+
+  <!-- detail modal -->
+  <transition>
+    <div class="modal-mask" v-if="active" @click.self="closeGene">
+      <div class="modal">
+        <button class="close" @click="closeGene">close ✕</button>
+
+        <div class="modal-head">
+          <div class="specimen-no">SPECIMEN №{{ String(activeIndex + 1).padStart(3, '0') }} · {{ active.project.toUpperCase() }} · {{ active.category }} · {{ active.family }}</div>
+          <div class="id-line">{{ active.id }}</div>
+          <h2 class="title-zh">{{ active.title_zh || active.id }}</h2>
+          <p class="title-en">{{ active.title_en || '—' }}</p>
+        </div>
+
+        <div class="modal-body">
+          <div class="section-h">Signals · Match
+            <span class="marker">{{ active.signals_match.length }} entries</span>
+          </div>
+          <div class="signals">
+            <span class="chip" :class="{ 'cn-extra': isCnSignal(s) }" v-for="s in active.signals_match" :key="s">{{ s }}</span>
+          </div>
+
+          <div class="section-h">Preconditions
+            <span class="marker">when this gene applies</span>
+          </div>
+          <div class="field-list">
+            <div class="item" v-for="(p, idx) in active.preconditions" :key="idx">
+              <span class="n">§ {{ String(idx + 1).padStart(2, '0') }}</span>
+              <span>{{ p }}</span>
+            </div>
+          </div>
+
+          <div class="section-h">Strategy
+            <span class="marker">recommended sequence</span>
+          </div>
+          <div class="field-list">
+            <div class="item" v-for="(s, idx) in active.strategy" :key="idx">
+              <span class="n">{{ String(idx + 1).padStart(2, '0') }}</span>
+              <span>{{ s }}</span>
+            </div>
+          </div>
+
+          <div class="section-h">Constraints &amp; Validation</div>
+          <div class="meta-grid">
+            <div class="meta-cell">
+              <div class="lbl">Max Files</div>
+              <div class="v">{{ active.constraints.max_files }}</div>
+            </div>
+            <div class="meta-cell">
+              <div class="lbl">Forbidden Paths</div>
+              <div class="vsmall">{{ active.constraints.forbidden_paths.join(' · ') }}</div>
+            </div>
+            <div class="meta-cell">
+              <div class="lbl">Validation</div>
+              <div class="vsmall">{{ active.validation.length ? active.validation.join('; ') : '— (read-only specimen)' }}</div>
+            </div>
+          </div>
+
+          <div class="section-h" v-if="active._provenance">Provenance
+            <span class="marker">field evidence</span>
+          </div>
+          <div class="meta-grid" v-if="active._provenance">
+            <div class="meta-cell">
+              <div class="lbl">Sessions</div>
+              <div class="v">{{ active._provenance.session_count }}</div>
+            </div>
+            <div class="meta-cell">
+              <div class="lbl">Occurrences</div>
+              <div class="v">{{ active._provenance.frequency }}</div>
+            </div>
+            <div class="meta-cell">
+              <div class="lbl">Source</div>
+              <div class="vsmall">{{ active._provenance.source }} · {{ active._provenance.project }}</div>
+            </div>
+          </div>
+          <div v-if="active._provenance && active._provenance.session_hashes_sample">
+            <div class="section-h">Sampled Session Hashes
+              <span class="marker">{{ active._provenance.session_hashes_sample.length }} ids</span>
+            </div>
+            <div class="session-list">
+              <span class="h" v-for="h in active._provenance.session_hashes_sample" :key="h">{{ h }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+  <footer class="colophon">
+    <div class="l">
+      <span class="pair"><span class="k">Engine</span><span class="v">evolver/signals.js</span></span>
+      <span class="pair"><span class="k">Curator</span><span class="v">qwen3.6-plus</span></span>
+      <span class="pair"><span class="k">Reproducibility</span><span class="v">SHA-256 prompt cache</span></span>
+    </div>
+    <div>
+      Set in Fraunces · Inter Tight · JetBrains Mono · Noto Serif SC
+    </div>
+  </footer>
+</div>
+
+<script type="module">
+  import { createApp, ref, computed, onMounted } from 'https://unpkg.com/vue@3.4.27/dist/vue.esm-browser.prod.js';
+
+  const RECOGNIZED_SIGNALS = new Set([
+    'log_error','recurring_errsig','errsig','perf_bottleneck','capability_gap',
+    'unsupported_input_type','user_feature_request','user_improvement_suggestion',
+    'external_opportunity','stable_success_plateau','workflow','phase_transition',
+    'tool_bypass','curriculum_target',
+  ]);
+
+  function looksLikeAsciiSignal(s) {
+    return /^[a-z][a-z0-9_:]*$/i.test(s);
+  }
+
+  function isCnSignal(s) {
+    if (!s) return false;
+    if (s.startsWith('cn_')) return true;
+    if (RECOGNIZED_SIGNALS.has(s.split(':')[0])) return false;
+    if (['read','edit','write','grep','bash','task','todowrite'].includes(s)) return false;
+    if (s.startsWith('mcp__')) return false;
+    if (s.startsWith('phase:') || s.startsWith('from:') || s.startsWith('to:')) return false;
+    if (!looksLikeAsciiSignal(s)) return false;
+    // remaining lowercase_underscore tokens that aren't in known sets: treat as LLM-derived
+    return s.includes('_');
+  }
+
+  createApp({
+    setup() {
+      const allGenes  = ref([]);
+      const stats     = ref(null);
+      const projectFilter  = ref('all');
+      const categoryFilter = ref('all');
+      const search = ref('');
+      const active = ref(null);
+      const activeIndex = ref(0);
+
+      async function load() {
+        const [g, s] = await Promise.all([
+          fetch('/api/genes').then(r => r.json()),
+          fetch('/api/stats').then(r => r.json()),
+        ]);
+        allGenes.value = g.genes;
+        stats.value = s;
+      }
+
+      const availableCategories = computed(() => {
+        const cats = new Set();
+        allGenes.value.forEach(g => cats.add(g.category));
+        const order = ['workflow', 'optimize', 'repair', 'innovate'];
+        return order.filter(c => cats.has(c)).concat([...cats].filter(c => !order.includes(c)));
+      });
+
+      const filtered = computed(() => {
+        const term = search.value.trim().toLowerCase();
+        return allGenes.value.filter(g => {
+          if (projectFilter.value !== 'all' && g.project !== projectFilter.value) return false;
+          if (categoryFilter.value !== 'all' && g.category !== categoryFilter.value) return false;
+          if (term) {
+            const hay = [g.id, g.title_zh, g.title_en, ...(g.signals_match || []), ...(g.strategy || [])]
+              .filter(Boolean).join(' ').toLowerCase();
+            if (!hay.includes(term)) return false;
+          }
+          return true;
+        }).sort((a, b) => {
+          const fa = (a._provenance && a._provenance.frequency) || 0;
+          const fb = (b._provenance && b._provenance.frequency) || 0;
+          return fb - fa;
+        });
+      });
+
+      const topSignals = computed(() => {
+        if (!stats.value) return [];
+        const top = stats.value.overall.top_signals || [];
+        return top.slice(0, 12);
+      });
+
+      const maxSignal = computed(() => {
+        const t = topSignals.value;
+        return t.length ? t[0][1] : 1;
+      });
+
+      function signalBarWidth(n) {
+        return Math.max(4, (n / maxSignal.value) * 100);
+      }
+
+      function openGene(g, i) {
+        active.value = g;
+        activeIndex.value = i;
+        document.body.style.overflow = 'hidden';
+      }
+      function closeGene() {
+        active.value = null;
+        document.body.style.overflow = '';
+      }
+
+      function truncate(s, n) {
+        if (!s) return '';
+        return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s;
+      }
+      function formatNumber(n) {
+        return (n || 0).toLocaleString('en-US');
+      }
+
+      const romanYear = 'MMXXVI';
+
+      onMounted(load);
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeGene();
+      });
+
+      return {
+        allGenes, stats, projectFilter, categoryFilter, search, active, activeIndex,
+        availableCategories, filtered, topSignals,
+        signalBarWidth, isCnSignal, openGene, closeGene, truncate, formatNumber,
+        romanYear,
+      };
+    }
+  }).mount('#app');
+</script>
+</body>
+</html>

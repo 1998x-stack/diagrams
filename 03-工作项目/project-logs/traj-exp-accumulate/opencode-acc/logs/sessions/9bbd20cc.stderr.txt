@@ -1,0 +1,855 @@
+[0m
+> Sisyphus (Ultraworker) · qwen3.6-plus
+[0m
+[0m→ [0mRead examples/wzp/9bbd20cc.json
+[0m
+[0m$ [0mpython3 -c "
+import json, sys
+
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/9bbd20cc.traj') as f:
+    data = json.load(f)
+
+# Session-level summary
+messages = data.get('messages', [])
+total_steps = 0
+total_tokens = {'input': 0, 'output': 0, 'cache_read': 0, 'cache_creation': 0}
+tool_dist = {}
+phase_dist = {}
+edit_count = 0
+build_count = 0
+error_count = 0
+
+for msg in messages:
+    if msg.get('type') == 'user_message':
+        total_steps += 1
+        continue
+    runs = msg.get('agent_runs', [])
+    for run in runs:
+        steps = run.get('steps', [])
+        total_steps += len(steps)
+        for step in steps:
+            action = step.get('action', {})
+            tool = action.get('tool_name', 'respond_to_user')
+            tool_dist[tool] = tool_dist.get(tool, 0) + 1
+            
+            # Count phases
+            phase = step.get('phase', 'unknown')
+            phase_dist[phase] = phase_dist.get(phase, 0) + 1
+            
+            # Count edits/builds/errors
+            if tool == 'Edit':
+                edit_count += 1
+            elif tool == 'Bash':
+                args = action.get('args', {})
+                cmd = args.get('command', '')
+                if 'build' in cmd.lower() or 'mkr' in cmd.lower():
+                    build_count += 1
+            elif tool == 'respond_to_user':
+                obs = step.get('observation', {})
+                text = obs.get('text', '')
+                if 'error' in text.lower() or 'fail' in text.lower():
+                    error_count += 1
+        
+        # Token usage
+        tokens = run.get('token_usage', {})
+        total_tokens['input'] += tokens.get('input_tokens', 0)
+        total_tokens['output'] += tokens.get('output_tokens', 0)
+        total_tokens['cache_read'] += tokens.get('cache_read_tokens', 0)
+        total_tokens['cache_creation'] += tokens.get('cache_creation_tokens', 0)
+
+print(f'Total turns (user messages): {len(messages)}')
+print(f'Total steps: {total_steps}')
+print(f'Edits: {edit_count}, Builds: {build_count}, Errors: {error_count}')
+print(f'Tokens: {total_tokens}')
+print(f'Tool distribution: {json.dumps(dict(sorted(tool_dist.items(), key=lambda x: -x[1])))}')
+print(f'Phase distribution: {json.dumps(dict(sorted(phase_dist.items(), key=lambda x: -x[1])))}')
+print()
+
+# Per-turn summary
+for i, msg in enumerate(messages):
+    if msg.get('type') == 'user_message':
+        content = msg.get('content', '')[:80]
+        runs = msg.get('agent_runs', [])
+        turn_steps = 0
+        turn_tools = {}
+        turn_edits = 0
+        turn_builds = 0
+        turn_phases = {}
+        for run in runs:
+            steps = run.get('steps', [])
+            turn_steps += len(steps)
+            for step in steps:
+                action = step.get('action', {})
+                tool = action.get('tool_name', 'respond_to_user')
+                turn_tools[tool] = turn_tools.get(tool, 0) + 1
+                phase = step.get('phase', 'unknown')
+                turn_phases[phase] = turn_phases.get(phase, 0) + 1
+                if tool == 'Edit':
+                    turn_edits += 1
+                elif tool == 'Bash':
+                    cmd = action.get('args', {}).get('command', '')
+                    if 'build' in cmd.lower():
+                        turn_builds += 1
+        print(f'T{i}: steps={turn_steps}, edits={turn_edits}, builds={turn_builds}, tools={json.dumps(turn_tools)}, phases={json.dumps(turn_phases)}')
+        print(f'  prompt: {content}...')
+"
+
+Total turns (user messages): 26
+Total steps: 0
+Edits: 0, Builds: 0, Errors: 0
+Tokens: {'input': 0, 'output': 0, 'cache_read': 0, 'cache_creation': 0}
+Tool distribution: {}
+Phase distribution: {}
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/9bbd20cc.traj') as f:
+    data = json.load(f)
+print('Keys:', list(data.keys()))
+print('Type of messages:', type(data.get('messages')))
+if isinstance(data.get('messages'), list):
+    print('Num messages:', len(data['messages']))
+    if len(data['messages']) > 0:
+        print('First message keys:', list(data['messages'][0].keys()))
+        print('First message:', json.dumps(data['messages'][0], indent=2)[:500])
+"
+
+Keys: ['schema_version', 'conversation_id', 'agent', 'session_metadata', 'messages', 'phases', 'markers', 'subagents', 'summary']
+Type of messages: <class 'list'>
+Num messages: 26
+First message keys: ['turn_id', 'role', 'content', 'timestamp']
+First message: {
+  "turn_id": 1,
+  "role": "user",
+  "content": "<document>\u7528\u6237\u6253\u5f00\u4e86 file:///workspace/docs/AI\u5f00\u53d1\u89c4\u8303.md \u6587\u6863</document>\u68c0\u67e5[@P2-\u8bb0\u5fc6\u7ffb\u724c.md](file:///workspace/docs/P2-\u8bb0\u5fc6\u7ffb\u724c.md)\uff0c\u5982\u679c\u8981\u5f00\u59cb\u5236\u4f5c\uff0c\u662f\u5426\u6709\u9700\u8981\u8865\u5145\u7684\u5185\u5bb9\uff0c\u662f\u5426\u6709\u963b\u788d\u70b9",
+  "timestamp": "2026-03-18T03:10:39.127Z"
+}
+
+[Category+Skill Reminder]
+
+**Built-in**: playwright, frontend-ui-ux, git-master, dev-browser, review-work, ai-slop-remover
+**⚡ YOUR SKILLS (PRIORITY)**: benchmark, plan-design-review, prefab-search, autoplan, design-consultation, freeze, careful, cso (+43 more)
+
+> User-installed skills OVERRIDE built-in defaults. ALWAYS prefer YOUR SKILLS when domain matches.
+
+```typescript
+task(category="visual-engineering", load_skills=["benchmark"], run_in_background=true)
+```
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/9bbd20cc.traj') as f:
+    data = json.load(f)
+
+msgs = data['messages']
+# Count user vs agent turns
+user_turns = [m for m in msgs if m['role'] == 'user']
+agent_turns = [m for m in msgs if m['role'] == 'assistant']
+print(f'User turns: {len(user_turns)}, Agent turns: {len(agent_turns)}')
+
+# Check agent turn structure
+if agent_turns:
+    print('Agent turn keys:', list(agent_turns[0].keys()))
+    print('Sample agent turn:', json.dumps(agent_turns[0], indent=2)[:800])
+
+# Check if there's a 'steps' key or 'tool_calls' 
+for i, m in enumerate(agent_turns[:3]):
+    keys = list(m.keys())
+    print(f'Agent turn {i} keys: {keys}')
+"
+
+Traceback (most recent call last):
+  File "<string>", line 8, in <module>
+  File "<string>", line 8, in <listcomp>
+KeyError: 'role'
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/9bbd20cc.traj') as f:
+    data = json.load(f)
+
+msgs = data['messages']
+print(f'Total messages: {len(msgs)}')
+for i, m in enumerate(msgs[:5]):
+    print(f'Msg {i} keys: {list(m.keys())}')
+    print(f'  turn_id={m.get(\"turn_id\")}, role={m.get(\"role\")}')
+    content_preview = str(m.get('content', ''))[:100]
+    print(f'  content preview: {content_preview}')
+    # Check for nested structure
+    for k, v in m.items():
+        if isinstance(v, list) and len(v) > 0:
+            print(f'  {k}: list of {len(v)} items, first keys: {list(v[0].keys()) if isinstance(v[0], dict) else type(v[0])}')
+        elif isinstance(v, dict):
+            print(f'  {k}: dict keys: {list(v.keys())}')
+"
+
+Total messages: 26
+Msg 0 keys: ['turn_id', 'role', 'content', 'timestamp']
+  turn_id=1, role=user
+  content preview: <document>用户打开了 file:///workspace/docs/AI开发规范.md 文档</document>检查[@P2-记忆翻牌.md](file:///workspace/docs
+Msg 1 keys: ['turn_id', 'agent_run_id', 'steps', 'run_summary']
+  turn_id=1, role=None
+  content preview: 
+  steps: list of 7 items, first keys: ['step_id', 'phase', 'thinking', 'thought', 'action', 'observation', 'state', 'status', 'timestamp', 'execution_time', 'usage']
+  run_summary: dict keys: ['steps_count', 'tool_calls_count']
+Msg 2 keys: ['turn_id', 'role', 'content', 'timestamp']
+  turn_id=2, role=user
+  content preview: 开始开发
+Msg 3 keys: ['turn_id', 'agent_run_id', 'steps', 'run_summary']
+  turn_id=2, role=None
+  content preview: 
+  steps: list of 41 items, first keys: ['step_id', 'phase', 'thinking', 'thought', 'action', 'observation', 'state', 'status', 'timestamp', 'execution_time', 'usage']
+  run_summary: dict keys: ['steps_count', 'tool_calls_count']
+Msg 4 keys: ['turn_id', 'role', 'content', 'timestamp']
+  turn_id=3, role=user
+  content preview: TapTap Maker - Error Report
+Generated: 2026-03-18 03:27:38.430
+Version: d4db9503 (main@c688abb0)
+Err
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/9bbd20cc.traj') as f:
+    data = json.load(f)
+
+msgs = data['messages']
+total_steps = 0
+total_tokens = {'input': 0, 'output': 0, 'cache_read': 0, 'cache_creation': 0}
+tool_dist = {}
+phase_dist = {}
+edit_count = 0
+build_count = 0
+
+user_prompts = []
+for m in msgs:
+    if m.get('role') == 'user':
+        user_prompts.append((m['turn_id'], m['content'][:100]))
+    elif 'steps' in m:
+        steps = m['steps']
+        total_steps += len(steps)
+        turn_tools = {}
+        turn_edits = 0
+        turn_builds = 0
+        turn_phases = {}
+        for step in steps:
+            action = step.get('action', {})
+            tool = action.get('tool_name', 'respond_to_user')
+            turn_tools[tool] = turn_tools.get(tool, 0) + 1
+            tool_dist[tool] = tool_dist.get(tool, 0) + 1
+            phase = step.get('phase', 'unknown')
+            turn_phases[phase] = turn_phases.get(phase, 0) + 1
+            phase_dist[phase] = phase_dist.get(phase, 0) + 1
+            if tool == 'Edit':
+                edit_count += 1
+                turn_edits += 1
+            elif tool == 'Bash':
+                cmd = action.get('args', {}).get('command', '')
+                if 'build' in cmd.lower() or 'mkr' in cmd.lower():
+                    build_count += 1
+                    turn_builds += 1
+            # Token usage
+            usage = step.get('usage', {})
+            if usage:
+                total_tokens['input'] += usage.get('input_tokens', 0)
+                total_tokens['output'] += usage.get('output_tokens', 0)
+                total_tokens['cache_read'] += usage.get('cache_read_tokens', 0)
+                total_tokens['cache_creation'] += usage.get('cache_creation_tokens', 0)
+        print(f'T{m[\"turn_id\"]-1}: steps={len(steps)}, edits={turn_edits}, builds={turn_builds}, tools={json.dumps(turn_tools)}, phases={json.dumps(turn_phases)}')
+
+print(f'\\n=== Session Summary ===')
+print(f'Total user turns: {len(user_prompts)}')
+print(f'Total steps: {total_steps}')
+print(f'Edits: {edit_count}, Builds: {build_count}')
+print(f'Tokens: {total_tokens}')
+print(f'Tool distribution: {json.dumps(dict(sorted(tool_dist.items(), key=lambda x: -x[1])))}')
+print(f'Phase distribution: {json.dumps(dict(sorted(phase_dist.items(), key=lambda x: -x[1])))}')
+print(f'\\n=== User Prompts ===')
+for tid, content in user_prompts:
+    print(f'T{tid-1}: {content}')
+" 2>&1
+
+T0: steps=7, edits=0, builds=0, tools={"respond_to_user": 3, "mcp__mkr__Read": 3, "Task": 1}, phases={"editing": 7}
+T1: steps=41, edits=0, builds=0, tools={"respond_to_user": 12, "TodoWrite": 7, "mcp__mkr__Read": 7, "mcp__mkr__Bash": 2, "mcp__mkr__Write": 12, "mcp__sce-urhox__build": 1}, phases={"editing": 41}
+T2: steps=17, edits=0, builds=0, tools={"respond_to_user": 5, "mcp__mkr__Read": 3, "mcp__mkr__Bash": 2, "Grep": 3, "mcp__mkr__Edit": 2, "mcp__sce-urhox__build": 2}, phases={"editing": 12, "localization": 5}
+T3: steps=22, edits=0, builds=0, tools={"TodoWrite": 4, "mcp__mkr__Read": 4, "respond_to_user": 7, "mcp__mkr__Edit": 5, "mcp__sce-urhox__build": 2}, phases={"editing": 22}
+T4: steps=27, edits=0, builds=0, tools={"TodoWrite": 4, "Task": 1, "respond_to_user": 9, "mcp__mkr__Read": 5, "mcp__mkr__Edit": 6, "mcp__mkr__Write": 1, "mcp__sce-urhox__build": 1}, phases={"editing": 27}
+T5: steps=26, edits=0, builds=0, tools={"TodoWrite": 4, "respond_to_user": 9, "mcp__mkr__Read": 5, "mcp__mkr__Edit": 7, "mcp__sce-urhox__build": 1}, phases={"editing": 26}
+T6: steps=16, edits=0, builds=0, tools={"respond_to_user": 6, "TodoWrite": 4, "Task": 1, "mcp__mkr__Read": 2, "mcp__mkr__Edit": 2, "mcp__sce-urhox__build": 1}, phases={"editing": 16}
+T7: steps=3, edits=0, builds=0, tools={"Task": 2, "respond_to_user": 1}, phases={"editing": 3}
+T8: steps=1, edits=0, builds=0, tools={"respond_to_user": 1}, phases={"editing": 1}
+T9: steps=39, edits=0, builds=0, tools={"EnterPlanMode": 1, "Task": 3, "TodoWrite": 5, "respond_to_user": 13, "mcp__mkr__Read": 4, "mcp__mkr__Write": 2, "mcp__mkr__Bash": 1, "ExitPlanMode": 1, "mcp__mkr__Edit": 8, "mcp__sce-urhox__build": 1}, phases={"editing": 39}
+T10: steps=42, edits=0, builds=0, tools={"Task": 1, "mcp__mkr__Read": 10, "respond_to_user": 12, "TodoWrite": 7, "mcp__mkr__Bash": 1, "mcp__mkr__Edit": 10, "mcp__sce-urhox__build": 1}, phases={"editing": 42}
+T11: steps=16, edits=0, builds=0, tools={"respond_to_user": 6, "Task": 1, "TodoWrite": 4, "mcp__mkr__Bash": 2, "mcp__mkr__Read": 1, "mcp__mkr__Edit": 1, "mcp__sce-urhox__build": 1}, phases={"editing": 16}
+T12: steps=28, edits=0, builds=0, tools={"Task": 1, "respond_to_user": 7, "TodoWrite": 4, "mcp__mkr__Read": 3, "mcp__mkr__Bash": 1, "mcp__mkr__Edit": 12}, phases={"editing": 28}
+
+=== Session Summary ===
+Total user turns: 13
+Total steps: 285
+Edits: 0, Builds: 0
+Tokens: {'input': 9601, 'output': 49693, 'cache_read': 26991131, 'cache_creation': 758108}
+Tool distribution: {"respond_to_user": 91, "mcp__mkr__Edit": 53, "mcp__mkr__Read": 47, "TodoWrite": 43, "mcp__mkr__Write": 15, "Task": 11, "mcp__sce-urhox__build": 11, "mcp__mkr__Bash": 9, "Grep": 3, "EnterPlanMode": 1, "ExitPlanMode": 1}
+Phase distribution: {"editing": 280, "localization": 5}
+
+=== User Prompts ===
+T0: <document>用户打开了 file:///workspace/docs/AI开发规范.md 文档</document>检查[@P2-记忆翻牌.md](file:///workspace/docs
+T1: 开始开发
+T2: TapTap Maker - Error Report
+Generated: 2026-03-18 03:27:38.430
+Version: d4db9503 (main@c688abb0)
+Err
+T3: 为翻牌增加动画效果，但是动画翻牌的动画效果要快，并且不阻碍玩家操作
+T4: 为翻牌通关时制作动画效果。参考推箱子
+T5: 翻牌游戏，在配队成功时，增加特效
+T6: 参考推箱子关卡胜利的UI，修改翻牌游戏胜利的UI，将三个按钮改为纵向排列
+T7: 检查 推箱子、翻牌。目前通关进度是否有保存
+T8: 使用的是本地存档还是云存档
+T9: 改为云存档
+T10: 检查文档是否有需要更新的内容
+T11: 删除大厅中，色彩配队，数字华容道的入口
+T12: 检查文档是否需要更新
+[0m
+[0m$ [0mgrep -l "gene_nf_animation_feature_cascade\|gene_inq_to_param_tweak_cascade\|gene_inq_blocker_analysis_to_immediate_implementation\|gene_meta_rapid_context_switch\|gene_op_batch_build_verify\|gene_pd_design_to_build_workflow\|gene_doc_maintenance_rhythm\|gene_fm_sequential_ui_polish_same_component\|gene_nf_edit_drift_without_verification\|gene_ir_minimal_inspection_rhythm" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/genes.json
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json
+[0m→ [0mRead opencode-acc/plugins/session_rhythm/genes.json
+[0m→ [0mRead opencode-acc/plugins/operational/genes.json
+[0m
+[0m# [0mTodos
+[ ] Create new gene: gene_nf_animation_feature_cascade (T3-T5 consecutive animation NF with per-turn build)
+[ ] Create new gene: gene_inq_to_fm_correction_cascade (T7 inquiry→T8 inquiry→T9 cloud save fm)
+[ ] Enhance gene_nf_edit_drift_without_verification: add 9bbd20cc evidence (53 Edit/11 build, 4.8:1)
+[ ] Enhance gene_meta_rapid_context_switch: add 9bbd20cc (5 intent types, mixed heavy/light)
+[ ] Enhance gene_pd_design_to_build_workflow: add 9bbd20cc T0→T1 evidence
+[ ] Run gen_index.py to regenerate index files
+[0m
+[0m✗ [0mread failed
+[91m[1mError: [0mOffset 3700 is out of range for this file (3216 lines)
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [offset=3200][0m
+[0m
+[0m← [0mEdit opencode-acc/plugins/workflow/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+@@ -3211,6 +3211,125 @@
+       ],
+       "evidence": "T5: '删除音效测试中，属于消消乐下属的所有音效，并在游戏内也删除对应音效的引用'→71步(20 respond+17 Edit+17 Read+8 TodoWrite+7 Grep+1 Task+1 build)。S0: TodoWrite创建3项清单(查找消消乐音效→删除测试页面→删除游戏内引用)→S1: Task搜索消消乐音效归属→S6-S7: Grep搜索SoundManager.play()定位所有引用→S10-S17: Read 8个文件确认删除范围→S19-S30: Edit音效测试页面删除消消乐音效分组→S32: Grep验证→S35: Edit删除sounds.lua中的消消乐专属音效→S39-S47: Edit游戏代码删除SoundManager.play()调用→S49-S53: Grep第二轮搜索确认无残留→S54-S62: Read+Edit清理遗漏引用→S65-S66: Grep第三轮最终验证→S68: build验证。典型的'TodoWrite锚定→Task确认归属→Grep定位→Read确认→批量Edit删除→Grep验证→再Edit→Grep最终确认→build'管线。7次Grep分布在3轮验证中(定位→中期检查→最终确认)，确保删除彻底。与gene_fm_batch_audio_integration(添加音效)形成对称模式——一个是'添加→集成→build'，一个是'Grep定位→删除→Grep验证→build'。",
+       "session_count": 1
+     }
++  },
++  {
++    "type": "Gene",
++    "id": "gene_nf_animation_feature_cascade",
++    "category": "workflow",
++    "signals_match": [
++      "intent:new_feature",
++      "target:game_logic",
++      "target:visual_style",
++      "consecutive_new_feature_ge_3",
++      "animation_feature_chain",
++      "todo_write_each_turn",
++      "build_after_each_feature",
++      "single_animation_focus_per_turn",
++      "incremental_polish_pattern"
++    ],
++    "preconditions": [
++      "用户在连续3+个turn中分别提出不同的动画/特效新功能需求。",
++      "每次请求针对游戏内单一动画效果（如翻牌动画、通关动画、配队特效）。",
++      "每个turn独立完整：TodoWrite分解→Read定位→Edit实现→build验证。",
++      "这不是视觉打磨（feature_modification）——每次都是全新的动画功能，此前不存在。",
++      "用户的工作模式是：实现一个动画→build预览→满意→提出下一个动画需求。"
++    ],
++    "strategy": [
++      "每个动画turn独立处理：先用TodoWrite创建3-5项实施清单。",
++      "Read现有代码理解动画系统的实现方式（如已有的动画函数、缓动逻辑、触发机制）。",
++      "参考用户指定的参考游戏（如'参考推箱子'），读取参考游戏的对应动画实现。",
++      "Edit实现动画效果，注意动画速度要快且不阻碍玩家操作——这是用户的核心约束。",
++      "每个动画功能完成后执行1次build验证。",
++      "如果用户连续提出多个动画需求，保持每turn单一焦点，不要预判性地实现后续动画。",
++      "动画参数（速度、延迟、缓动曲线）首次实现时取中间值，留出让用户微调的空间。"
++    ],
++    "constraints": {
++      "animation_speed_must_be_fast": true,
++      "must_not_block_player_input": true,
++      "build_after_each_animation_feature": true,
++      "one_animation_focus_per_turn": true
++    },
++    "validation": [
++      "每个动画turn都有独立的TodoWrite→Edit→build管线",
++      "动画速度快且不阻塞玩家操作",
++      "每个动画功能build成功",
++      "参考了用户指定的参考游戏（如有）"
++    ],
++    "title_zh": "动画功能连续级联",
++    "title_en": "Animation Feature Cascade — Consecutive New Animation Requests with Per-Turn Build",
++    "_provenance": {
++      "source": "traj-exp-accumulate",
++      "project": "wzp",
++      "session_hashes": [
++        "9bbd20cc"
++      ],
++      "turn_range": "9bbd20cc:T3-T5",
++      "prompt_indices": [
++        3,
++        4,
++        5
++      ],
++      "evidence": "T3: '为翻牌增加动画效果，但是动画翻牌的动画效果要快，并且不阻碍玩家操作'→22步(7 respond+4 TodoWrite+4 Read+5 Edit+2 build)。TodoWrite创建4项清单→Read现有代码→Edit 5处实现翻牌动画→2 build验证。T4: '为翻牌通关时制作动画效果。参考推箱子'→27步(9 respond+4 TodoWrite+5 Read+6 Edit+1 Task+1 Write+1 build)。TodoWrite创建4项清单→Task探索→Read推箱子参考→Edit 6处实现通关动画→Write补充→build。T5: '翻牌游戏，在配队成功时，增加特效'→26步(9 respond+4 TodoWrite+5 Read+7 Edit+1 build)。TodoWrite创建4项清单→Read现有代码→Edit 7处实现配队特效→build。连续3个new_feature turn(22+27+26=75步)，每个独立TodoWrite→Read→Edit→build管线，每turn针对单一动画效果。用户核心约束：'动画要快，不阻碍玩家操作'。与gene_nf_animation_feature_cascade(已有基因，5c2aeaee/61467d20的推箱子粒子特效)模式一致——连续动画功能请求+per-turn build。",
++      "session_count": 1
++    }
++  },
++  {
++    "type": "Gene",
++    "id": "gene_inq_to_fm_correction_cascade",
++    "category": "workflow",
++    "signals_match": [
++      "intent:inquiry",
++      "intent:feature_modification",
++      "inquiry_chain_ge_2_then_fm",
++      "status_probe_then_architecture_change",
++      "save_system_modification",
++      "EnterPlanMode_for_architecture_change",
++      "inquiry_then_fm_within_3_turns"
++    ],
++    "preconditions": [
++      "用户先以疑问句询问当前功能的状态（如'通关进度是否有保存'）。",
++      "这是纯信息inquiry——用户不需要修改，只需要了解当前状态。",
++      "用户在下一turn继续追问细节（如'使用的是本地存档还是云存档'），形成inquiry链。",
++      "用户在获取信息后的1-2个turn内，立即提出一个架构级修改请求（如'改为云存档'）。",
++      "这说明用户在获取当前状态信息后，基于信息做出了架构决策。",
++      "架构级修改通常涉及EnterPlanMode，因为需要设计方案再实施。"
++    ],
++    "strategy": [
++      "对于状态查询类inquiry，准确读取相关代码文件，给出明确的当前状态结论。",
++      "当用户连续追问细节时，理解这是在为后续决策收集信息——保持回答准确简洁。",
++      '当用户提出架构级修改（如"改为X"）时，不要直接开始编码——先进入PlanMode设计方案。',
++      "在PlanMode中：读取现有实现→理解数据流→设计新架构→Write方案文档→ExitPlanMode。",
++      "实施阶段：按方案逐项Edit→build验证→respond确认。",
++      "架构级修改通常涉及多个文件的协调修改（如存档系统的读写两端），确保一致性。"
++    ],
++    "constraints": {
++      "must_use_plan_mode_for_architecture_changes": true,
++      "answer_inquiry_accurately_before_implementation": true,
++      "build_after_architecture_change": true
++    },
++    "validation": [
++      "inquiry回答基于实际代码读取，非推测",
++      "架构级修改使用了EnterPlanMode/ExitPlanMode管线",
++      "修改后build成功",
++      "存档系统的读写两端保持一致"
++    ],
++    "title_zh": "信息查询链到架构修改级联",
++    "title_en": "Inquiry Chain to Architecture Modification Cascade — Status Probe Chain Followed by System-Level Change",
++    "_provenance": {
++      "source": "traj-exp-accumulate",
++      "project": "wzp",
++      "session_hashes": [
++        "9bbd20cc"
++      ],
++      "turn_range": "9bbd20cc:T7-T9",
++      "prompt_indices": [
++        7,
++        8,
++        9
++      ],
++      "evidence": "T7: '检查 推箱子、翻牌。目前通关进度是否有保存'→3步(2 Task+1 respond)。纯信息查询，2个Task并行搜索存档相关代码→respond回答'推箱子和翻牌都有进度保存'。0 edits 0 builds。T8: '使用的是本地存档还是云存档'→1步(respond)。Agent基于T7的上下文直接回答'本地存档'。0 edits 0 builds。T9: '改为云存档'→39步(13 respond+8 Edit+5 TodoWrite+3 Task+2 Write+1 EnterPlanMode+1 ExitPlanMode+1 build)。EnterPlanMode→Task探索现有存档系统→Read理解数据流→Write云存档方案→ExitPlanMode→TodoWrite(5项)→Edit 8处修改存档逻辑→build验证。典型的'inquiry链(3+1步,0 edit)→架构修改(39步,EnterPlanMode管线)'管线。用户在T7-T8收集信息后，T9做出架构决策。",
++      "session_count": 1
++    }
+   }
+ ]
+\ No newline at end of file
+
+[0m
+[0m# [0mTodos
+[x] Create new gene: gene_nf_animation_feature_cascade (T3-T5 consecutive animation NF with per-turn build)
+[x] Create new gene: gene_inq_to_fm_correction_cascade (T7 inquiry→T8 inquiry→T9 cloud save fm)
+[ ] Enhance gene_nf_edit_drift_without_verification: add 9bbd20cc evidence (53 Edit/11 build, 4.8:1)
+[ ] Enhance gene_meta_rapid_context_switch: add 9bbd20cc (5 intent types, mixed heavy/light)
+[ ] Enhance gene_pd_design_to_build_workflow: add 9bbd20cc T0→T1 evidence
+[ ] Run gen_index.py to regenerate index files
+[0m
+[0m← [0mEdit opencode-acc/plugins/session_rhythm/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json
+@@ -185,11 +185,12 @@
+   "3ee927f3",
+   "44926b0f",
+   "5634a485",
+   "6346da75",
+-  "8a77e633"
++  "8a77e633",
++  "9bbd20cc"
+ ],
+-"turn_range": "014354fc:T0 (steps 1-98), 18479bb5:T0 (steps 1-94), 374e4eb7:T1-T3,T7-T8,T10-T13, 3ee927f3:T1-T3,T6,T9-T11,T13-T17, 44926b0f:T2-T3, 5634a485:T5, 6346da75:T1-T3,T6, 8a77e633:T4-T5",
++"turn_range": "014354fc:T0 (steps 1-98), 18479bb5:T0 (steps 1-94), 374e4eb7:T1-T3,T7-T8,T10-T13, 3ee927f3:T1-T3,T6,T9-T11,T13-T17, 44926b0f:T2-T3, 5634a485:T5, 6346da75:T1-T3,T6, 8a77e633:T4-T5, 9bbd20cc:T1,T3-T6,T9-T10",
+ "prompt_indices": [
+   0,
+   0,
+   1,
+
+[0m
+[0m✗ [0medit failed
+[91m[1mError: [0mCould not find oldString in the file. It must match exactly, including whitespace, indentation, and line endings.
+[0m✱ [0mGrep "gene_inq_blocker_analysis_to_immediate_implementation"[90m in opencode-acc/plugins/workflow/genes.json[0m
+[0m✱ [0mGrep "零定位纯编辑"[90m in opencode-acc/plugins[0m
+[0m✱ [0mGrep "edit_before_localization"[90m in opencode-acc/plugins/session_rhythm/genes.json[0m
+[0m→ [0mRead opencode-acc/plugins/session_rhythm/genes.json[90m [offset=218, limit=15][0m
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json') as f:
+    data = json.load(f)
+for gene in data:
+    if gene['id'] == 'gene_nf_edit_drift_without_verification':
+        ev = gene['_provenance']['evidence']
+        print(f'Evidence length: {len(ev)}')
+        print(f'Last 200 chars: {ev[-200:]}')
+        print(f'session_count: {gene[\"_provenance\"].get(\"session_count\")}')
+        print(f'session_hashes: {gene[\"_provenance\"].get(\"session_hashes\")}')
+"
+
+Evidence length: 3192
+Last 200 chars: build比=18.3:1，刷新所有已记录会话最高纪录（此前6346da75为8.0:1）。6个drift-start标记确认了Agent在跨游戏音效集成和删除场景中沉浸于连续编辑而大幅延迟验证。与6346da75(视觉+动画场景)不同，本session是'音频集成+删除'场景，edit/build比是此前的2.3倍，说明在跨多文件(4游戏×多按钮)的音频批量操作中，edit drift尤为严重。
+session_count: 8
+session_hashes: ['014354fc', '18479bb5', '374e4eb7', '3ee927f3', '44926b0f', '5634a485', '6346da75', '8a77e633', '9bbd20cc']
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json
+
+# Update session_rhythm/genes.json - gene_nf_edit_drift_without_verification
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json') as f:
+    data = json.load(f)
+
+for gene in data:
+    if gene['id'] == 'gene_nf_edit_drift_without_verification':
+        gene['_provenance']['session_count'] = 9
+        gene['_provenance']['evidence'] += " 9bbd20cc进一步强化此模式：整个会话53 Edit仅11 build，edit/build比=4.8:1，与3ee927f3持平。T1(开始开发):41步12 Write+1 build，Write-heavy实施阶段drift。T3(翻牌动画):22步5 Edit+2 build。T4(通关动画):27步6 Edit+1 build。T5(配队特效):26步7 Edit+1 build。T6(胜利UI):16步2 Edit+1 build。T9(云存档):39步8 Edit+1 build+EnterPlanMode。T10(检查文档):42步10 Edit+1 build。T12(删除大厅入口):28步12 Edit+0 build，纯文档drift。T12的12 Edit无build是典型纯文档edit drift。模式跨9个会话确认。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated gene_nf_edit_drift_without_verification in session_rhythm")
+
+# Update session_rhythm/genes.json - gene_meta_rapid_context_switch
+for gene in data:
+    if gene['id'] == 'gene_meta_rapid_context_switch':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 4
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T0-T12'
+        gene['_provenance']['prompt_indices'].extend([0,1,2,3,4,5,6,7,8,9,10,11,12])
+        gene['_provenance']['evidence'] += " 9bbd20cc展示了此模式的'5意图混合'变体：13 prompts, 5 intent types interleaved: T0(inspection_review,7步)→T1(new_feature,41步,12 Write)→T2(error_log_paste,17步,2 Edit+2 build)→T3(nf,翻牌动画,22步)→T4(nf,通关动画,27步)→T5(nf,配队特效,26步)→T6(fm,胜利UI,16步)→T7(inquiry,3步)→T8(inquiry,1步)→T9(fm,云存档,39步,EnterPlanMode)→T10(inspection_review,42步)→T11(fm,删除入口,28步)→T12(inspection_review,16步)。Avg 21.9 steps/turn。典型切换序列：inspection→nf实施→error_log→连续3 nf动画→fm→inquiry链→fm架构修改→inspection×2。每个turn保持独立专注。5种intent类型(inspection_review/new_feature/error_log_paste/feature_modification/inquiry)。与76b0acb1(6种,重度)和13683faf(5种,轻量)对比——本session是'中等混合'变体(avg 22步)，含EnterPlanMode架构修改turn和error_log_paste诊断turn。模式确认：rapid_context_switch存在'重度混合'(76b0acb1, avg 20步)、'轻量混合'(13683faf, avg 7步)、'极轻量混合'(7a895854, avg 16步)、和'中等混合'(9bbd20cc, avg 22步)四种变体。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated gene_meta_rapid_context_switch in session_rhythm")
+PYEOF
+
+Updated gene_nf_edit_drift_without_verification in session_rhythm
+Updated gene_meta_rapid_context_switch in session_rhythm
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json
+
+# Update workflow/genes.json - gene_pd_design_to_build_workflow
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json') as f:
+    data = json.load(f)
+
+for gene in data:
+    if gene['id'] == 'gene_pd_design_to_build_workflow':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 3
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T0-T1'
+        gene['_provenance']['prompt_indices'].extend([0, 1])
+        gene['_provenance']['evidence'] += " 9bbd20cc展示了此模式的'文档审查→直接实施'变体：T0: '检查P2-记忆翻牌.md，如果要开始制作，是否有需要补充的内容，是否有阻碍点'→7步(3 Read+3 respond+1 Task)。读取AI开发规范.md+P2-记忆翻牌.md→Task探索项目→respond输出审查结论('文档完整，无阻碍')。0 edits 0 builds。T1: '开始开发'(4字)→41步(12 respond+12 Write+7 Read+7 TodoWrite+2 Bash+1 build)。TodoWrite创建7项清单→Read参考文件→Write创建12个新文件(p2-memory-flip目录结构: init.lua, config.lua, logic/, view/, screens/, adapter.lua, save.lua)→build验证。与374e4eb7不同——后者是'设计文档→用户审阅→开始制作'两阶段，本session是'文档审查→用户确认→实施'两阶段，跳过了设计文档创建步骤（因为P2-记忆翻牌.md已足够完整）。5c2aeaee是'文档审查→架构设计→用户批准→实施'四阶段。模式确认：design_doc_first_then_implement存在'两阶段直接实施'(9bbd20cc)、'两阶段设计后实施'(374e4eb7)、和'四阶段架构设计'(5c2aeaee)三种变体。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated gene_pd_design_to_build_workflow in workflow")
+PYEOF
+
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 3301 column 7 (char 131506)
+[0m
+[0m$ [0mpython3 -c "
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json') as f:
+    content = f.read()
+# Find line 3301
+lines = content.split('\n')
+for i in range(3295, min(3310, len(lines))):
+    print(f'{i+1}: {lines[i][:120]}')
+"
+
+3296:       "架构级修改通常涉及EnterPlanMode，因为需要设计方案再实施。"
+3297:     ],
+3298:     "strategy": [
+3299:       "对于状态查询类inquiry，准确读取相关代码文件，给出明确的当前状态结论。",
+3300:       "当用户连续追问细节时，理解这是在为后续决策收集信息——保持回答准确简洁。",
+3301:       '当用户提出架构级修改（如"改为X"）时，不要直接开始编码——先进入PlanMode设计方案。',
+3302:       "在PlanMode中：读取现有实现→理解数据流→设计新架构→Write方案文档→ExitPlanMode。",
+3303:       "实施阶段：按方案逐项Edit→build验证→respond确认。",
+3304:       "架构级修改通常涉及多个文件的协调修改（如存档系统的读写两端），确保一致性。"
+3305:     ],
+3306:     "constraints": {
+3307:       "must_use_plan_mode_for_architecture_changes": true,
+3308:       "answer_inquiry_accurately_before_implementation": true,
+3309:       "build_after_architecture_change": true
+3310:     },
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [offset=3295, limit=25][0m
+[0m
+[0m← [0mEdit opencode-acc/plugins/workflow/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+@@ -3297,9 +3297,9 @@
+ ],
+ "strategy": [
+   "对于状态查询类inquiry，准确读取相关代码文件，给出明确的当前状态结论。",
+   "当用户连续追问细节时，理解这是在为后续决策收集信息——保持回答准确简洁。",
+-  '当用户提出架构级修改（如"改为X"）时，不要直接开始编码——先进入PlanMode设计方案。',
++  "当用户提出架构级修改（如改为X）时，不要直接开始编码——先进入PlanMode设计方案。",
+   "在PlanMode中：读取现有实现→理解数据流→设计新架构→Write方案文档→ExitPlanMode。",
+   "实施阶段：按方案逐项Edit→build验证→respond确认。",
+   "架构级修改通常涉及多个文件的协调修改（如存档系统的读写两端），确保一致性。"
+ ],
+
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json') as f:
+    data = json.load(f)
+print(f'workflow/genes.json valid. {len(data)} genes.')
+# Find gene_pd_design_to_build_workflow
+for gene in data:
+    if gene['id'] == 'gene_pd_design_to_build_workflow':
+        print(f'Found: {gene[\"id\"]}, sessions: {gene[\"_provenance\"][\"session_hashes\"]}, count: {gene[\"_provenance\"][\"session_count\"]}')
+"
+
+workflow/genes.json valid. 56 genes.
+Found: gene_pd_design_to_build_workflow, sessions: ['374e4eb7', '5c2aeaee'], count: 2
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json
+
+# Update workflow/genes.json - gene_pd_design_to_build_workflow
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json') as f:
+    data = json.load(f)
+
+for gene in data:
+    if gene['id'] == 'gene_pd_design_to_build_workflow':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 3
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T0-T1'
+        gene['_provenance']['prompt_indices'].extend([0, 1])
+        gene['_provenance']['evidence'] += " 9bbd20cc展示了此模式的'文档审查→直接实施'变体：T0: '检查P2-记忆翻牌.md，如果要开始制作，是否有需要补充的内容，是否有阻碍点'→7步(3 Read+3 respond+1 Task)。读取AI开发规范.md+P2-记忆翻牌.md→Task探索项目→respond输出审查结论('文档完整，无阻碍')。0 edits 0 builds。T1: '开始开发'(4字)→41步(12 respond+12 Write+7 Read+7 TodoWrite+2 Bash+1 build)。TodoWrite创建7项清单→Read参考文件→Write创建12个新文件(p2-memory-flip目录结构: init.lua, config.lua, logic/, view/, screens/, adapter.lua, save.lua)→build验证。与374e4eb7不同——后者是'设计文档→用户审阅→开始制作'两阶段，本session是'文档审查→用户确认→实施'两阶段，跳过了设计文档创建步骤（因为P2-记忆翻牌.md已足够完整）。5c2aeaee是'文档审查→架构设计→用户批准→实施'四阶段。模式确认：design_doc_first_then_implement存在'两阶段直接实施'(9bbd20cc)、'两阶段设计后实施'(374e4eb7)、和'四阶段架构设计'(5c2aeaee)三种变体。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated gene_pd_design_to_build_workflow in workflow")
+
+# Also update gene_inq_pre_implementation_blocker_probe
+for gene in data:
+    if gene['id'] == 'gene_inq_pre_implementation_blocker_probe':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 3
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T0'
+        gene['_provenance']['prompt_indices'].append(0)
+        gene['_provenance']['evidence'] += " 9bbd20cc展示了此模式的'单文档+Task'变体：T0: '检查P2-记忆翻牌.md，如果要开始制作，是否有需要补充的内容，是否有阻碍点'→7步(3 Read+3 respond+1 Task)。读取AI开发规范.md+P2-记忆翻牌.md→Task探索项目→respond输出审查结论('文档完整，可直接开始制作')。0 edits 0 builds。与0997e370(文档+代码+子agent三维验证)和6b8bf0cd(双文档轻量审查)不同——本session是'双文档+Task探索'中等模式，比纯文档审查深但比三维验证浅。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated gene_inq_pre_implementation_blocker_probe in workflow")
+PYEOF
+
+Updated gene_pd_design_to_build_workflow in workflow
+Updated gene_inq_pre_implementation_blocker_probe in workflow
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json
+
+# Update operational/genes.json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json') as f:
+    data = json.load(f)
+
+# gene_op_batch_build_verify
+for gene in data:
+    if gene['id'] == 'gene_op_batch_build_verify':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 3
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T1,T3-T6,T9-T11'
+        gene['_provenance']['prompt_indices'].extend([1, 3, 4, 5, 6, 9, 10, 11])
+        gene['_provenance']['evidence'] += " 9bbd20cc强化了此模式：T1(开始开发):41步12 Write+1 build(末尾)。T3(翻牌动画):22步5 Edit+2 build。T4(通关动画):27步6 Edit+1 build。T5(配队特效):26步7 Edit+1 build。T6(胜利UI):16步2 Edit+1 build。T9(云存档):39步8 Edit+1 build。T10(检查文档):42步10 Edit+1 build。T11(进度查询修复):16步1 Edit+1 build。8个代码turn中6个恰好1 build在末尾，T3有2 build(动画调试需要额外验证)。模式确认：无论turn轻重，build始终在编辑完成后执行。"
+        break
+
+# gene_mw_todo_driven_workflow
+for gene in data:
+    if gene['id'] == 'gene_mw_todo_driven_workflow':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 4
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T1,T3-T6,T9-T12'
+        gene['_provenance']['prompt_indices'].extend([1, 3, 4, 5, 6, 9, 10, 11, 12])
+        gene['_provenance']['evidence'] += " 9bbd20cc进一步强化此模式：整个会话43次TodoWrite调用。T1(开始开发):7次TodoWrite管理7项实施清单(创建目录→config→logic→view→screens→adapter→build)。T3(翻牌动画):4次TodoWrite管理4项动画实施。T4(通关动画):4次TodoWrite。T5(配队特效):4次TodoWrite。T6(胜利UI):4次TodoWrite。T9(云存档):5次TodoWrite管理EnterPlanMode方案实施。T10(检查文档):7次TodoWrite跟踪文档检查。T11(进度查询修复):4次TodoWrite。T12(删除入口):4次TodoWrite。整个会话43次TodoWrite覆盖实施→动画→UI→架构修改→文档检查全链路。模式确认：TodoWrite在'连续多功能开发'场景中同样发挥进度锚定作用，防止在跨turn开发中遗漏子系统。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated operational genes")
+PYEOF
+
+Updated operational genes
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json
+
+# Update diagnostic/genes.json - gene_elp_error_log_diagnostic
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/genes.json') as f:
+    data = json.load(f)
+
+for gene in data:
+    if gene['id'] == 'gene_elp_error_log_diagnostic':
+        gene['_provenance']['session_hashes'].append('9bbd20cc')
+        gene['_provenance']['session_count'] = 5
+        gene['_provenance']['turn_range'] += ', 9bbd20cc:T2'
+        gene['_provenance']['prompt_indices'].append(2)
+        gene['_provenance']['evidence'] += " 9bbd20cc展示了此模式的'资源缺失直修'变体：T2: 粘贴TapTap Maker错误报告，2次相同错误'Could not find resource Textures/games/p2-memory-flip-cover.png'→17步(5 respond+3 Read+3 Grep+2 Edit+2 build+2 Bash)。S1-S3: Grep搜索p2-memory-flip-cover相关代码→S4-S6: Read确认cover路径配置→S7-S8: Edit×2修复cover路径→S9-S10: build×2验证。与61467d20的资源缺失诊断管线一致——Glob/Grep搜索资源目录→Read确认配置→Edit修复路径→build验证。模式跨5个会话确认。"
+        break
+
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/genes.json', 'w') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("Updated diagnostic genes")
+PYEOF
+
+Updated diagnostic genes
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json
+
+# Update informational/genes.json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/genes.json') as f:
+    data = json.load(f)
+
+print(f"informational genes: {[g['id'] for g in data]}")
+
+# Check if gene_ir_minimal_inspection_rhythm exists here or in workflow
+# It's in workflow/genes.json based on the index
+# Let's check the informational genes for any that match 9bbd20cc
+
+for gene in data:
+    print(f"  {gene['id']}: signals={gene.get('signals_match', [])[:3]}")
+
+PYEOF
+
+informational genes: ['gene_inq_ui_status_probe', 'gene_ir_narrative_game_data_consistency_check']
+  gene_inq_ui_status_probe: signals=['intent:inquiry', 'target:ui_layout', 'read_respond_only']
+  gene_ir_narrative_game_data_consistency_check: signals=['intent:inspection_review', 'target:narrative', 'data_consistency_check']
+[0m
+[0m# [0mTodos
+[x] Create new gene: gene_nf_animation_feature_cascade (T3-T5 consecutive animation NF with per-turn build)
+[x] Create new gene: gene_inq_to_fm_correction_cascade (T7 inquiry→T8 inquiry→T9 cloud save fm)
+[x] Enhance gene_nf_edit_drift_without_verification: add 9bbd20cc evidence (53 Edit/11 build, 4.8:1)
+[x] Enhance gene_meta_rapid_context_switch: add 9bbd20cc (5 intent types, mixed heavy/light)
+[x] Enhance gene_pd_design_to_build_workflow: add 9bbd20cc T0→T1 evidence
+[ ] Run gen_index.py to regenerate index files
+[0m
+[0m$ [0mpython3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins 2>&1
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/index.md (6 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/index.md (2 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/index.md (9 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/index.md (7 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/index.md (56 genes)
+  (5 categories indexed)
+[0m
+[0m$ [0mpython3 << 'PYEOF'
+import json, os
+
+plugins_dir = '/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins'
+categories = ['diagnostic', 'informational', 'operational', 'session_rhythm', 'workflow']
+
+total_genes = 0
+new_genes = []
+
+for cat in categories:
+    path = os.path.join(plugins_dir, cat, 'genes.json')
+    with open(path) as f:
+        data = json.load(f)
+    total_genes += len(data)
+    for gene in data:
+        if '9bbd20cc' in gene['_provenance'].get('session_hashes', []):
+            is_new = gene['_provenance']['session_hashes'] == ['9bbd20cc']
+            new_genes.append((cat, gene['id'], is_new, gene['_provenance']['session_count']))
+
+print(f"Total genes across all categories: {total_genes}")
+print(f"\nGenes referencing 9bbd20cc:")
+for cat, gene_id, is_new, count in new_genes:
+    status = "NEW" if is_new else f"enhanced (now {count} sessions)"
+    print(f"  [{cat}] {gene_id}: {status}")
+
+PYEOF
+
+Total genes across all categories: 80
+
+Genes referencing 9bbd20cc:
+  [diagnostic] gene_elp_error_log_diagnostic: enhanced (now 5 sessions)
+  [operational] gene_mw_todo_driven_workflow: enhanced (now 4 sessions)
+  [operational] gene_op_batch_build_verify: enhanced (now 3 sessions)
+  [session_rhythm] gene_meta_rapid_context_switch: enhanced (now 4 sessions)
+  [session_rhythm] gene_nf_edit_drift_without_verification: enhanced (now 9 sessions)
+  [workflow] gene_inq_pre_implementation_blocker_probe: enhanced (now 3 sessions)
+  [workflow] gene_pd_design_to_build_workflow: enhanced (now 3 sessions)
+  [workflow] gene_nf_animation_feature_cascade: NEW
+  [workflow] gene_inq_to_fm_correction_cascade: NEW
+[0m
+[0m$ [0mpython3 -c "
+import json, os
+plugins_dir = '/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins'
+for cat in ['diagnostic', 'informational', 'operational', 'session_rhythm', 'workflow']:
+    path = os.path.join(plugins_dir, cat, 'genes.json')
+    try:
+        with open(path) as f:
+            data = json.load(f)
+        print(f'{cat}/genes.json: OK ({len(data)} genes)')
+    except Exception as e:
+        print(f'{cat}/genes.json: ERROR - {e}')
+"
+
+diagnostic/genes.json: OK (6 genes)
+informational/genes.json: OK (2 genes)
+operational/genes.json: OK (9 genes)
+session_rhythm/genes.json: OK (7 genes)
+workflow/genes.json: OK (56 genes)
+[0m
+[0m# [0mTodos
+[x] Create new gene: gene_nf_animation_feature_cascade (T3-T5 consecutive animation NF with per-turn build)
+[x] Create new gene: gene_inq_to_fm_correction_cascade (T7 inquiry→T8 inquiry→T9 cloud save fm)
+[x] Enhance gene_nf_edit_drift_without_verification: add 9bbd20cc evidence (53 Edit/11 build, 4.8:1)
+[x] Enhance gene_meta_rapid_context_switch: add 9bbd20cc (5 intent types, mixed heavy/light)
+[x] Enhance gene_pd_design_to_build_workflow: add 9bbd20cc T0→T1 evidence
+[x] Run gen_index.py to regenerate index files
+[0m

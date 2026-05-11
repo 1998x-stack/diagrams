@@ -1,0 +1,10 @@
+Done. Here's what was extracted from session `5dbc4646`:
+
+**T1 (inquiry: "自由模式，记忆翻牌，不同关卡的卡牌数量是怎样的")**
+→ Enhanced `gene_inq_current_impl_audit` (now 3 sessions). Confirms the simplified variant: game-specific factual inquiry → 1 Task SA handles all discovery → 3-step response. No Glob or direct reads by main agent.
+
+**T2 (feature_modification: "参考连连看的方块图形，修改记忆翻牌的图形")**
+→ Created new gene `gene_fm_cross_game_graphic_lib_import`. Key distinction from the existing `gene_fm_cross_game_effect_style_port`: the source is an **existing** game's renderer (not a same-session modification), the import copies entire drawing function bodies (not just style parameters), and two target files must be updated — the renderer (drawing functions) and the board logic (art pool names).
+
+**T3 (new_feature: "设计主线关卡，到28关")**
+→ Enhanced `gene_nf_planmode_parallel_bulk_level_expansion` with a **no-planmode sequential variant**. While the existing gene used PlanMode + 3 parallel write subagents, this session read all 16 existing story files individually (1-by-1 heavier read phase), added a pagination check (`NODES_PER_PAGE`), then wrote 12 new level files sequentially — no PlanMode, no parallel subagents.

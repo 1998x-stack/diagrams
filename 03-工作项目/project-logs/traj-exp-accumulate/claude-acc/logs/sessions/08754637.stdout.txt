@@ -1,0 +1,16 @@
+Done. Here's a summary of what was extracted from session `zzj/08754637` (854 turns):
+
+**Intent distribution highlights:** `feature_modification` dominated at 47.5% (406 turns), followed by `new_feature` (120), `bug_report` (113), `inquiry` (104), `ai_output_correction` (49), `error_log_paste` (32).
+
+**3 new genes created:**
+
+1. **`gene_aoc_logic_reexplain_cluster`** (diagnostic) — When AI fails to apply a logic correction, user sends 2-3 consecutive AOC turns restating the same constraint with escalating specificity. Evidence: T97-T99 (energy charge phases), T299-T301 (beam deletion method), T834-T835 (damage formula). Strategy: treat 2nd AOC as signal to reread+rewrite from scratch, explicitly state the invariant, confirm mapping in reply.
+
+2. **`gene_elp_platform_noise_continue_pattern`** (diagnostic) — "View exceeds maximum limit" appeared 11 times; in every case the user's next turn was unrelated (FM/inq, never a fix request). Strategy: acknowledge briefly, do not block workflow, no unsolicited fix attempt.
+
+3. **`gene_pd_design_discussion_to_impl_trigger`** (workflow) — 7 clean PD→NF transitions observed (design discussion immediately followed by implementation request). Also identified anti-pattern: T678-T680 shows 3 repeated near-identical PD turns when AI's design response wasn't actionable. Strategy: enumerate concrete implementable options during PD, don't implement during PD, preserve PD parameters in NF.
+
+**1 gene enhanced:**
+- **`gene_fm_visual_polish_cascade`** — Added provenance from T71-T86 (16-turn HUD UI polish, longest in dataset) and T430-T444 (15-turn 3D armor model appearance cascade). Session count now 6.
+
+Index regenerated: diagnostic=27, workflow=93.

@@ -1,0 +1,720 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_br_minimal_bug_fix",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:ui_layout",
+      "target:game_logic",
+      "single_file_fix",
+      "read_edit_build_cycle",
+      "minimal_change",
+      "grep_for_root_cause"
+    ],
+    "preconditions": [
+      "用户报告一个具体的bug（如UI交互异常、游戏逻辑错误、显示错位）。",
+      "问题范围明确，指向单一文件或组件。",
+      "不需要大规模重构，只需定位并修复具体问题。",
+      "对于game_logic类bug（如章节显示错位、点击穿透），可能需要Grep搜索相关关键词来定位根因。"
+    ],
+    "strategy": [
+      "第一步：读取受影响的目标文件，理解当前实现。",
+      "第二步：定位问题根因（如事件处理缺失、布局参数错误）。",
+      "第三步：最小化修改——只修复问题本身，不做额外重构。",
+      "第四步：立即build验证修复效果。",
+      "第五步：如问题未解决，重新读取文件确认修改已生效。"
+    ],
+    "constraints": {
+      "max_edits_per_bug": 3,
+      "must_build_after_fix": true,
+      "no_refactoring_while_fixing": true
+    },
+    "validation": [
+      "build成功",
+      "用户报告的bug现象已消除",
+      "修改仅限于问题相关文件"
+    ],
+    "title_zh": "最小化Bug修复模式",
+    "title_en": "Minimal Bug Fix — Read-Edit-Build Cycle for UI Defects",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "014354fc",
+        "13683faf"
+      ],
+      "turn_range": "014354fc:T3-T4, 13683faf:T2-T3,T5",
+      "prompt_indices": [
+        3,
+        4,
+        2,
+        3,
+        5
+      ],
+      "evidence": "014354fc: T3: debug按钮无法点击→读取sound-test-panel.lua→3次edit→1次build→修复。T4: 音效测试UI位置异常→读取sound-test-panel.lua→2次edit→1次build→修复。两个bug均为read→edit→build的简洁循环，无多余操作。13683faf: 扩展了game_logic类bug模式。T2: 章节标题重叠('第一章和第二章同时显示')→1 Edit+1 build→修复。T3: 章节-页码错位('第三页显示第四章')→Read+Edit+build→修复。T5: 点击穿透('点击忠告页面直接进入关卡')→2 Reads+3 Greps+2 Edits+1 build→修复。T5展示了game_logic bug需要Grep辅助定位的特点（搜索事件处理、遮罩层相关代码），与UI bug的纯Read定位不同。",
+      "session_count": 2
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_nf_subagent_fallback_to_direct",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:new_feature",
+      "subagent_404_error",
+      "Task_tool_failure",
+      "fallback_to_glob",
+      "fallback_to_direct_read",
+      "localization_without_edit"
+    ],
+    "preconditions": [
+      "用户提出新功能需求，Agent 尝试通过 Task 子 Agent 探索代码库。",
+      "子 Agent 因 404 错误全部失败（环境限制或平台不支持子 Agent 恢复）。",
+      "Agent 需要自行完成代码定位工作，无法委托给子 Agent。"
+    ],
+    "strategy": [
+      "检测到子 Agent 404 错误后，立即切换到直接工具（Glob、Read）进行代码探索。",
+      "优先使用 Glob 扫描相关文件路径，确认目标文件存在。",
+      "使用 Read 逐个读取关键文件，构建对代码架构的理解。",
+      "不要在失败的子 Agent 上重试或等待恢复——直接降级到手动探索。",
+      "记录哪些子 Agent 失败了，避免重复尝试相同的 delegation。"
+    ],
+    "constraints": {
+      "max_subagent_retry_on_404": 0,
+      "fallback_tool_priority": [
+        "Glob",
+        "Read",
+        "Grep"
+      ]
+    },
+    "validation": [
+      "子 Agent 失败后，Agent 在 2 步内切换到直接工具",
+      "不再尝试使用 Task 工具创建相同类型的子 Agent",
+      "成功读取至少 1 个目标文件的内容"
+    ],
+    "title_zh": "子Agent失败降级为直接探索",
+    "title_en": "Subagent Delegation Failure to Direct Tool Fallback",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "0428882b"
+      ],
+      "turn_range": "0428882b:T01-T13",
+      "prompt_indices": [
+        0
+      ],
+      "evidence": "4 subagents launched (a53e615, a5ca1be, a9418bf, a9b1bff). a9b1bff partially explored /workspace/scripts/ via Bash before also hitting 404. Agent then fell back to Glob (steps 3-4, 9-10) and mcp__mkr__Read (steps 6-8, 11-12), reading 6 files: router.lua, storyline/init.lua, adventure-sfx.lua, adventure/init.lua, home/init.lua, main menu. Session terminated by API error before any edit could be made. Pattern: 404 -> Glob -> Read -> terminate.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_bug_retry_escalation",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "same_bug_consecutive_turns_ge_2",
+      "escalating_frustration_language",
+      "still_only_once_pattern",
+      "target:game_logic",
+      "minimal_edit_per_retry",
+      "build_after_each_retry_fix"
+    ],
+    "preconditions": [
+      "用户报告一个bug后，Agent进行了修复并build。",
+      "用户在接下来的2-3个连续turn中报告同一个bug仍然存在，使用'还是'、'仍然'、'依旧'等词语。",
+      "每次报告的措辞略有变化但指向同一问题（如'只会显示一个聊天'→'还是只能点击依次'→'还是只能点击一次'）。",
+      "这是用户 frustration 升级的信号——说明Agent的前一次修复没有真正解决问题根因。",
+      "目标产物通常是game_logic类bug（点击事件处理、状态管理、计数器逻辑）。"
+    ],
+    "strategy": [
+      "当用户第二次报告同一个bug时（使用'还是'、'仍然'等词），理解为你前一次的修复没有生效。",
+      "不要重复相同的修复方法——回到Read阶段，重新理解问题的完整上下文。",
+      "扩大搜索范围：不仅读取此前修改的文件，还要读取调用方、事件处理链、状态管理相关文件。",
+      "用Grep搜索相关关键词（如onClick、onTouch、click handler），确认事件处理是否被正确注册和触发。",
+      "检查是否存在状态变量没有被正确重置（如一个计数器只递增不重置、一个标志位只设置不清除）。",
+      "修复后必须build，并在respond_to_user中明确说明你这次修复了什么、为什么此前修复失败。",
+      "如果第三次仍然失败，考虑是否存在架构层面的问题（如事件冒泡、渲染层遮挡、状态生命周期），需要更彻底的方案。"
+    ],
+    "constraints": {
+      "do_not_repeat_same_fix_on_retry": true,
+      "must_reread_and_reanalyze_on_second_report": true,
+      "must_build_after_each_retry_fix": true,
+      "explain_why_previous_fix_failed": true
+    },
+    "validation": [
+      "第二次报告时，Agent没有重复相同的修复方法",
+      "Agent扩大了搜索范围，读取了更多相关文件",
+      "每次修复后都执行了build",
+      "respond_to_user中说明了此次修复与前次的差异",
+      "最终bug被彻底修复，用户不再重复报告"
+    ],
+    "title_zh": "Bug重试升级模式",
+    "title_en": "Bug Retry Escalation — Same Bug Reported Across Consecutive Turns with Frustration Signals",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "374e4eb7",
+        "bdf118ee",
+        "4f916c20",
+        "d8f96672"
+      ],
+      "turn_range": "374e4eb7:T19-T21, bdf118ee:T03-T04, 4f916c20:T15-T17, d8f96672:T10-T12",
+      "prompt_indices": [
+        19,
+        20,
+        21,
+        3,
+        4,
+        14,
+        16,
+        10,
+        11,
+        12
+      ],
+      "evidence": "T19: '修改主页面，点击角色的聊天，现在只会显示一个聊天，之后点击就无效了'→24步(10 respond+8 Read+4 Grep+1 Edit+1 build)。Agent读取fox-mascot.lua等文件，修改聊天点击逻辑→build。T20: '还是只能点击依次'→0步（空turn，可能是API错误或用户立即发送）。T21: '还是只能点击一次'→17步(6 respond+4 Read+2 Grep+2 build+2 Glob)。Agent再次读取fox-mascot.lua、chat-bubble.lua等，执行第二次修复→2次build。典型的'报告→修复→还是不行→再修复'模式，用户使用'还是'表达frustration。T20的0步可能是API错误或用户连续发送，T21的'还是只能点击一次'与T19的'只会显示一个聊天'指向同一问题。 bdf118ee扩展了此模式的\"加载失败\"变体：T03: \"进入第二关时，显示游戏加载失败，请返回重试\"→52步(17 respond+13 Read+9 Edit+6 TodoWrite+5 Grep)。Agent读取多个文件诊断加载失败根因→9 Edit修复→respond确认。T04: \"story-2还是显示游戏加载失败，请返回重试\"→20步(8 respond+6 Grep+2 Read+2 Edit+1 Bash)。用户使用\"还是\"表达同一bug仍存在→Grep定位→2 Edit修复→Bash验证。与374e4eb7不同——后者是game_logic点击事件bug(聊天点击无效)，本session是game_logic加载/初始化bug(关卡数据加载失败)，但\"报告→修复→还是不行→再修复\"模式完全一致。T04的20步比T03的52步显著缩短，说明Agent在第二次报告时更快定位问题。 4f916c20扩展了此模式的'Web剪贴板bug'变体：T15: '输入关卡数据UI，无法粘贴和输入数据'→10步(7 Grep+3 respond)。纯诊断模式，7次Grep搜索→0 Edit。T16: 'build'→2步。T17: 'web无法使用粘贴'→33步(7 Grep+6 Edit+4 Read+4 TodoWrite)。用户提供更多上下文→7 Grep+4 Read定位→6 Edit修复→build。与374e4eb7的game_logic点击事件bug和bdf118ee的加载失败bug不同，本session是Web剪贴板输入bug，但'报告→诊断→build→再报告(带更多上下文)→修复'模式完全一致。 d8f96672展示了此模式的'错误日志升级'变体：T10: '点击推箱子后，屏幕渐黑，然后就一直维持全黑了'→13步(6 respond+2 Read+2 Edit+2 Todo+1 build)。转场效果bug首次报告→Edit修复→build。T11: '现在仍然是变成全黑'→40步(16 respond+8 Edit+4 Grep+4 Todo+4 Read)。用户使用'仍然是'表达同一bug仍存在→Agent扩大调查范围(4 Grep+4 Read)→8 Edit修复→2 build。T12: 粘贴TapTap Maker错误报告(18步,4 Edit+5 Write+1 build)。用户在build后测试仍然失败→直接粘贴原始错误日志(WebAssembly indirect call to null)→Agent切换到错误日志诊断模式→4 Edit+5 Write修复→build。典型的'报告(13步)→仍然是(40步,扩大调查)→错误日志(18步,诊断升级)'管线。与374e4eb7的game_logic点击事件bug不同——本session是转场效果渲染bug，但'报告→修复→仍然是→扩大调查→诊断升级'模式完全一致。T12的错误日志粘贴是诊断方法的终极升级——从自然语言描述到原始错误堆栈。模式跨4个会话确认。",
+      "session_count": 4
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_error_log_diagnostic",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "stacktrace_in_prompt",
+      "mentions_specific_file",
+      "error_count_ge_10",
+      "same_error_repeated",
+      "Grep_for_error_line",
+      "Read_target_file",
+      "single_edit_fix",
+      "build_after_fix"
+    ],
+    "preconditions": [
+      "用户直接粘贴原始错误日志/崩溃报告/堆栈跟踪，没有附加指令。",
+      "错误日志包含文件名和行号（如fox-mascot.lua:337）。",
+      "同一错误重复出现多次（如59次相同的arithmetic on table value错误）。",
+      "这是高优先级问题——运行时错误影响游戏正常运行。"
+    ],
+    "strategy": [
+      "从错误日志中提取关键信息：文件名、行号、错误类型（如'attempt to perform arithmetic on a table value'）。",
+      "用Grep搜索错误行附近的代码，理解上下文——不要直接读取整行，先定位问题区域。",
+      "读取目标文件的错误行及其前后代码，理解是什么操作导致了类型错误。",
+      "常见原因：变量预期为number但实际为table、数组索引错误、返回值类型不匹配。",
+      "执行精准Edit修复问题行，不要修改无关代码。",
+      "修复后立即build验证。",
+      "在respond_to_user中说明：错误根因（什么变量是什么类型）、修复方案（改为什么）、预期效果。"
+    ],
+    "constraints": {
+      "extract_file_and_line_from_stacktrace": true,
+      "grep_before_reading_target_file": true,
+      "minimal_edit_only_fix_error_line": true,
+      "must_build_after_fix": true
+    },
+    "validation": [
+      "从错误日志中正确提取了文件名和行号",
+      "读取了目标文件的错误行上下文",
+      "修复了导致类型错误的代码行",
+      "build成功",
+      "respond_to_user中说明了错误根因和修复方案"
+    ],
+    "title_zh": "错误日志诊断模式",
+    "title_en": "Error Log Diagnostic — Stack Trace Parsing to Surgical Fix",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "374e4eb7",
+        "61467d20",
+        "76b0acb1",
+        "7a895854",
+        "9bbd20cc",
+        "bdf118ee",
+        "cc1dd130"
+      ],
+      "turn_range": "374e4eb7:T23, 61467d20:T4, 76b0acb1:T18, 7a895854:T2, 9bbd20cc:T2, bdf118ee:T03, cc1dd130:T2",
+      "prompt_indices": [
+        23,
+        4,
+        17,
+        2,
+        2,
+        2,
+        2
+      ],
+      "evidence": "T23: 用户粘贴TapTap Maker错误报告，59次相同错误'fox-mascot:337: attempt to perform arithmetic on a table value'→10步(4 respond+3 Grep+1 Read+1 Edit+1 build)。S1: Grep搜索fox-mascot render函数→S2: Grep搜索第337行附近的arithmetic操作→S3: Read fox-mascot.lua确认问题→S4: Edit修复类型错误→S5: build验证→respond输出修复说明。典型的'错误日志→Grep定位→Read确认→Edit修复→build验证'管线。 61467d20扩展了此模式的变体——资源缺失类错误：T4: 粘贴TapTap Maker错误报告，2次相同错误'Could not find resource Textures/games/p3-match-3-cover.png'→12步(4 respond+3 Glob+2 Grep+1 Read+1 Edit+1 build)。S1-S3: Glob搜索assets/Textures/games/*定位资源目录→S5-S6: Grep搜索cover/icon相关代码→S8: Read p3-match-3.lua确认cover路径配置→S9: Edit修复cover路径→S10: build验证。与374e4eb7的代码逻辑错误不同，本session是资源文件缺失/路径错误类问题，诊断方法从Grep代码行升级为Glob文件搜索+Grep配置引用。模式确认：error_log_paste不仅适用于代码运行时错误，也适用于资源缺失类构建错误，诊断工具从Grep扩展为Glob+Grep组合。 76b0acb1进一步强化此模式：T18: 粘贴TapTap Maker错误报告，69次相同错误'fox-mascot:231: attempt to perform arithmetic on a nil value (field \"integer index\")'→17步(8 respond+3 Read+3 Edit+2 Grep+1 build)。S1-S2: Grep搜索fox-mascot render函数和integer index变量→S3: Read fox-mascot.lua:231确认问题→S4-S6: Edit×3修复nil值算术运算→S7: build验证→respond输出修复说明。与374e4eb7的fox-mascot:337 table value错误不同，本session是fox-mascot:231 nil value错误，但诊断管线一致：Grep→Read→Edit→build。模式跨会话确认。 7a895854展示了此模式的极轻量变体——Lua语法错误直修：T2: 粘贴TapTap Maker错误报告，5个错误指向kinsoku.lua:10 'unfinished string'→5步(2 respond+1 Read+1 Edit+1 build)。S1: Read kinsoku.lua→S2: Edit修复未闭合字符串→S3: build验证→S4: respond输出修复说明。与此前会话不同——本session **零Grep**，因为错误信息极其明确（'unfinished string near'直接指出语法问题类型和行号），Agent跳过定位阶段直接Read→Edit→build。这是error_log_diagnostic的最简形式：当错误日志包含精确文件名+行号+错误类型时，Grep定位步骤可省略。模式确认：error_log_diagnostic存在'Grep重定位'(10-17步)、'Glob+Grep定位'(12步)、和'零Grep直修'(5步)三种变体，根据错误信息明确度自适应。 9bbd20cc展示了此模式的'资源缺失直修'变体：T2: 粘贴TapTap Maker错误报告，2次相同错误'Could not find resource Textures/games/p2-memory-flip-cover.png'→17步(5 respond+3 Read+3 Grep+2 Edit+2 build+2 Bash)。S1-S3: Grep搜索p2-memory-flip-cover相关代码→S4-S6: Read确认cover路径配置→S7-S8: Edit×2修复cover路径→S9-S10: build×2验证。与61467d20的资源缺失诊断管线一致——Glob/Grep搜索资源目录→Read确认配置→Edit修复路径→build验证。模式跨5个会话确认。 bdf118ee展示了此模式的\"wallSet nil\"变体：T03: 粘贴TapTap Maker错误报告，62次相同错误\"games/p1-puzzle-land/logic/board:81: attempt to index a nil value (field 'wallSet')\"→38步(12 respond+12 Grep+7 Read+4 TodoWrite+1 Edit+1 build+1 Bash)。S1-S12: Grep搜索board.lua的wallSet/wall相关代码→S13-S19: Read board.lua等文件确认问题→S20-TodoWrite创建修复清单→S21: Edit修复wallSet初始化→S22: build验证→S23: Bash验证。与374e4eb7的fox-mascot:337 table value错误和76b0acb1的fox-mascot:231 nil value错误不同，本session是board.lua:81 wallSet nil错误，但诊断管线一致：Grep→Read→Edit→build。模式跨6个会话确认。 cc1dd130展示了此模式的'board-renderer nil'变体：T2: 粘贴TapTap Maker错误报告，80次相同错误'board-renderer:996: attempt to perform arithmetic on a nil value (field integer index)'13步(5 respond+5 Grep+1 Read+1 Edit+1 build)。S0: respond确认 -> S1: Read board-renderer.lua -> S2: respond -> S3-S7: 5次Grep搜索nvgTextBounds/drawHUD相关代码 -> S8-S12: respond输出诊断结论 -> S13: Edit修复 -> S14: build验证。与76b0acb1的fox-mascot:231 nil value错误同类型(integer index nil)，但本session的Edit量更少(1 vs 3)，步骤更轻量(13 vs 17)。模式跨7个会话确认。",
+      "session_count": 7
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_multi_error_diagnostic_cascade",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "stacktrace_in_prompt",
+      "mentions_specific_file",
+      "error_after_fix_new_file",
+      "multi_error_cascade",
+      "different_error_after_first_fix",
+      "Read_target_file",
+      "single_edit_fix",
+      "build_after_fix"
+    ],
+    "preconditions": [
+      "用户粘贴第一个错误日志，Agent定位并修复。",
+      "修复后用户测试，粘贴了第二个不同的错误日志——错误发生在不同的文件和行号。",
+      "这说明第一个修复解决了原问题，但暴露了第二个潜在的bug（可能是此前被第一个错误掩盖的）。",
+      "第二个错误通常发生在相关联的代码路径中（如修复了adapter的渲染入口后，result-popup的渲染逻辑暴露了nil引用）。"
+    ],
+    "strategy": [
+      "理解这是一个'修复一个错误→暴露另一个错误'的级联模式，而非原修复失败。",
+      "从第二个错误日志中提取关键信息：新文件名、新行号、新错误类型。",
+      "不要回到第一个错误的文件——第二个错误是独立的问题。",
+      "读取第二个错误的目标文件，理解问题上下文。",
+      "执行精准Edit修复第二个错误。",
+      "修复后立即build验证。",
+      "在respond_to_user中向用户说明：第一个错误已修复，第二个错误是一个独立问题（此前可能被第一个错误掩盖），现已修复。"
+    ],
+    "constraints": {
+      "treat_second_error_as_independent": true,
+      "do_not_revert_first_fix": true,
+      "extract_file_and_line_from_second_stacktrace": true,
+      "must_build_after_second_fix": true
+    },
+    "validation": [
+      "第二个错误被识别为独立问题而非原修复失败",
+      "从第二个错误日志中正确提取了新文件名和行号",
+      "读取了第二个错误的目标文件",
+      "修复了第二个错误",
+      "build成功",
+      "respond_to_user中说明了两个错误的关系"
+    ],
+    "title_zh": "多错误级联诊断——修复一个错误后暴露新错误",
+    "title_en": "Multi-Error Diagnostic Cascade — Second Error Exposed After First Fix",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "3ee927f3"
+      ],
+      "turn_range": "3ee927f3:T0-T8",
+      "prompt_indices": [
+        0,
+        1,
+        3,
+        5,
+        6,
+        8
+      ],
+      "evidence": "T0: 粘贴adapter:133 'draw' nil错误(68次)→33步(11 respond+8 Read+5 Glob+5 Grep+3 TodoWrite+1 build)，诊断但未修复（纯错误日志分析）。T1: 再次粘贴相同错误(67次)→70步(25 respond+24 Bash+9 Read+3 TodoWrite+3 Glob+2 Grep+2 Edit+2 build)，尝试修复→build。T3: 粘贴adapter:141 'draw' nil错误(78次)—行号从133变为141，说明T1的修复移动了问题但未根除→32步(15 Bash+9 respond+3 TodoWrite+3 Read+1 Edit+1 build)。T5: '还是报错，参考其他游戏对比'→23步(9 respond+6 Bash+3 TodoWrite+2 Read+1 Task+1 Write+1 build)，跨游戏对比诊断→Write修复→build。T6: '还是报错，检查是否覆盖key'+粘贴错误日志→41步(12 respond+12 Read+6 Edit+4 TodoWrite+3 Bash+3 Grep+1 build)，深度调查key覆盖问题→6 Edit→build。T7: '没有报错，可以正常进入游戏了，总结是什么问题'→1步respond，Agent总结根因。T8: 新错误！result-popup:150 'attempt to index a nil value (local ra)'→8步(4 respond+2 Edit+1 Read+1 build)，读取result-popup.lua→2 Edit修复→build。典型的'修复adapter draw错误→暴露result-popup nil引用'级联模式。T8的错误是独立的——发生在不同的文件(result-popup vs adapter)、不同的错误类型(index nil vs call nil)、不同的函数(drawCleared vs P4LM_HandleNanoVGRender)。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_error_log_retry_with_diagnostic_upgrade",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "stacktrace_in_prompt",
+      "same_error_consecutive_turns_ge_2",
+      "error_log_retry",
+      "diagnostic_method_change_per_retry",
+      "cross_game_comparison",
+      "key_overwrite_hypothesis",
+      "build_between_retries"
+    ],
+    "preconditions": [
+      "用户连续2-3次粘贴相同的错误日志（或行号略有变化），说明Agent的前一次修复没有完全解决问题。",
+      "每次重试时，用户可能附加诊断性指令（如'参考其他游戏对比'、'检查是否覆盖了key'）。",
+      "这与bug_report的retry不同——用户不是用自然语言描述bug，而是直接粘贴原始错误日志。",
+      "每次重试之间通常有build操作，用户是在build后测试发现错误仍然存在。",
+      "错误日志的行号可能变化（如133→141→133），说明代码被修改但根因未消除。"
+    ],
+    "strategy": [
+      "当用户第二次粘贴相同错误日志时，理解为你前一次的修复没有根除问题。",
+      "不要重复相同的修复方法——升级诊断策略：",
+      "  - 第一次：Grep/Read定位→Edit修复（标准错误日志诊断）。",
+      "  - 第二次：跨游戏对比（读取其他正常游戏的相同文件，找差异）。",
+      "  - 第三次：检查key覆盖/命名冲突（搜索是否有变量/表项被意外覆盖）。",
+      "  - 第四次：检查模块初始化顺序、依赖加载时机。",
+      "每次重试使用不同的诊断方法，而非重复相同的Read→Edit模式。",
+      "用Bash执行运行时诊断命令（如打印变量值、检查模块加载状态）。",
+      "修复后build，并在respond_to_user中明确说明此次修复与前次的差异。",
+      "如果3次以上重试仍失败，考虑是否存在架构层面的问题（如模块加载顺序、全局状态污染）。"
+    ],
+    "constraints": {
+      "do_not_repeat_same_diagnostic_method": true,
+      "escalate_diagnostic_depth_each_retry": true,
+      "must_build_after_each_fix_attempt": true,
+      "explain_difference_from_previous_fix": true
+    },
+    "validation": [
+      "每次重试使用了不同的诊断方法",
+      "诊断深度递增（从简单Read到跨游戏对比到key覆盖检查）",
+      "每次修复后都执行了build",
+      "respond_to_user中说明了此次修复与前次的差异",
+      "最终错误被彻底消除"
+    ],
+    "title_zh": "错误日志重试升级——连续粘贴错误日志的诊断升级模式",
+    "title_en": "Error Log Retry Escalation — Consecutive Error Log Pasting with Diagnostic Method Upgrade",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "3ee927f3"
+      ],
+      "turn_range": "3ee927f3:T0-T6",
+      "prompt_indices": [
+        0,
+        1,
+        3,
+        5,
+        6
+      ],
+      "evidence": "T0: 粘贴adapter:133 'draw' nil错误(68次)→33步(11 respond+8 Read+5 Glob+5 Grep+3 TodoWrite+1 build)。诊断分析但未修复。T1: 4分钟后再次粘贴相同错误(67次)→70步(25 respond+24 Bash+9 Read+3 TodoWrite+3 Glob+2 Grep+2 Edit+2 build)。诊断方法升级：使用Bash执行运行时诊断→2 Edit修复→2 build。T3: build后再次粘贴错误(78次)，行号从133变为141→32步(15 Bash+9 respond+3 TodoWrite+3 Read+1 Edit+1 build)。诊断方法再次升级：大量Bash运行时命令→1 Edit→build。T5: '还是报错，参考其他游戏对比'→23步(9 respond+6 Bash+3 TodoWrite+2 Read+1 Task+1 Write+1 build)。诊断方法第三次升级：跨游戏对比（读取其他正常游戏的adapter.lua）→Write修复→build。T6: '还是报错，检查是否覆盖key'+粘贴错误日志→41步(12 respond+12 Read+6 Edit+4 TodoWrite+3 Bash+3 Grep+1 build)。诊断方法第四次升级：检查key覆盖/命名冲突，读取12个文件理解表结构→6 Edit→build。T7: '没有报错，可以正常进入游戏了'→确认修复成功。5次错误日志提交，每次诊断方法不同：Read/Grep→Bash运行时→Bash+行号变化分析→跨游戏对比→key覆盖检查。典型的'错误日志重试→诊断方法升级'模式。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_bug_retry_with_diagnostic_upgrade",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "same_bug_consecutive_turns_ge_3",
+      "still_not_working_pattern",
+      "diagnostic_upgrade_per_retry",
+      "user_provides_debug_info",
+      "target:game_logic",
+      "save_persistence_bug",
+      "build_between_retries"
+    ],
+    "preconditions": [
+      "用户报告一个bug后，Agent进行了修复并build。",
+      "用户在接下来的3+个连续turn中报告同一个bug仍然存在。",
+      "与gene_br_bug_retry_escalation不同——用户不是用'还是'+自然语言描述，而是逐步提供更具体的诊断信息（如'还是显示的默认皮肤'→'还是不行，检查是保存问题还是读取问题'→'刷新页面，看到[skinId]=sport，但是游戏内还是初始皮肤'）。",
+      "用户主动提供调试信息（如观察到的变量值、配置状态），帮助Agent缩小排查范围。",
+      "每次重试之间通常有build操作，用户是在build后测试发现bug仍然存在。"
+    ],
+    "strategy": [
+      "当用户第二次报告同一bug时，不要重复此前的修复方法——需要换一种诊断思路。",
+      "利用用户提供的调试信息（如变量值、配置状态）直接定位问题环节。",
+      "区分'保存问题'和'读取问题'——检查数据是否正确写入，以及是否正确读取。",
+      "如果用户提供具体观察（如'看到skinId=sport但游戏内是初始皮肤'），说明保存成功但读取/应用失败，重点检查加载和应用逻辑。",
+      "每次修复后build验证，并主动告知用户如何测试验证修复效果。"
+    ],
+    "constraints": {
+      "max_retries_before_root_cause_analysis": 3,
+      "must_differentiate_save_vs_load": true
+    },
+    "validation": [
+      "每次修复后build成功",
+      "用户确认刷新页面后皮肤正确加载",
+      "存档数据中包含正确的skinId"
+    ],
+    "title_zh": "Bug重试与诊断升级模式",
+    "title_en": "Bug Retry with Diagnostic Upgrade — Consecutive Bug Reports with User-Provided Debug Info",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "9df66fd4"
+      ],
+      "turn_range": "9df66fd4:T28-T31",
+      "prompt_indices": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "evidence": "T28: '现在刷新网页后，没有读取上一次我设置的皮肤，检查是什么问题'→48步(18 respond+10 Read+8 Edit+7 Grep+2 TodoWrite+2 Bash+1 build)。Agent大规模调查皮肤持久化问题→Read 10文件→8 Edit修复→build。1个error。T29: '还是显示的默认皮肤'→14步(5 respond+4 Read+2 TodoWrite+1 Grep+1 Edit+1 build)。用户提供关键信息'还是默认皮肤'→Agent重新调查→4 Read+1 Edit→build。2个errors。T30: '还是不行，检查是保存问题还是读取问题'→9步(4 respond+2 Read+2 Edit+1 build)。用户明确指示'检查保存还是读取'→Agent聚焦调查→2 Edit→build。4个errors。T31: '刷新页面，看到[skinId]=sport，但是游戏内还是初始皮肤'→13步(6 respond+4 Edit+2 TodoWrite+1 build)。用户提供精确调试信息'skinId=sport但游戏内初始'→说明保存成功但应用失败→4 Edit修复应用逻辑→build。2个errors。4个连续turn报告同一bug，用户逐步提供更精确的诊断信息，从'没读取'(T28)→'还是默认'(T29)→'检查保存还是读取'(T30)→'skinId=sport但初始皮肤'(T31)。典型的'bug报告→用户提供调试信息→Agent聚焦修复'升级模式。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_white_image_cascade",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:visual_style",
+      "white_image_rendering",
+      "cross_context_spread_ge_3",
+      "escalating_investigation_depth",
+      "grep_heavy_ge_10",
+      "bash_heavy_ge_5",
+      "read_heavy_ge_10",
+      "per_turn_build_verify"
+    ],
+    "preconditions": [
+      "用户报告游戏内图片/图像显示为白色色块的渲染bug。",
+      "bug在连续3+个turn中报告，每次影响的范围扩大（从单一元素→所有图片→跨页面）。",
+      "这与gene_br_bug_retry_escalation不同——后者是同一bug反复报告（'还是不行'），本模式是bug影响范围跨上下文扩散。",
+      "Agent的调查深度随bug范围扩大而递增（从14步轻量→108步重度→51步中量→27步修复）。",
+      "调查方法包括大量Grep搜索渲染相关代码、Bash运行时诊断、多文件读取。"
+    ],
+    "strategy": [
+      "首次报告：轻量调查（Task+Read+Grep），确认问题范围，尝试初步修复→build验证。",
+      "范围扩大时：升级为重度调查模式——Grep搜索渲染管线关键词（nvgImage、drawImage、texture、sprite等），Read 10+个渲染相关文件，Bash执行运行时诊断命令。",
+      "当bug扩散到跨页面时：检查共享渲染组件和全局图像加载逻辑，而非单一页面文件。",
+      "修复后：在每个受影响的上下文中逐一build验证，确保修复不会引入新问题。",
+      "如果修复后新页面出现相同问题：检查是否存在全局图像加载/渲染初始化代码遗漏，而非继续修补单一页面。"
+    ],
+    "constraints": {
+      "max_investigation_steps": 120,
+      "must_build_after_each_context_fix": true
+    },
+    "validation": [
+      "每个受影响的页面/上下文build验证通过",
+      "白色图像问题在所有页面中消失",
+      "修复未引入新的渲染异常"
+    ],
+    "title_zh": "白色图像渲染bug跨上下文扩散级联",
+    "title_en": "White Image Rendering Bug Cascade — Cross-Context Spread with Escalating Investigation",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "a09c411b"
+      ],
+      "turn_range": "a09c411b:T08-T11",
+      "prompt_indices": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "evidence": "T08: '主线模式，左下角的角色图像，现在是一块白色的'→14步(6 respond+2 Grep+2 Glob+1 Task+1 Read+1 build)。轻量调查，定位角色图像渲染问题→build。T09: '主线模式，和游戏内，的图片都变为了白色'→108步(38 respond+27 Read+18 Grep+13 Bash+5 TodoWrite)。bug范围扩大到所有图片→升级为重度调查：18次Grep搜索渲染管线+27次Read渲染相关文件+13次Bash运行时诊断→修复→build。T10: '现在主线模式和游戏内显示正常了，但是自由模式选择游戏的页面左下角的角色变成白色了'→51步(18 respond+13 Read+12 Grep+2 TodoWrite+2 Glob+2 build)。修复后新页面出现相同问题→2次build验证。T11: '在主线模式，自由模式页面切换时，左下角的角色就会变成白色'→27步(12 respond+6 Read+6 Edit+1 Grep+1 build)。定位到页面切换时的渲染初始化问题→6 Edit修复→build。4个连续bug_report turn，影响范围从单一元素(角色)→所有图片→跨页面(自由模式)→页面切换，调查深度从14→108→51→27步。典型的'白色渲染bug跨上下文扩散'模式。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_investigation_without_implementation",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:feature_modification",
+      "zero_edits_zero_builds",
+      "read_heavy_ge_5",
+      "investigation_without_implementation",
+      "session_terminated_before_edit",
+      "task_plus_todo_without_action",
+      "target:ui_layout"
+    ],
+    "preconditions": [
+      "用户提出一个具体的feature_modification需求（如修改UI、调整游戏逻辑）。",
+      "Agent进入调查模式：读取多个文件（5+）、分派Task、创建TodoWrite。",
+      "但Agent在整个turn中未执行任何Edit或Write操作，也未执行build。",
+      "会话在调查完成后直接终止（end_of_conversation），未进入实施阶段。",
+      "这可能是因为token预算耗尽、API错误、或Agent判断需要用户确认后再实施。"
+    ],
+    "strategy": [
+      "收到feature_modification请求后，先用Read（3-5个文件）快速定位相关代码。",
+      "如需要，用Task探索项目结构或用TodoWrite分解实施步骤。",
+      "在调查完成后，用respond_to_user向用户汇报调查结果和拟定的实施方案。",
+      "明确询问用户是否按此方案开始实施，而非等待用户再次确认。",
+      "如果token预算紧张，优先在同一个turn内完成至少1-2处关键Edit，而非纯调查。",
+      "避免'调查→respond→会话结束'的空转模式——确保每个feature_modification turn至少产出1处Edit或明确的下一步行动。"
+    ],
+    "constraints": {
+      "min_edits_per_feature_modification_turn": 1,
+      "must_propose_implementation_plan_if_zero_edits": true,
+      "ask_for_confirmation_before_session_end": true
+    },
+    "validation": [
+      "feature_modification turn中至少有1次Edit或Write操作",
+      "如因调查需要暂未Edit，respond中必须包含明确的实施方案和下一步行动",
+      "会话不应在纯调查后无提示地终止"
+    ],
+    "title_zh": "功能修改调查无实施模式",
+    "title_en": "Feature Modification Investigation Without Implementation — Heavy Read, Zero Edit, Session Terminated",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "e948a3d9"
+      ],
+      "turn_range": "e948a3d9:T02",
+      "prompt_indices": [
+        2
+      ],
+      "evidence": "T2: '修改4个游戏结束页面，如果没有满星，在下方显示更高星级需要的条件'→12步(6 Read+4 respond+1 Task+1 TodoWrite)。S0: respond确认方案→S1: Task探索→S2: Read result-popup.lua→S3: respond→S4: TodoWrite创建任务清单→S5-S8: Read gameplay.lua×4→S9: respond→S10: Read board.lua→S11: respond。12步调查，0 Edit 0 Write 0 build，会话直接end_of_conversation终止。典型的'feature_modification→调查(6 Read+Task+TodoWrite)→respond→会话结束(未实施)'模式。与此前所有feature_modification turn不同——其他session的feature_modification均至少包含1次Edit，本session是唯一一个纯调查无实施的feature_modification turn。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_aoc_multi_turn_escalation",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:ai_output_correction",
+      "consecutive_aoc_ge_3",
+      "escalating_frustration_language",
+      "你搞错了吧_pattern",
+      "不不不_pattern",
+      "我发现你完全理解错了_pattern",
+      "target:game_logic",
+      "mechanic_misunderstanding"
+    ],
+    "preconditions": [
+      "用户连续3+次使用 ai_output_correction 纠正AI对同一机制的理解。",
+      "用户的措辞逐步升级：从'你搞错了吧'到'不不不，你是不是还是理解错了'再到'我发现你完全理解错了'。",
+      "这说明AI多次误解了用户的核心意图，每次修复只解决了表面问题而非根本理解。",
+      "典型场景：用户描述一个多阶段机制（如蓄力然后持续发射），AI只理解了其中一部分。",
+      "这是高优先级问题——说明Agent需要停下来重新理解用户的完整意图，而非继续修补。"
+    ],
+    "strategy": [
+      "当用户第2次使用ai_output_correction纠正同一机制时，停止Edit，先用respond_to_user复述你理解的完整机制，请用户确认。",
+      "识别多阶段机制的关键词：'蓄力'、'持续'、'阶段'、'然后'——这些暗示机制有多个步骤。",
+      "当用户说'你搞错了吧'或'不不不'时，此前的实现方向可能有根本性错误，不要继续修补，应重新设计方案。",
+      "当用户说'我发现你完全理解错了'时，必须完全放弃此前的实现，从零开始按用户的完整描述重新实现。",
+      "在复述确认后再开始Edit，避免再次误解导致的反复修正。"
+    ],
+    "constraints": {
+      "max_consecutive_aoc_before_stop": 2,
+      "must_confirm_understanding_before_edit_after_2nd_aoc": true
+    },
+    "validation": [
+      "第2次ai_output_correction后，Agent用自然语言复述机制并获得用户确认",
+      "最终实现的机制行为与用户描述的完整流程一致"
+    ],
+    "title_zh": "AI输出纠正升级——连续误解与逐步升级的frustration",
+    "title_en": "AI Output Correction Escalation — Consecutive Misunderstanding with Frustration Signals",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "zzj",
+      "session_hashes": [
+        "08754637"
+      ],
+      "turn_range": "08754637:T97-T99",
+      "prompt_indices": [
+        97,
+        98,
+        99
+      ],
+      "evidence": "T97: '你搞错了吧？我的意思是蓄力不扣能量'。T98: '不不不，你是不是还是理解错了？我的意思是，蓄力的时候不应该扣能量，不扣能量是对的，扣能量是错的'。T99: '我发现你完全理解错了，这个蓄力技能不是有2个阶段吗？蓄力，然后持续发射激光，我说的蓄力是说蓄力阶段不扣能量，持续发射的时候是要扣能量的'。典型的'纠正→还是错→完全理解错了'3-turn升级管线。Agent每次都只修复了表面问题，未理解蓄力技能的两阶段本质（蓄力阶段vs持续发射阶段）。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_recurrent_engine_error",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "same_error_recurring_across_session",
+      "view_exceeds_maximum_limit",
+      "engine_limit_error",
+      "error_paste_ge_5_same_type",
+      "spread_across_session",
+      "not_fixed_by_standard_edit"
+    ],
+    "preconditions": [
+      "用户在同一会话中多次（5+次）粘贴相同的引擎级错误日志。",
+      "错误类型为引擎限制（如'View exceeds maximum limit'），而非代码逻辑错误。",
+      "此类错误通常由视觉元素过多、粒子过多、或渲染对象超出引擎上限引起。",
+      "标准的代码Edit修复往往无效——需要从设计上减少渲染对象数量或使用不同的渲染方式。",
+      "错误分布在会话的不同阶段，说明每次新增视觉元素时都会触发。"
+    ],
+    "strategy": [
+      "当同一引擎限制错误第2次出现时，告知用户这是引擎上限问题，需要从设计上减少渲染对象。",
+      "不要尝试通过修改代码逻辑来绕过引擎限制——这通常无效。",
+      "建议方案：合并渲染对象、使用粒子系统替代独立对象、减少同时存在的视觉元素数量。",
+      "当用户再次粘贴相同错误时，先检查此前建议的方案是否已实施，再提出替代方案。",
+      "记录已尝试的修复方案，避免重复无效的方法。"
+    ],
+    "constraints": {
+      "max_attempts_before_design_change": 2,
+      "must_inform_user_of_engine_limit": true
+    },
+    "validation": [
+      "第2次相同错误出现时，Agent识别为引擎限制而非代码bug",
+      "提出的解决方案从设计上减少渲染对象数量，而非修改代码逻辑",
+      "错误最终不再出现，或用户接受引擎限制的约束"
+    ],
+    "title_zh": "重复引擎限制错误——View超出上限的反复报告",
+    "title_en": "Recurrent Engine Limit Error — View Exceeds Maximum Limit Repeatedly Reported",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "zzj",
+      "session_hashes": [
+        "08754637"
+      ],
+      "turn_range": "08754637:T58,T66,T94,T133,T164,T207,T293,T613,T619",
+      "prompt_indices": [
+        58,
+        66,
+        94,
+        133,
+        164,
+        207,
+        293,
+        613,
+        619
+      ],
+      "evidence": "同一'View exceeds maximum limit'错误在会话中被粘贴9次(T58,T66,T94,T133,T164,T207,T293,T613,T619)，分布在会话全周期。这是TapTap Maker/Urho3D引擎的View数量上限错误，通常由过多UI元素、粒子、或渲染对象引起。标准的代码Edit修复无效，需要从设计上减少渲染对象。错误在每次新增视觉元素（光束、粒子、特效）时反复触发，说明Agent未从根本上解决渲染对象数量问题。",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_bug_to_elp_diagnostic_upgrade",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "intent:error_log_paste",
+      "bug_report_then_error_log",
+      "diagnostic_method_upgrade",
+      "natural_language_to_stacktrace",
+      "user_provides_diagnostic_hypothesis",
+      "still_not_working_pattern",
+      "cross_game_comparison"
+    ],
+    "preconditions": [
+      "用户先用自然语言报告bug（如'还是报错，参考其他游戏对比'），没有粘贴错误日志。",
+      "Agent进行诊断和修复后，用户在下一turn再次报告同一bug，但这次直接粘贴原始错误日志。",
+      "用户在粘贴错误日志的同时提供诊断性假设（如'检查是否覆盖了什么key'）。",
+      "这说明用户的工作模式是：先用自然语言描述→Agent修复→仍然失败→升级诊断方法（粘贴原始日志+提供假设）。",
+      "这与 gene_elp_error_log_retry_with_diagnostic_upgrade 不同——后者是连续2+次粘贴错误日志，本模式是'自然语言bug报告→错误日志粘贴'的诊断升级。"
+    ],
+    "strategy": [
+      "当用户用自然语言报告bug时，先进行常规诊断（Read+Grep搜索相关代码）。",
+      "如果用户说'参考其他游戏对比'，主动读取其他正常游戏的对应代码进行对比分析。",
+      "当用户再次报告同一bug并粘贴错误日志时，切换到错误日志诊断模式：解析堆栈跟踪→定位精确文件和行号。",
+      "注意用户提供的诊断假设（如'检查是否覆盖key'），这通常指向根因方向。",
+      "修复后build验证，并主动向用户总结根因。"
+    ],
+    "constraints": {
+      "must_compare_with_working_games_when_requested": true,
+      "must_parse_stacktrace_on_error_log": true,
+      "must_address_user_hypothesis": true
+    },
+    "validation": [
+      "自然语言bug报告阶段：执行跨游戏对比诊断",
+      "错误日志阶段：解析堆栈跟踪定位精确文件/行号",
+      "修复后build成功并向用户总结根因"
+    ],
+    "title_zh": "Bug报告到错误日志诊断升级",
+    "title_en": "Bug Report to Error Log Diagnostic Upgrade — Natural Language to Stacktrace Escalation",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "3ee927f3"
+      ],
+      "turn_range": "3ee927f3:T05-T06",
+      "prompt_indices": [
+        5,
+        6
+      ],
+      "evidence": "3ee927f3: T05: '还是报错，参考其他游戏，对比一下，其他游戏是正常的'→23步(9 respond+6 Bash+3 TodoWrite+2 Read+1 Task)。自然语言bug报告→Agent执行跨游戏对比诊断(6 Bash运行时命令+2 Read)→respond输出发现。T06: '还是报错，检查是否覆盖了什么key'+粘贴TapTap Maker错误报告(61次adapter:133 'draw' nil错误)→41步(12 respond+12 Read+6 Edit+4 TodoWrite+3 Bash+3 Grep+1 build)。诊断方法升级：从自然语言描述→原始错误日志+用户诊断假设('检查key覆盖')→12 Read理解表结构→6 Edit修复→build验证。典型的'自然语言bug报告(23步,跨游戏对比)→错误日志粘贴+诊断假设(41步,key覆盖调查)'升级管线。与gene_elp_error_log_retry_with_diagnostic_upgrade(连续错误日志粘贴)不同——本模式是'自然语言→错误日志'的首次诊断升级。",
+      "session_count": 1
+    }
+  }
+]

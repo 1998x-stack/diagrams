@@ -1,0 +1,46 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_elp_stacktrace_paste_diagnosis",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "target:game_logic",
+      "stacktrace_in_prompt",
+      "lua_error_keywords",
+      "high_error_count",
+      "mentions_specific_file:true"
+    ],
+    "preconditions": [
+      "用户直接粘贴了运行时错误报告，包含完整的stack trace和错误计数。",
+      "通常无附加指令，用户期望AI直接定位并修复错误。",
+      "错误日志中包含具体文件名和行号，可直接定位问题代码。"
+    ],
+    "strategy": [
+      "从stack trace中提取关键信息：错误类型、文件名、行号。",
+      "直接 Read 错误指向的文件和行号，理解上下文。",
+      "常见Lua错误类型：'attempt to perform arithmetic on a table value'（类型混淆）、'attempt to index a nil value'（空引用）。",
+      "定位错误后修复，通常是类型检查缺失或参数传递错误。",
+      "build 验证错误消失。关注错误计数——如果原错误计数很高(59次)，说明是每帧触发的渲染错误。"
+    ],
+    "constraints": {
+      "must_build_after_fix": true,
+      "fix_root_cause_not_symptom": true
+    },
+    "validation": [
+      "修复后相同操作不再产生错误日志",
+      "build 通过",
+      "不影响正常功能"
+    ],
+    "title_zh": "错误日志粘贴直接诊断",
+    "title_en": "Error Log Stacktrace Paste — Direct Diagnosis From Crash Report",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["374e4eb7"],
+      "turn_range": "T24",
+      "prompt_indices": [23],
+      "evidence": "User pasted TapTap Maker error report with 59 errors, all 'attempt to perform arithmetic on a table value' at fox-mascot.lua:337. 10 steps to fix."
+    }
+  }
+]

@@ -1,0 +1,14 @@
+All done. Here's a summary of what was written for session `1cd7c1eb`:
+
+**Enhanced (1 gene):**
+- `gene_doc_terse_breadth_first` — added `1cd7c1eb:T07` to provenance. Variant: Task subagent for doc discovery → read 5 docs → 21 edits across 4 docs including the game design spec (`策划案-大厅.md`) that needed updating after the UI direction changed.
+
+**Created (3 new genes):**
+
+| ID | Category | Source | Pattern |
+|---|---|---|---|
+| `gene_pd_design_only_planmode_defer` | workflow | T00 | User says "先设计一下让我参考" → agent enters PlanMode, dispatches 2-3 research subagents, writes plan file, exits PlanMode — **zero code changes** in this turn. Implementation only starts after explicit approval. |
+| `gene_pd_terse_approval_batch_rewrite` | workflow | T01 | After a design-only turn, user says "符合预期" (3 chars) → agent batch-reads all affected files first, then sequentially **Writes** (not Edits) full file rewrites for structural changes → Build. |
+| `gene_fm_emoji_to_nanovg_migration` | workflow | T04-T05 | Emoji inquiry → Grep confirms locations → user orders NanoVG replacement → agent studies existing NanoVG patterns from game adapters → Writes component rewrites + Edits lifecycle hooks → build fails on API name mismatch (`nvgDestroy` vs `nvgDelete`) → reads error log → grep to confirm correct name → fix → build success. |
+
+workflow/index.md now shows 21 genes (up from 18).

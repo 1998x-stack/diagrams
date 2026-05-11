@@ -1,0 +1,59 @@
+This session is extremely minimal — only 1 turn, 14 steps, 2 edits. Let me check for overlaps with existing genes before deciding what to extract.
+Now let me read the most relevant existing genes to check for potential enhancement:
+Now I have a complete picture. Let me analyze the session data against existing genes.
+
+**Session 125a7a4a Summary:**
+- **1 turn, 14 steps, 1 prompt** (42 seconds duration)
+- User: "修改换装页面'通关主席纳第x关解锁'，改为'完成X关'"
+- Intent: `feature_modification`, target: `ui_layout`
+- Workflow: respond→Grep×2→respond→Read→respond→Edit×2→respond→Build→Grep→Glob→Build→respond
+- 5 respond_to_user (36%), 2 edits, 2 builds, 3 greps
+- Marker: drift-start at step 8 (4 consecutive edits without verification)
+- 3 subagents (warmup only)
+
+**Overlap Analysis:**
+
+1. **gene_sr_respond_think_before_act** (session_rhythm) — Strong match. 36% respond ratio, announce-before-edit, confirm-after-edit pattern. This session reinforces the gene.
+
+2. **gene_fm_layout_param_surgical** (workflow) — Partial match. Same intent/target, but this is copy text editing, not layout parameters. The gene's `read_ge_5_edit_1` signal doesn't fit (this has read_ge_3_edit_2). Different pattern.
+
+3. **gene_op_batch_build_verify** (operational) — Does NOT match. This session has 2 builds, not 1.
+
+4. **No existing gene** for the Grep→Read→Edit→Build→Verify→Build text localization workflow.
+
+I'll enhance `gene_sr_respond_think_before_act` and create 1 new workflow gene for the text localization pattern.
+Now create the new workflow gene for text localization:
+Now regenerate the index:
+Let me verify the updated indexes:
+分析完成。以下是会话 `125a7a4a` 的基因提取结果：
+
+## 会话概览
+
+| 指标 | 值 |
+|---|---|
+| 项目 | wzp (脑力大冒险) |
+| 时长 | 42秒 |
+| Turns | 1 |
+| 步骤 | 14 |
+| 工具调用 | 9 |
+| 意图 | `feature_modification` → `ui_layout` |
+| 用户请求 | "修改换装页面'通关主席纳第x关解锁'，改为'完成X关'" |
+
+## 提取结果
+
+### 1. 增强已有基因：`gene_sr_respond_think_before_act`
+- **session_count**: 2 → **3**
+- 新增证据：14步中5步respond(36%)，即使在极小会话中也保持了announce-before-edit模式
+
+### 2. 新基因：`gene_fm_text_localization_pipeline`
+- **分类**: workflow
+- **模式**: Grep定位 → Read确认 → Edit替换 → Build → Grep/Glob验证 → 二次Build
+- **关键信号**: `text_or_copy_edit`, `grep_first_localization`, `double_build_verification`, `post_build_grep_verify`
+- **证据**: 14步完整管线，2次Grep定位原文、1次Read确认上下文、2次Edit精准替换、2次Build验证
+
+### 去重结果
+- `gene_fm_layout_param_surgical` — 不匹配（这是文案修改，非布局参数）
+- `gene_op_batch_build_verify` — 不匹配（本会话2次build，非1次）
+
+### 限制说明
+该会话仅1个prompt，低于3个prompt的推荐阈值。`gene_fm_text_localization_pipeline` 的模式虽清晰但证据单薄，建议在后续会话中积累更多同类证据后再次增强。

@@ -1,0 +1,46 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_aoc_effect_not_visible",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:ai_output_correction|bug_report",
+      "is_correction_of_ai_work:true",
+      "cn_no_effect_visible_keywords",
+      "recent_edit_in_previous_turn",
+      "visual_animation_context"
+    ],
+    "preconditions": [
+      "用户在AI刚完成修改后报告'没有看到效果'、'并没有XX效果'、'看起来并没有'。",
+      "AI在前一轮声称已实现某个视觉/动画效果，但用户实际看到的结果与预期不符。",
+      "属于AI交付质量问题而非产品既有bug。"
+    ],
+    "strategy": [
+      "首先检查上一轮修改是否真正生效：代码是否保存、函数是否被调用、动画参数是否合理。",
+      "常见失效原因清单：",
+      "  1. 动画函数在引擎中未注册/未启动",
+      "  2. 动画参数太小导致视觉不可见（如位移1px、持续时间0.01s）",
+      "  3. 代码修改了错误的文件或函数（重名文件、多副本问题）",
+      "  4. 修改被后续代码覆盖（初始化逻辑重置了值）",
+      "修复后build，并在回复中明确说明上次失败的具体原因。"
+    ],
+    "constraints": {
+      "must_explain_why_previous_failed": true,
+      "must_build_after_fix": true
+    },
+    "validation": [
+      "修复后效果在视觉上可感知",
+      "已解释上次失效的具体原因"
+    ],
+    "title_zh": "AI输出效果不可见纠正",
+    "title_en": "AI Output Correction — Effect Not Visible After Claimed Implementation",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T09",
+      "prompt_indices": [8],
+      "evidence": "'看起来并没有浮动效果，改为缓慢的向上飘动' — user corrects AI after floating animation was claimed to be added but wasn't visually apparent. 15 steps to investigate and fix."
+    }
+  }
+]

@@ -1,0 +1,38 @@
+Only 2 prompts — below the 3-prompt threshold. Let me check the trajectory depth to see if the pattern is prominent enough.
+Now I have the full picture. Let me check for overlapping genes.
+Strong match with `gene_ir_doc_anchored_inspection_to_fix`. The pattern is nearly identical — deep audit (7 Read, 2 TodoWrite, 0 edits) → user says "修复这些问题" → repair (4 Edit + 1 build). I'll enhance the existing gene rather than create a new one.
+
+Let me also check the edit_drift gene since d02df5f6 has 2 drift-start markers.
+Now let me read and update the genes. I'll enhance `gene_ir_doc_anchored_inspection_to_fix` and `gene_nf_edit_drift_without_verification`.
+Now I'll update the `_provenance` of `gene_ir_doc_anchored_inspection_to_fix`:
+Now update the `gene_nf_edit_drift_without_verification` in session_rhythm:
+The edit drift in d02df5f6 (4 edits, 2 drift markers) is below the `consecutive_edits_ge_10` threshold — not significant enough to add. The primary pattern (inspection→fix) is already captured.
+
+Now run the index generator:
+Let me verify the update:
+Analysis complete. Here's the summary:
+
+## 会话 d02df5f6 分析结果
+
+**会话概况**: 2 prompts, 32 steps, 22 tool calls, 3 subagents, ~3分钟
+
+| Turn | Intent | Steps | Key Tools | Edits | Build |
+|------|--------|-------|-----------|-------|-------|
+| T0 | inspection_review | 15 | 7 Read, 2 Bash, 2 TodoWrite | 0 | 0 |
+| T1 | bug_report ("修复这些问题") | 17 | 4 Edit, 1 Write, 3 TodoWrite, 1 Grep | 5 | 1 |
+
+**Markers**: 2 drift-start (steps 4, 23)
+
+### 基因处理
+
+**增强已有基因**: `gene_ir_doc_anchored_inspection_to_fix` (workflow)
+- d02df5f6 完美匹配 "深度审计→极简确认→修复" 管线
+- T0: 7 Read + 2 Bash + 2 TodoWrite, 0 edits (深度审计)
+- T1: "修复这些问题"(5字) → 4 Edit + 1 Write + 1 build (修复)
+- session_count: 1 → 2
+- 新增变体: "策划案审查→修复" — 与此前的"自查问题报告→修复"不同，本session附带的是策划案设计文档(P3-消消乐.md)而非问题清单文档，但管线一致
+
+**未创建新基因的原因**:
+- 仅2个prompts，低于3个的阈值
+- 模式完全被 `gene_ir_doc_anchored_inspection_to_fix` 覆盖
+- edit drift(2 markers, 4 edits)低于 `consecutive_edits_ge_10` 阈值，不足以增强 `gene_nf_edit_drift_without_verification`

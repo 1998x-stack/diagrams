@@ -1,0 +1,47 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_cc_audio_generate_audition_integrate",
+    "category": "workflow",
+    "signals_match": [
+      "intent:content_creation",
+      "target:audio",
+      "generate_sfx_keywords",
+      "audition_before_apply",
+      "reference_existing_asset",
+      "cn_generate_listen_keywords"
+    ],
+    "preconditions": [
+      "用户请求生成新的音效或BGM资源，通常指定风格/目标用户/参考资源。",
+      "用户期望先试听再决定应用，工作流为：生成→放入测试环境→试听→选择→应用。",
+      "平台具备音频生成能力（如 text_to_music、batch_sound_effects MCP工具）。"
+    ],
+    "strategy": [
+      "根据用户描述的风格需求调用音频生成工具（batch_sound_effects 或 text_to_music）。",
+      "将生成的音频文件按用户指定的分类（如'气泡1'）组织到音效测试目录中。",
+      "修改音效测试页面的配置，添加新分类和音效条目，让用户可以在游戏内试听。",
+      "build 后等待用户试听反馈，不要自动将音效应用到游戏中。",
+      "当用户以'参考 X，生成更多类似的'方式请求时，分析参考资源的特征（时长、频率、风格）传递给生成工具。"
+    ],
+    "constraints": {
+      "must_build_for_audition": true,
+      "do_not_auto_apply_to_game": true,
+      "organize_by_user_specified_category": true
+    },
+    "validation": [
+      "生成的音效文件存在于资源目录中",
+      "音效测试页面中可以找到并播放新音效",
+      "分类名称匹配用户指定的名称"
+    ],
+    "title_zh": "音频生成→试听→集成工作流",
+    "title_en": "Audio Generate → Audition → Integrate Pipeline",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T23, T29-T30, T33",
+      "prompt_indices": [22, 28, 29, 32],
+      "evidence": "4 content_creation prompts: generate SFX (batch_sound_effects) → reference-based generation → organize into test category '气泡1' → generate BGM (text_to_music). Clear audition-first workflow."
+    }
+  }
+]

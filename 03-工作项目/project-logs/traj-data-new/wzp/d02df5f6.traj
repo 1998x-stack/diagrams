@@ -1,0 +1,1333 @@
+{
+  "schema_version": "2.0",
+  "conversation_id": "d02df5f6-6c17-48d0-adae-18fa1e69c0a4",
+  "agent": {
+    "name": "claude-code",
+    "model": "claude-opus-4-6",
+    "environment": "taptap-maker",
+    "tool_protocol": "claude_tool_use"
+  },
+  "session_metadata": {
+    "project": "wzp",
+    "project_name": "脑力大冒险",
+    "session_id": "d02df5f6-6c17-48d0-adae-18fa1e69c0a4",
+    "started_at": "2026-03-18T04:11:48.393Z",
+    "ended_at": "2026-03-18T04:20:31.700Z",
+    "duration_sec": 523.3,
+    "cwd": "/workspace",
+    "version": "2.1.4",
+    "git_branch": ""
+  },
+  "messages": [
+    {
+      "turn_id": 1,
+      "role": "user",
+      "content": "检查[@P3-消消乐.md](file:///workspace/docs/P3-消消乐.md)策划案，根据其他文档检查是否有需要修改和优化的内容",
+      "timestamp": "2026-03-18T04:11:48.393Z"
+    },
+    {
+      "turn_id": 1,
+      "agent_run_id": "run_t1",
+      "steps": [
+        {
+          "step_id": 1,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "让我先读取策划案文档，然后对照相关的引擎文档和示例来检查。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:53.271Z",
+          "execution_time": 4.9,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 1,
+            "cache_read_tokens": 37967,
+            "cache_creation_tokens": 15822
+          }
+        },
+        {
+          "step_id": 2,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_01W2qT5ySRx1qGaYjBTroeU3",
+            "args": {
+              "file_path": "/workspace/docs/P3-消消乐.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 益智乐园 · 消消乐详细策划文档\r\n\r\n> 目标：提供可直接用于研发、策划、美术和测试协作的消消乐玩法设计说明，覆盖规则、关卡目标、数值、数据契约、埋点与验收标准。\r\n\r\n---\r\n\r\n## 零、工程接入与目录约定（开发前必填）\r\n\r\n### 0.1 大厅接入契约（对齐 AI 开发规范）\r\n\r\n- `gameId`: `p3-match-3`\r\n- `title`: `消消乐`\r\n- `entryModule`: `games.p3-match-3.init`\r\n- `status`: `dev`（联调完成后改 `online`）\r\n- `version`: `1.0.0`\r\n\r\n`scripts/config/games/p3-match-3.lua` 示例：\r\n\r\n```lua\r\nreturn {\r\n    gameId = \"p3-match-3\",\r\n    title = \"消消乐\",\r\n    subtitle = \"交换方块，连消通关\",\r\n    icon = \"Textures/games/p3-match-3-icon.png\",\r\n    cover = \"Textures/games/p3-match-3-cover.png\",\r\n    entryModule = \"games.p3-match-3.init\",\r\n    tags = { \"益智\", \"三消\", \"休闲\" },\r\n    status = \"dev\",\r\n    sortWeight = 75,\r\n    version = \"1.0.0\",\r\n}\r\n```\r\n\r\n### 0.2 推荐目录结构（M1）\r\n\r\n```text\r\nscripts/\r\n  games/p3-match-3/\r\n    init.lua\r\n    adapter.lua\r\n    state.lua\r\n    logic.lua\r\n    ui.lua\r\n    level-config.lua\r\n  config/games/p3-match-3.lua\r\n  config/games/p3-match-3-levels.lua\r\n```\r\n\r\n约束：\r\n- `init.lua` 仅做生命周期编排（进入/退出/重开），不堆业务细节。\r\n- `adapter.lua` 只处理大厅接入，不实现具体玩法。\r\n- 方块类型、分值、目标、步数、掉落权重统一走 `scripts/config/`，禁止硬编码。\r\n\r\n---\r\n\r\n## 一、玩法目标与设计原则\r\n\r\n### 1.1 玩法目标\r\n\r\n- 玩家通过交换相邻方块，形成 3 个及以上同色连线并消除。\r\n- 在限定步数内完成关卡目标（分数、指定颜色消除数量等）。\r\n- 利用连锁反应与特殊方块提升策略深度和爽感。\r\n\r\n### 1.2 设计原则\r\n\r\n1. **规则清晰**：一次交换只在“能触发消除”时生效，降低学习成本。\r\n2. **反馈明确**：交换、消除、连锁、目标进度和失败原因都可感知。\r\n3. **难度递进**：从纯分数关到复合目标关，逐步引入特殊方块组合。\r\n4. **可复盘可调参**：关卡参数、掉落权重、目标阈值配置化。\r\n\r\n---\r\n\r\n## 二、核心玩法规则\r\n\r\n### 2.1 棋盘与基础术语\r\n\r\n- 棋盘默认 `8x8`（后续可配置）。\r\n- 每格最多存在 1 个方块，方块有 `colorId`（颜色/类型）。\r\n- 相邻定义：上下左右四方向（不含斜向）。\r\n\r\n### 2.2 有效交换规则（必须）\r\n\r\n1. 玩家拖拽或点击交换两个相邻方块。\r\n2. 系统先模拟交换结果：\r\n   - 若产生任意 `>=3` 连线，则交换生效；\r\n   - 若未产生消除，则交换回退（播放“无效交换”反馈，不扣步数）。\r\n3. 有效交换生效后，步数 `-1`，再进入消除结算流程。\r\n\r\n### 2.3 消除判定规则\r\n\r\n- 连线判定仅计算水平或垂直连续同色块。\r\n- 同一步内可同时命中多组消除，统一归并结算。\r\n- 特殊方块触发产生的二次消除也计入本步连锁。\r\n\r\n### 2.4 掉落与补齐\r\n\r\n每轮消除后按以下顺序处理：\r\n\r\n1. 清空被消除格；\r\n2. 重力下落：列内方块向下填充空位；\r\n3. 顶部按掉落池生成新方块补齐；\r\n4. 再次检测是否形成新消除（连锁），若有则继续循环；\r\n5. 直到棋盘稳定（无自动消除）结束本步。\r\n\r\n### 2.5 连锁定义\r\n\r\n- 同一次玩家有效交换触发的后续自动消除统称“连锁”。\r\n- 连锁层级从 1 开始计数（首次手动触发为 `combo=1`，后续自动触发为 `combo=2+`）。\r\n- 连锁越高，得分倍率越高（见第五章）。\r\n\r\n### 2.6 无",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:53.838Z",
+          "execution_time": 0.6,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 1,
+            "cache_read_tokens": 37967,
+            "cache_creation_tokens": 15822
+          }
+        },
+        {
+          "step_id": 3,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Bash",
+            "tool_use_id": "toolu_vrtx_012GeXWLBjLjma7P2dDRqxzm",
+            "args": {
+              "command": "ls /workspace/docs/ 2>/dev/null",
+              "timeout": 5000
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Exited with code 0.Final output:\n\nAI开发规范.md\nP1-推箱子关卡详细设计.md\nP2-记忆翻牌.md\nP3-消消乐.md\n完成记录.md\n开发记录-P1推箱子M1.md\n开发记录-大厅M1.md\n总体进度.md\n文档维护规范.md\n架构决策记录.md\n策划案-大厅.md\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:54.419Z",
+          "execution_time": 0.6,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 1,
+            "cache_read_tokens": 37967,
+            "cache_creation_tokens": 15822
+          }
+        },
+        {
+          "step_id": 4,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "让我进一步阅读相关的架构决策、开发规范和已有的策划案作为对比参考。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:58.713Z",
+          "execution_time": 4.3,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 53789,
+            "cache_creation_tokens": 6124
+          }
+        },
+        {
+          "step_id": 5,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_01BW5u2Pjn2q7MNNNAzgPD92",
+            "args": {
+              "file_path": "/workspace/docs/AI开发规范.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# AI 开发规范（统一入口）\n\n> 目的：让所有 AI 在同一套约束下工作，保证实现路径一致、结构一致、质量一致。\n\n## 1. 适用范围与优先级\n\n- 适用范围：本项目内所有 AI 生成/修改的代码、配置、测试与说明。\n- 执行顺序（必须）：\n  1) 先阅读本文件\n  2) 再阅读 `CLAUDE.md`（项目根目录，安全与引擎规则）\n  3) 再阅读 `docs/策划案-大厅.md`（产品与工程落地）\n  4) 再阅读 `docs/架构决策记录.md`（历史技术决策，重点看最近条目）\n- 规则冲突时优先级：\n  - `CLAUDE.md` 安全规则最高\n  - 其次是本规范\n  - 最后是模块内局部说明\n\n## 2. 强制目录规范\n\n- 所有业务代码仅放 `scripts/`。\n- 启动入口固定为 `scripts/main.lua`。\n- 配置仅放 `scripts/config/`，格式为 Lua table 文件（`return { ... }`），首个游戏接入时创建对应子目录：\n  - `scripts/config/games/*.lua`\n  - `scripts/config/home/*.lua`\n  - `scripts/config/feature-flags.lua`\n  - `scripts/config/schema/*.lua`\n- 测试仅放 `scripts/tests/`（M1 阶段以手动验证为主，目录可在引入自动化测试时再创建）：\n  - `scripts/tests/unit/`\n  - `scripts/tests/integration/`\n  - `scripts/tests/e2e/`\n- 工具脚本放 `tools/`。\n- 文档目录路径不做硬约束，由 AI 按任务自行分配。\n\n## 3. 资源与引用规范\n\n- 资源路径统一在游戏配置（`scripts/config/games/*.lua`）中声明。\n- 页面逻辑通过配置读取路径，再用 `cache:GetResource()` 加载，例如：\n  ```lua\n  local config = require(\"config.games.p1-puzzle-land\")\n  local icon = cache:GetResource(\"Texture2D\", config.icon)\n  ```\n- 禁止在页面代码中硬编码资源路径字符串；必须通过配置或 `shared/constants` 统一映射。\n- 资源文件存放于 `assets/` 目录，引用时不加 `assets/` 前缀（引擎自动识别资源根目录）。\n\n## 4. 游戏接入配置契约\n\n完整字段定义、范例、校验规则见 `策划案-大厅.md` §12.2。\n\n快速参考——必填字段：`gameId`、`title`、`entryModule`、`status`、`version`。\n\n## 5. 配置加载、校验与回滚\n\n完整规则见 `策划案-大厅.md` §12.0（加载顺序）、§12.2（校验与错误码）、§12.2.1（远程合并与回滚）。\n\n## 6. 代码组织与实现约束\n\n- 采用分层依赖：`pages -> modules -> sdk/shared`，禁止反向依赖。\n- `games/*/adapter.lua` 只做接入适配，不实现具体玩法。\n- 首页只依赖 `game-registry` 标准对象；入游通过 `entryModule`。\n- 不允许吞异常；`pcall` 后必须处理并记录。\n- 复杂逻辑可写简短\"原因型注释\"，禁止无信息注释。\n\n### 6.1 文件与函数规模\n\n- 单文件建议不超过 1000 行；超过 1500 行必须拆分（与 `CLAUDE.md` 规则 #13 一致）。\n- 单函数建议不超过 60 行；复杂流程拆成小函数。\n\n### 6.2 引擎编码注意事项\n\n引擎特定的编码规则以 `CLAUDE.md` 为准，此处列出最关键的几条供快速参考：\n\n- **eventData 访问**：使用 `eventData[\"Key\"]:GetInt()` / `GetFloat()` / `GetString()` 模式（tolua++ 绑定），不可直接当 table 用。\n- **Lua 数组从 1 开始**：循环用 `for i = 1, n do`，不是 `for i = 0, n-1 do`。\n- **NanoVG 渲染**：必须在 `NanoVGRender` 事件回调中执行，不能在 `Update` 中绘制。\n- **nvgCreateFont 只调一次**：在 `Start()` 或初始化时调用，不要每帧调用（会显存泄漏）。\n- ",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:59.317Z",
+          "execution_time": 0.6,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 53789,
+            "cache_creation_tokens": 6124
+          }
+        },
+        {
+          "step_id": 6,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_01BFkSHLVzEVmU7hQh2BJbcC",
+            "args": {
+              "file_path": "/workspace/docs/架构决策记录.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 架构决策记录（ADR）\n\n> 记录开发过程中的关键技术决策，为后续 AI 会话提供上下文。\n>\n> 规则：只记录有\"为什么\"价值的决策，不记录常规实现。格式见末尾模板。\n\n---\n\n## 决策索引\n\n| 编号 | 标题 | 状态 | 日期 |\n|------|------|------|------|\n| ADR-001 | 屏幕方向：竖屏 | 已决定 | 2026-03-17 |\n| ADR-002 | 游戏容器：混合方案 | 已决定 | 2026-03-17 |\n| ADR-003 | 页面切换：轻量路由 | 已决定 | 2026-03-17 |\n| ADR-004 | 推箱子渲染：NanoVG 自绘 + 逻辑渲染分离 | 已决定 | 2026-03-17 |\n| ADR-005 | 记忆翻牌渲染：NanoVG 自绘 + 矢量图案 | 已决定 | 2026-03-18 |\n\n---\n\n## ADR-001：屏幕方向\n\n- **状态**：已决定\n- **日期**：2026-03-17\n- **背景**：`策划案-大厅.md` §12.1 明确写\"竖屏（portrait）\"，但 `.project/project.json` 中 `screen_orientation` 为 `landscape`。两处不一致。\n- **决策**：以策划案为准，使用 **竖屏（portrait）**。\n- **理由**：策划案是产品需求源头，project.json 为初始模板默认值，需同步修改。\n- **影响范围**：`.project/project.json` 需改为 portrait；所有 UI 布局按竖屏设计；卡片比例按竖屏优化。\n\n---\n\n## ADR-002：游戏容器技术方案\n\n- **状态**：已决定\n- **日期**：2026-03-17\n- **背景**：`策划案-大厅.md` §14 定义了生命周期状态机，但未说明游戏容器在引擎层面如何实现。\n- **候选方案**：\n  - A：切换 Scene（每个小游戏独立 Scene，主页面也是一个 Scene）\n  - B：同一 Scene 内切换 UI 树（小游戏作为 UI 层叠加/替换）\n  - C：混合方案（主页面用 UI，小游戏按类型决定是否新建 Scene）\n- **决策**：选择 **方案 C（混合方案）**。\n- **理由**：主页面是纯 UI，用 UI 树即可；小游戏类型多样（纯 UI 游戏、2D 物理游戏、3D 游戏），不同类型对 Scene 的需求不同。混合方案兼顾灵活性与隔离性，由 `entryModule` 的 adapter 自行决定是否创建独立 Scene。\n- **影响范围**：game-container 模块需支持两种加载模式（UI-only / Scene-based）；adapter 接口需声明所需模式。\n\n---\n\n## ADR-003：页面切换机制\n\n- **状态**：已决定\n- **日期**：2026-03-17\n- **背景**：底部导航有 4 个 tab（首页/游戏库/活动/我的），需要页面切换能力。UrhoX 没有内置路由系统。\n- **候选方案**：\n  - A：简单状态变量（`currentPage`）控制 UI 树的显示/隐藏\n  - B：实现轻量路由模块（支持 push/pop/replace）\n  - C：策划案中 `entryRoute` 暗示的路由系统（但标记为兼容字段）\n- **决策**：选择 **方案 B（轻量路由模块）**。\n- **理由**：M1 需要 tab 切换 + 游戏进入/退出的页面栈管理，简单状态变量无法满足\"从游戏返回到之前的 tab\"等场景。轻量路由提供 push/pop/replace 语义，覆盖当前需求且不过度设计。\n- **影响范围**：新增 `scripts/app/router.lua` 模块；pages/ 下每个页面导出统一的 create/destroy 接口；底部导航通过 router.replace 切换 tab。\n\n---\n\n## ADR-004：推箱子渲染方案\n\n- **状态**：已决定\n- **日期**：2026-03-17\n- **背景**：推箱子作为首个实装子游戏，需要选择渲染方案。ADR-002 已决定混合方案（adapter 自行决定渲染模式），但具体子游戏需要确定用 UI 树还是 NanoVG 自绘。同时需要确保未来可替换渲染方案。\n- **候选方案**：\n  - A：使用 UrhoX UI 库（Yoga + NanoVG 封装），`getUI()` 返回 UI 节点树\n  - B：NanoVG 裸绘制，`getUI()` 返回 nil，adapter 自管",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:59.589Z",
+          "execution_time": 0.3,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 53789,
+            "cache_creation_tokens": 6124
+          }
+        },
+        {
+          "step_id": 7,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_018UWeStshCbVJ1oBmrnSZx7",
+            "args": {
+              "file_path": "/workspace/docs/策划案-大厅.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 益智游戏合集主页面策划案（第一阶段）\n\n## 一、项目目标\n\n构建一个统一入口的益智游戏合集产品，玩家从主菜单进入后，能够快速找到想玩的游戏，并在不学习复杂规则的前提下完成进入、游玩、返回的完整闭环。\n\n本阶段只定义\"主页面与全局框架\"，不涉及具体小游戏玩法内容。\n\n---\n\n## 二、产品定位与核心原则\n\n### 2.1 产品定位\n\n- 轻量化、易上手的益智小游戏聚合平台。\n- 强调\"快速开始\"和\"连续体验\"。\n- 支持后续持续上新小游戏，而不破坏现有结构。\n- 首期游戏数量控制在约 5 款，优先保证每款体验质量。\n\n### 2.2 设计原则\n\n1. 入口清晰：用户 3 秒内理解\"去哪玩、怎么玩\"。\n2. 操作最短：尽量 2-3 次点击进入游戏。\n3. 回流顺畅：玩完后自然回到主菜单继续下一款。\n4. 结构可扩：新增游戏、活动、系统功能时无需大改主框架。\n\n---\n\n## 三、信息架构（IA）\n\n### 3.1 一级结构\n\n**M1 冻结为 2 个 tab**：\n\n1. 首页（游戏入口大厅）\n2. 我的\n\n> 目录结构中预留了 `game-library/`、`activity/` 页面目录（见 §13.1），M2+ 按需启用，M1 不实现。\n\n### 3.2 首页（主菜单）定位\n\n首页承担\"入口大厅\"职责，仅展示可玩的游戏入口，不承载推荐、活动等分发能力。\n\n---\n\n## 四、主页面模块设计（重点）\n\n## 4.1 页面目标\n\n- 帮玩家快速开始游戏\n- 清晰展示约 5 款益智游戏入口\n- 保持页面简单稳定，避免无关运营模块\n\n### 4.2 页面布局（自上而下）\n\n1. 顶部栏\n   - 标题：\"益智游戏大厅\"\n   - 设置按钮（可选）\n2. 游戏入口列表区\n   - 展示约 5 款益智游戏（固定列表）\n   - 每个入口统一信息：封面图、标题、简述、开始按钮\n3. 底部导航栏（可选）\n   - 首页 / 我的\n\n### 4.3 关键模块规则\n\n- 列表固定展示在线游戏入口，不做推荐排序。\n- 卡片信息统一：封面图、标题、简述、开始按钮。\n- 空状态策略：当无可用游戏时显示\"暂未开放，敬请期待\"。\n\n---\n\n## 五、核心用户流程\n\n### 5.1 首次进入流程\n\n启动应用 -> 首页新手引导（可跳过） -> 选择任一游戏 -> 进入游戏内页\n\n### 5.2 常规进入流程\n\n启动应用 -> 首页 -> 点击任一游戏入口 -> 进入对应游戏\n\n### 5.3 多游戏切换流程\n\n游戏内暂停/返回 -> 回到首页 -> 进入下一款游戏\n\n---\n\n## 六、全局功能规划（不涉及单个小游戏）\n\n### 6.1 账号与存档\n\n- 支持游客模式快速进入。\n- 支持账号登录（后续）进行云存档。\n- 各游戏存档隔离，主页面仅提供统一入口，不承担存档管理展示。\n\n### 6.2 进度与成就（合集层）\n\n- 合集等级（根据总游玩行为累计）。\n- 合集任务（如\"今日游玩 2 款不同游戏\"）。\n- 合集成就（覆盖广度、连续登录、挑战完成等）。\n\n### 6.3 通知与消息\n\n- 新游戏上线提醒\n- 版本更新说明\n\n### 6.4 设置中心\n\n- 音乐/音效开关\n- 画质与性能档位\n- 语言切换\n- 隐私与账号管理\n\n---\n\n## 七、可扩展性设计（重点）\n\n### 7.1 内容扩展\n\n- 新增小游戏采用\"配置注册\"机制接入：\n  - 配置标题、图标、入口路径、开放条件即可上线\n  - 主页面无需改代码结构，仅读取配置渲染\n- 列表策略采用\"少而精\"：大厅固定展示约 5 款精品益智游戏入口。\n\n### 7.2 运营扩展\n\n- 支持节日主题皮肤按日期自动切换。\n\n### 7.3 系统扩展\n\n- 预留排行榜系统接口（合集榜 / 单游戏榜）。\n- 预留社交分享能力（邀请、分享战绩）。\n- 预留商业化位（非强制：皮肤、通行证、订阅）。\n\n### 7.4 技术扩展\n\n- 主页面模块组件化（入口卡、列表条可复用）。\n- 配置热更新：活动与入口位可服务端下发。\n- 日志埋点统一规范，便于后续精细化运营。\n\n---\n\n## 八、数据与埋点规划（主页面）\n\n### 8.1 核心指标\n\n- 首页到游戏的转化率\n- 人均游玩游戏数（按日/周）\n- 首页停留时长与跳出率\n\n### 8.2 关键事件\n\n- `home_view`\n- `click_game_card`\n- `switch_tab`\n\n---\n\n## 九、里程碑建议\n\n### M1（最小可用）\n\n- 首页基础布局\n- 游戏卡片入口\n- 底部导航\n\n### M2（体验增强）\n\n- 空状态优化\n- 首页视觉优化\n\n### M3（可运营化）\n\n- 动态配置下发\n- 埋点看板\n- A/B 测试能力\n\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:11:59.900Z",
+          "execution_time": 0.3,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 53789,
+            "cache_creation_tokens": 6124
+          }
+        },
+        {
+          "step_id": 8,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_012y7cwcA8Y7xCCukodFaLYz",
+            "args": {
+              "file_path": "/workspace/docs/P2-记忆翻牌.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 益智乐园 · 记忆翻牌详细策划文档\n\n> 目标：提供可直接用于研发、策划、美术和测试协作的记忆翻牌子玩法设计说明，覆盖规则、关卡、计时、评级与配置契约。\n\n---\n\n## 零、工程接入与目录约定（开发前必填）\n\n### 0.1 大厅接入契约（对齐 AI 开发规范）\n\n- `gameId`: `p2-memory-flip`\n- `title`: `记忆翻牌`\n- `entryModule`: `games.p2-memory-flip.init`\n- `status`: `dev`（联调完成后改 `online`）\n- `version`: `1.0.0`\n\n`scripts/config/games/p2-memory-flip.lua` 示例：\n\n```lua\nreturn {\n    gameId = \"p2-memory-flip\",\n    title = \"记忆翻牌\",\n    subtitle = \"翻开并配对所有卡牌\",\n    icon = \"Textures/games/p2-memory-flip-icon.png\",\n    cover = \"Textures/games/p2-memory-flip-cover.png\",\n    entryModule = \"games.p2-memory-flip.init\",\n    tags = { \"益智\", \"记忆\", \"休闲\" },\n    status = \"dev\",\n    sortWeight = 70,\n    version = \"1.0.0\",\n}\n```\n\n### 0.2 推荐目录结构（M1，对齐 P1 分层模式）\n\n```text\nscripts/\n  games/p2-memory-flip/\n    init.lua                    # 入口（仅转发 adapter，与 P1 一致）\n    adapter.lua                 # 生命周期适配器（NanoVG 上下文管理、事件订阅、屏幕切换）\n    save.lua                    # 存档读写（最佳成绩、进度快照）\n    logic/\n      state.lua                 # 游戏状态机（Idle/OneFlipped/TwoFlippedChecking/Resolving/Cleared）\n      board.lua                 # 棋盘逻辑（洗牌、配对判定，纯 Lua，禁止引入渲染 API）\n    view/\n      card-renderer.lua         # 卡牌绘制（NanoVG 矢量图案）\n      hud-renderer.lua          # HUD 绘制（计时、错误次数、按钮）\n      result-popup.lua          # 结算弹窗绘制\n      pause-overlay.lua         # 暂停菜单（NanoVG 自绘，不复用 UI 版 pause-menu）\n    screens/\n      level-select.lua          # 关卡选择屏幕\n      gameplay.lua              # 游玩主屏幕（编排 logic + view）\n    data/\n      levels.lua                # 关卡数据（卡片数、布局、评级阈值、图案池）\n  config/games/p2-memory-flip.lua  # 大厅接入配置（仅元信息）\n```\n\n约束：\n- `init.lua` 仅做一行转发 `return require(\"games.p2-memory-flip.adapter\")`，与 P1 推箱子保持一致。\n- `adapter.lua` 只处理大厅接入（NanoVG 上下文、事件订阅），不实现玩法逻辑。\n- `logic/` 为纯 Lua 逻辑层，禁止引入任何渲染 API（与 ADR-004 逻辑/渲染分离一致）。\n- `view/` 封装所有 NanoVG 绘制代码，仅通过只读方式访问逻辑层状态。\n- 关卡数据放在 `data/levels.lua`（游戏内部数据），不放在 `scripts/config/`（大厅配置）。\n- 全局事件处理函数使用 `P2MF_` 前缀（如 `P2MF_HandleNanoVGRender`、`P2MF_HandleUpdate`），避免与 P1 的 `P1PZ_` 前缀冲突。`onExit` 时须将这些全局函数置 nil 清理。\n\n### 0.3 渲染方案（对齐",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:12:00.396Z",
+          "execution_time": 0.5,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 53789,
+            "cache_creation_tokens": 6124
+          }
+        },
+        {
+          "step_id": 9,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "现在让我再阅读 P1 推箱子的策划案和已有代码结构作为对比参考。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:12:04.371Z",
+          "execution_time": 4.0,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 59913,
+            "cache_creation_tokens": 24056
+          }
+        },
+        {
+          "step_id": 10,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_013vCmxn9vJDpYqK6vkNi3ev",
+            "args": {
+              "file_path": "/workspace/docs/P1-推箱子关卡详细设计.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 益智乐园 · 推箱子详细设计文档\r\n\r\n> 目标：提供可直接用于研发、策划、美术和测试协作的推箱子子玩法设计说明，覆盖规则、数据结构、编辑器约束与示例关卡。\r\n\r\n---\r\n\r\n## 一、玩法目标与设计原则\r\n\r\n### 1.1 玩法目标\r\n\r\n- 玩家通过四方向移动与推动箱子，将所有箱子推到目标点。\r\n- 关卡解法强调路径规划、空间管理与状态切换。\r\n- 在传统推箱子基础上，加入特殊地块（冰面、轨道、传送等）提升关卡变化。\r\n\r\n### 1.2 设计原则\r\n\r\n1. **规则可解释**：所有交互有明确优先级，玩家能通过失败学习。\r\n2. **难度可分层**：从单箱教学到多机制联动，形成稳定成长曲线。\r\n3. **编辑可控**：创作者可快速搭关，系统能自动检测明显坏图。\r\n4. **可回放可复盘**：支持撤销、重置、回放，降低挫败感。\r\n\r\n---\r\n\r\n## 二、元素定义与符号规范\r\n\r\n### 2.1 地图元素\r\n\r\n| 元素 | 符号 | 说明 |\r\n|------|------|------|\r\n| 空地 | `.` | 可行走格 |\r\n| 墙体 | `#` | 不可通过，不可推动进入 |\r\n| 玩家出生点 | `P` | 玩家初始位置 |\r\n| 箱子 | `B` | 可被玩家推动 |\r\n| 目标点 | `T` | 箱子到达后计入完成 |\r\n| 冰面 | `I` | 进入后自动滑行 |\r\n| 轨道 | `R` | 箱子进入后按轨道方向自动移动 |\r\n| 传送入口 | `A` `C`... | 与同字母出口配对 |\r\n| 传送出口 | `a` `c`... | 箱子/玩家传送落点 |\r\n| 单向格（向右） | `>` | 仅允许按箭头方向进入/推出 |\r\n| 开关 | `S` | 箱子压上触发机关 |\r\n| 门 | `D` | 默认关闭，触发后可通行 |\r\n\r\n> 注：字母大小写用于入口/出口区分，最终以数据配置为准。\r\n\r\n### 2.2 文本地图复合符号（导入/导出约定）\r\n\r\n为避免文本关卡与运行时状态丢失，增加复合符号：\r\n\r\n| 复合状态 | 符号 | 说明 |\r\n|------|------|------|\r\n| 玩家在目标点 | `+` | 玩家位置与目标点重叠 |\r\n| 箱子在目标点 | `*` | 箱子位置与目标点重叠 |\r\n\r\n> 说明：编辑器导出 JSON 时，`+/*` 需拆解为基础实体坐标（player/boxes）与 `targets`。\r\n\r\n### 2.3 胜负判定\r\n\r\n- **胜利条件**：所有目标点均被箱子占据。\r\n- **失败判定（软失败）**：无可行操作或玩家主动重置。\r\n- **死锁定义（用于提示）**：\r\n  - 箱子进入非目标死角（两面墙夹角）；\r\n  - 箱子卡在不可逆单向链路；\r\n  - 关键开关箱被误锁无法取回。\r\n\r\n### 2.4 坐标与索引约定（必须统一）\r\n\r\n- 网格坐标使用 `x,y` 二元组，原点为左上角 `([0,0])`。\r\n- `x` 向右递增，`y` 向下递增。\r\n- 所有坐标均为整数格坐标，采用 **0-based** 索引。\r\n- 越界定义：`x < 0`、`x >= width`、`y < 0`、`y >= height`。\r\n\r\n---\r\n\r\n## 三、基础规则（无特殊地块）\r\n\r\n### 3.1 移动与推动\r\n\r\n1. 玩家每步可向上/下/左/右移动一格。\r\n2. 前方为空地：玩家移动成功。\r\n3. 前方为箱子，且箱子前方为空地：推动成功（玩家和箱子同时前进一步）。\r\n4. 箱子前方为墙/箱子/不可通行地块：推动失败，玩家原地不动。\r\n\r\n### 3.2 操作与辅助\r\n\r\n- 支持逐步撤销（Undo），默认至少 200 步历史。\r\n- 支持整局重置（Reset）。\r\n- 支持回放（Replay）用于学习最优解。\r\n- 支持步数统计、用时统计、星级结算。\r\n- 单次输入触发的连锁效果（推动 -> 传送 -> 轨道 -> 冰面）视为**一个原子操作**：\r\n  - 步数 +1 仅发生一次；\r\n  - Undo 回滚整个连锁结果；\r\n  - 连锁中不接受二次输入。\r\n\r\n### 3.3 星级建议\r\n\r\n| 星级 | 条件示例 |\r\n|------|----------|\r\n| 3 星 | 步数 <= 参考最优步数 × 1.2 |\r\n| 2 星 | 步数 <= 参考最优步数 × 1.6 |\r\n| 1 星 | 通关即可 |\r\n\r\n---\r\n\r\n## 四、特殊地块详细规则\r\n\r\n### 4.1 冰面 `I`\r\n\r\n- 玩家或箱子进入冰面后，沿进入方向持续滑行。\r\n- 在以下情况停止：\r\n  - 前方为墙、箱子或关闭门；\r\n  - 前方越界；\r\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:12:05.015Z",
+          "execution_time": 0.6,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 59913,
+            "cache_creation_tokens": 24056
+          }
+        },
+        {
+          "step_id": 11,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_01VoMPdkD934qpyb4fHw1oRr",
+            "args": {
+              "file_path": "/workspace/docs/文档维护规范.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 文档维护规范\n\n> 目的：定义项目文档的更新规则，确保多轮 AI 会话之间的上下文连续性。\n\n---\n\n## 1. 文档清单与职责\n\n| 文档 | 职责 | 谁来改 | 何时改 |\n|------|------|--------|--------|\n| `docs/总体进度.md` | 项目全局进度总览、模块完成状态、代码规模、待办汇总 | AI 主动记录 | 里程碑变更或模块完成时 |\n| `docs/策划案-大厅.md` | 大厅主页面的产品需求、功能定义、验收标准 | 用户主导，AI 可提议 | 需求变更时 |\n| `docs/P1-推箱子关卡详细设计.md` | 推箱子子游戏的关卡设计、机制定义、验收标准 | 用户主导，AI 可提议 | 需求变更时 |\n| `docs/策划案-*.md`（后续） | 各子系统/小游戏的策划案，按需新增 | 用户主导，AI 可提议 | 需求变更时 |\n| `docs/AI开发规范.md` | 工程约束、目录规范、编码规则 | 用户或 AI 均可 | 规则变更时 |\n| `docs/架构决策记录.md` | 开发过程中的技术决策与理由 | AI 主动记录 | 每次关键决策时 |\n| `docs/开发记录-*.md` | 各里程碑的开发过程记录（进度、问题、变更） | AI 主动记录 | 开发过程中持续更新 |\n| `docs/完成记录.md` | 按日期索引的每日完成事项 | AI 主动记录 | 每次会话结束时 |\n| `docs/文档维护规范.md` | 文档体系本身的规则（本文件） | 用户主导 | 几乎不变 |\n\n---\n\n## 2. 核心原则\n\n### 2.1 只记录有决策价值的内容\n\n- 记录\"为什么选 A 而不是 B\"，不记录\"A 是什么\"。\n- 记录\"与策划案/规范不同的地方\"，不重复抄写已有内容。\n- 记录\"下次 AI 会话需要知道的上下文\"，不记录过程性调试细节。\n\n### 2.2 就近原则\n\n- 模块级的说明放在模块目录的注释或文件头部，不集中到 docs/。\n- 只有跨模块、全局性的决策才进入 `架构决策记录.md`。\n\n### 2.3 单一事实源\n\n- 同一个信息只在一个地方定义。\n- 其他文档通过引用（`见 XXX.md §X`）指向源头，不复制粘贴。\n- 冲突时以源头文档为准。\n\n---\n\n## 3. 各文档的更新规则\n\n### 3.1 策划案系列（`策划案-大厅.md`、`策划案-*.md`）\n\n**命名规则**：`策划案-{子系统}.md`，如 `策划案-大厅.md`、`策划案-益智乐园.md`。\n\n**触发条件**（必须更新）：\n- 新增/删除/修改功能模块\n- 修改验收标准或量化指标\n- 修改配置契约（字段增删改）\n- 修改生命周期接口\n- 待定事项落实后补全\n\n**更新方式**：\n- 在原文对应章节直接修改，不另开文档。\n- 修改后更新文档底部的版本号和日期。\n- 重大变更在修改处用 `> v1.x 变更：简述` 行内标注。\n\n**新增策划案**：\n- 新增小游戏或独立子系统时，可创建新的 `策划案-{名称}.md`。\n- 新文档需在本文件 §1 文档清单中注册。\n\n**禁止**：\n- 不要删除已冻结的契约内容，只能标记废弃并说明替代方案。\n- 不要在策划案中写实现细节（那是代码和 ADR 的职责）。\n\n### 3.2 AI开发规范.md\n\n**触发条件**（必须更新）：\n- 新增/修改目录结构约定\n- 新增/修改配置加载规则\n- 新增/修改编码约束\n- 发现需要全局遵守的新规则\n\n**更新方式**：\n- 在原文对应章节直接修改。\n- 更新文档底部的版本号和日期。\n\n### 3.3 架构决策记录.md（ADR）\n\n**触发条件**（必须记录）：\n- 策划案中标注\"待定\"的事项被落实\n- 选择了某个技术方案（且存在其他可选方案）\n- 实现与策划案描述不一致（主动偏离或发现策划案有矛盾）\n- 发现了需要所有后续会话知道的约束或陷阱\n\n**不需要记录**：\n- 常规功能实现（按策划案直接落地的）\n- 局部 bug 修复\n- 代码风格调整\n\n**格式见** `架构决策记录.md`。\n\n---\n\n## 4. AI 会话交接协议\n\n### 4.1 每次会话开始时\n\nAI 应按以下顺序阅读：\n1. `docs/AI开发规范.md`（工程约束）\n2. `docs/策划案-大厅.md` 及相关策划案（产品需求，可按需跳读相关章节）\n3. `docs/架构决策记录.md`（历史决策，重点看最近条目）\n4. 相关模块的代码\n\n### 4.2 每次会话结束前\n\n如果本次会话做出了符合 §3.3 触发条件的决策，AI 应：\n1. 将决策追加到 `架构决策记录.md`\n2. ",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:12:05.664Z",
+          "execution_time": 0.6,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 59913,
+            "cache_creation_tokens": 24056
+          }
+        },
+        {
+          "step_id": 12,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Bash",
+            "tool_use_id": "toolu_vrtx_01GYCvkt15wD7VDs5SVQkyr7",
+            "args": {
+              "command": "ls /workspace/scripts/games/ 2>/dev/null && echo \"---\" && ls /workspace/scripts/config/games/ 2>/dev/null",
+              "timeout": 5000
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Exited with code 0.Final output:\n\np1-puzzle-land\np2-memory-flip\n---\ndemo-color-match.lua.meta\ndemo-memory-flip.lua.meta\ndemo-number-puzzle.lua.meta\np1-puzzle-land.lua\np1-puzzle-land.lua.meta\np2-memory-flip.lua\np2-memory-flip.lua.meta\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:12:06.873Z",
+          "execution_time": 1.2,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 59913,
+            "cache_creation_tokens": 24056
+          }
+        },
+        {
+          "step_id": 13,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "TodoWrite",
+            "tool_use_id": "toolu_vrtx_013cgaegWKh5SmBKVsXpZRkA",
+            "args": {
+              "todos": [
+                {
+                  "content": "对照 P2 记忆翻牌和其他规范文档，全面审查 P3 消消乐策划案",
+                  "status": "in_progress",
+                  "activeForm": "审查 P3 消消乐策划案"
+                }
+              ]
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:13:00.670Z",
+          "execution_time": 53.8,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 1,
+            "cache_read_tokens": 83969,
+            "cache_creation_tokens": 9220
+          }
+        },
+        {
+          "step_id": 14,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "以下是对照 P1 推箱子、P2 记忆翻牌、AI开发规范、架构决策记录、策划案-大厅等文档后，对 P3 消消乐策划案的审查结果。按严重程度分级列出：\n\n---\n\n## 一、结构性问题（必须修改）\n\n### 1. 缺少渲染方案声明（§0.3）\n\nP2 有明确的 §0.3 \"渲染方案（对齐 ADR-005）\" 章节，声明了 NanoVG 自绘、逻辑/渲染分离、组件复用决策表。P3 完全没有这个章节。\n\n消消乐是网格型游戏，与推箱子和记忆翻牌场景一致，应同样采用 NanoVG 自绘方案，并需要在架构决策记录中新增 ADR-006。\n\n**建议**：新增 §0.3，包含：\n- 渲染方案选择（NanoVG 自绘，`getUI()` 返回 nil）\n- 逻辑/渲染分离声明\n- 组件复用决策表（转场复用 shared、暂停菜单自绘）\n\n### 2. 目录结构不符合已建立的分层模式\n\nP2 建立了清晰的 `logic/` + `view/` + `screens/` + `data/` 分层。P3 的目录结构是扁平的：\n\n```text\n# P3 当前（扁平，不一致）\ninit.lua, adapter.lua, state.lua, logic.lua, ui.lua, level-config.lua\n\n# 应参照 P2 改为\ninit.lua\nadapter.lua\nsave.lua                    # 缺失\nlogic/\n  state.lua\n  board.lua                 # 棋盘逻辑（消除、掉落、连锁）\nview/\n  board-renderer.lua        # 棋盘绘制\n  hud-renderer.lua          # HUD 绘制\n  result-popup.lua          # 结算弹窗\n  pause-overlay.lua         # 暂停菜单\nscreens/\n  level-select.lua          # 选关\n  gameplay.lua              # 主游戏编排\ndata/\n  levels.lua                # 关卡数据\n```\n\n**关键问题**：\n- 缺少 `save.lua`（P1、P2 都有存档模块）\n- `ui.lua` 职责模糊，应拆为 `view/` 下的多个专用渲染器\n- `level-config.lua` 应改为 `data/levels.lua`\n\n### 3. `init.lua` 职责定义与已建立模式矛盾\n\nP3 约束中写道：\n> `init.lua` 仅做生命周期编排（进入/退出/重开），不堆业务细节。\n\n但 P2 已确立的模式是：\n> `init.lua` 仅做一行转发 `return require(\"games.p2-memory-flip.adapter\")`\n\n两者矛盾。应统一为一行转发模式。\n\n### 4. 关卡数据存放位置矛盾\n\nP3 同时定义了两个位置存放关卡数据：\n- `scripts/games/p3-match-3/level-config.lua`（§0.2 目录结构）\n- `scripts/config/games/p3-match-3-levels.lua`（§7.2 Lua 配置示例）\n\nP2 已明确：\n> 关卡数据放在 `data/levels.lua`（游戏内部数据），不放在 `scripts/config/`（大厅配置）。\n\n`scripts/config/games/` 应只放大厅接入元信息，关卡数据应在游戏目录内。\n\n### 5. 缺少全局函数前缀约定\n\nP2 明确定义了 `P2MF_` 前缀（如 `P2MF_HandleNanoVGRender`），并要求 `onExit` 时置 nil 清理。P3 没有定义前缀，这会导致多游戏间全局函数名冲突。\n\n**建议**：定义 `P3M3_` 前缀（或 `P3MM_`），并说明退出清理要求。\n\n---\n\n## 二、逻辑完整性问题（建议修改）\n\n### 6. 缺少游戏状态机定义\n\nP2 §2.4 定义了严格的 5 状态机（`Idle/OneFlipped/TwoFlippedChecking/Resolving/Cleared`），有效防止了并发操作问题。\n\n消消乐同样存在动画期间禁止输入的需求（消除动画、掉落动画、连锁动画期间不能交换），但策划案没有定义状态机。建议参照 P2 增加，例如：\n\n```\nIdle → Swapping → Checking → Eliminating → Falling → Checking（循环）→ Idle/Cleared/Failed\n```\n\n### 7. 缺少中断恢复规则（对齐 GameLifecycleAdapter）\n\nP2 §4.5 有完整的中断恢复表（切后台/回前台/暂停/返回大厅/崩溃恢复/定期自动保存），对齐了 `GameLifecycleAdapter` 的每个接口。\n\nP3 完全没有这部分内容。消消乐有步数和分数状态，中断恢复逻辑更复杂（保存当前棋盘状态、已用步数、目标进度等），必须定义。\n\n### 8. 缺少关卡解锁机制\n\nP2 §3.1.1 明确定义了线性解锁规则。P3 没有定义关卡如何解锁。\n\n### 9. L9 目标与 v1 范围声明矛盾\n\n§4.1 声明 v1 每关只支持单一主目标，\"M2 再支持多目标组合\"。但 §6.2 中 L9 定义的目标是\"收集红/绿 各18\"，这是两种颜色各自有数量要求的复合目标。\n\n两种处理方式：\n- 将 L9 简化为单色收集（如\"收集红色 36\"）\n- 在 §4.1 中将\"多色收集\"归为单一 `collect_color` 目标的变体（`targets` 数组已支持多项），明确这不算\"多目标组合\"\n\n### 10. `starScore` 数组结构不清晰\n\n§7.2 中 `starScore = { 0, 2200, 2800, 3200 }`，4 个元素，Lua 1-based 索引下语义不明确（`starScore[1]` = 0 代表什么？）。\n\nP2 使用命名 key `rankTime = { s = 15, a = 20, b = 28 }`，语义清晰。建议改为：\n\n```lua\nstarScore = { oneStar = 0, twoStar = 2200, threeStar = 3200 }\n-- 或\nstarScore = { [1] = 0, [2] = 2200, [3] = 3200 }  -- 去掉多余的第4个元素\n```\n\n---\n\n## 三、规范对齐问题（建议修改）\n\n### 11. 未提及 Emoji 禁令对方块视觉的影响\n\nAI开发规范 §6.3 严禁使用 Emoji。P2 §3.5 用大量篇幅说明了如何用 NanoVG 矢量绘制替代 Emoji 图案。\n\nP3 的方块颜色可能倾向于用纯色区分（比 P2 的图案需求简单），但文档应明确说明：方块视觉使用 NanoVG 矢量绘制（圆角矩形 + 纯色/渐变 + 可选图案），禁止使用 Emoji。\n\n### 12. 暂停菜单实现方案未说明\n\nP2 §0.3 和 §7.1 明确说明暂停菜单使用 `view/pause-overlay.lua` NanoVG 自绘实现，并解释了为什么不复用 UI 库版本。P3 §8.1 只说\"预留道具位、重开按钮、退出按钮\"，未说明暂停菜单的实现方案。\n\n### 13. 缺少运行时错误码\n\nP1 定义了 `SKB-001` 到 `SKB-007` 的错误码体系。P3 没有定义任何错误码。建议新增如 `M3-001`（非法交换）、`M3-002`（棋盘状态异常）等。\n\n### 14. 确定性/回放支持描述较弱\n\nP1 有完整的回放文件格式（§9.3）和确定性校验接口。P3 仅在 §6.3 提到 `seed` 支持固定复现，但未明确：\n- 同一 seed + 同一操作序列是否保证同一结果\n- 是否需要回放文件格式\n- 验收标准中确定性校验的具体要求\n\n---\n\n## 四、细节优化（可选改进）\n\n### 15. 结算记录缺少 `goalType` 和 `goalProgress`\n\n§7.3 结算记录只有 `bestScore` 和 `bestStar`，缺少关卡目标类型和完成情况。对于收集类/特效类目标，记录目标进度有助于数据分析。\n\n### 16. 动效时间建议放入可配置参数\n\n§8.3 的动效时间（150-220ms 交换、180-260ms 消除等）目前只是文案描述，建议像 P2 的 `flipBackDelayMs` 一样放入关卡或全局配置结构中。\n\n### 17. 文档版本格式\n\n建议与 P2 保持一致，从 `v1.0` 改为 `v1.0`（已一致），但后续迭代时注意使用 `vX.Y` 格式。\n\n---\n\n## 总结：必须修改项清单\n\n| 序号 | 问题 | 严重程度 | 参照文档 |\n|------|------|----------|----------|\n| 1 | 缺少 §0.3 渲染方案声明 + ADR-006 | 必须 | P2 §0.3, ADR-005 |\n| 2 | 目录结构不符合 logic/view/screens/data 分层 | 必须 | P2 §0.2 |\n| 3 | init.lua 职责定义矛盾 | 必须 | P2 §0.2 约束 |\n| 4 | 关卡数据存放位置矛盾 | 必须 | P2 §0.2, AI开发规范 §2 |\n| 5 | 缺少全局函数前缀约定 | 必须 | P2 §0.2 约束 |\n| 6 | 缺少游戏状态机定义 | 建议 | P2 §2.4 |\n| 7 | 缺少中断恢复规则 | 建议 | P2 §4.5, 策划案-大厅 §14 |\n| 8 | 缺少关卡解锁机制 | 建议 | P2 §3.1.1 |\n| 9 | L9 目标与 v1 范围声明矛盾 | 建议 | P3 §4.1 vs §6.2 |\n| 10 | starScore 数组语义不清晰 | 建议 | P2 rankTime 命名风格 |\n| 11-17 | 其余规范对齐与细节优化 | 可选 | 各对应文档 |\n\n如需要，我可以直接修改 P3 策划案文档来修复这些问题。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:14:09.695Z",
+          "execution_time": 69.0,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 93189,
+            "cache_creation_tokens": 2412
+          }
+        },
+        {
+          "step_id": 15,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "TodoWrite",
+            "tool_use_id": "toolu_vrtx_017HLuiJNR4JWydtdT3EWg6h",
+            "args": {
+              "todos": [
+                {
+                  "content": "对照 P2 记忆翻牌和其他规范文档，全面审查 P3 消消乐策划案",
+                  "status": "completed",
+                  "activeForm": "审查 P3 消消乐策划案"
+                }
+              ]
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:14:10.820Z",
+          "execution_time": 1.1,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 93189,
+            "cache_creation_tokens": 2412
+          }
+        }
+      ],
+      "run_summary": {
+        "steps_count": 15,
+        "tool_calls_count": 11
+      }
+    },
+    {
+      "turn_id": 2,
+      "role": "user",
+      "content": "修复这些问题",
+      "timestamp": "2026-03-18T04:15:00.804Z"
+    },
+    {
+      "turn_id": 2,
+      "agent_run_id": "run_t2",
+      "steps": [
+        {
+          "step_id": 16,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "TodoWrite",
+            "tool_use_id": "toolu_vrtx_015e9qjVc3VPQkfN7J8frfXj",
+            "args": {
+              "todos": [
+                {
+                  "content": "修改 P3 策划案 §0.2 目录结构（对齐 P2 分层模式）",
+                  "status": "in_progress",
+                  "activeForm": "修改 §0.2 目录结构"
+                },
+                {
+                  "content": "新增 P3 策划案 §0.3 渲染方案声明",
+                  "status": "pending",
+                  "activeForm": "新增 §0.3 渲染方案"
+                },
+                {
+                  "content": "修复 init.lua 职责定义、全局函数前缀、关卡数据位置",
+                  "status": "pending",
+                  "activeForm": "修复 §0.2 约束条目"
+                },
+                {
+                  "content": "新增游戏状态机定义（§2.x）",
+                  "status": "pending",
+                  "activeForm": "新增状态机定义"
+                },
+                {
+                  "content": "新增关卡解锁机制（§6.x）",
+                  "status": "pending",
+                  "activeForm": "新增关卡解锁机制"
+                },
+                {
+                  "content": "修复 L9 目标与 v1 范围矛盾",
+                  "status": "pending",
+                  "activeForm": "修复 L9 目标矛盾"
+                },
+                {
+                  "content": "修复 starScore 数组结构",
+                  "status": "pending",
+                  "activeForm": "修复 starScore 结构"
+                },
+                {
+                  "content": "新增中断恢复规则（对齐 GameLifecycleAdapter）",
+                  "status": "pending",
+                  "activeForm": "新增中断恢复规则"
+                },
+                {
+                  "content": "新增 Emoji 禁令说明、暂停菜单方案、错误码、确定性要求",
+                  "status": "pending",
+                  "activeForm": "补充规范对齐内容"
+                },
+                {
+                  "content": "优化结算记录结构和动效配置",
+                  "status": "pending",
+                  "activeForm": "优化数据结构"
+                },
+                {
+                  "content": "新增 ADR-006 到架构决策记录",
+                  "status": "pending",
+                  "activeForm": "新增 ADR-006"
+                }
+              ]
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:18.854Z",
+          "execution_time": 18.1,
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 937,
+            "cache_read_tokens": 99294,
+            "cache_creation_tokens": 10
+          }
+        },
+        {
+          "step_id": 17,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "我需要对 P3 策划案做大量修改，先整体规划再逐步执行。让我开始修改。\n\n首先修改 §0.2 目录结构，对齐 P2 的分层模式。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:24.156Z",
+          "execution_time": 5.3,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 99304,
+            "cache_creation_tokens": 1642
+          }
+        },
+        {
+          "step_id": 18,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Edit",
+            "tool_use_id": "toolu_vrtx_0121gTGzwZ2vabeE5J1YSQ1m",
+            "args": {
+              "file_path": "/workspace/docs/P3-消消乐.md",
+              "old_string": "### 0.2 推荐目录结构（M1）\n\n```text\nscripts/\n  games/p3-match-3/\n    init.lua\n    adapter.lua\n    state.lua\n    logic.lua\n    ui.lua\n    level-config.lua\n  config/games/p3-match-3.lua\n  config/games/p3-match-3-levels.lua\n```\n\n约束：\n- `init.lua` 仅做生命周期编排（进入/退出/重开），不堆业务细节。\n- `adapter.lua` 只处理大厅接入，不实现具体玩法。\n- 方块类型、分值、目标、步数、掉落权重统一走 `scripts/config/`，禁止硬编码。",
+              "new_string": "### 0.2 推荐目录结构（M1，对齐 P2 分层模式）\n\n```text\nscripts/\n  games/p3-match-3/\n    init.lua                    # 入口（仅转发 adapter，与 P1/P2 一致）\n    adapter.lua                 # 生命周期适配器（NanoVG 上下文管理、事件订阅、屏幕切换）\n    save.lua                    # 存档读写（最佳成绩、进度快照）\n    logic/\n      state.lua                 # 游戏状态机（Idle/Swapping/Eliminating/Falling/Settled/Cleared/Failed）\n      board.lua                 # 棋盘逻辑（消除判定、掉落补齐、连锁、死盘检测，纯 Lua，禁止引入渲染 API）\n    view/\n      board-renderer.lua        # 棋盘与方块绘制（NanoVG 矢量绘制）\n      hud-renderer.lua          # HUD 绘制（步数、分数、目标进度）\n      result-popup.lua          # 结算弹窗绘制\n      pause-overlay.lua         # 暂停菜单（NanoVG 自绘，不复用 UI 版 pause-menu）\n    screens/\n      level-select.lua          # 关卡选择屏幕\n      gameplay.lua              # 游玩主屏幕（编排 logic + view）\n    data/\n      levels.lua                # 关卡数据（卡片类型、分值、目标、步数、掉落权重）\n  config/games/p3-match-3.lua   # 大厅接入配置（仅元信息）\n```\n\n约束：\n- `init.lua` 仅做一行转发 `return require(\"games.p3-match-3.adapter\")`，与 P1/P2 保持一致。\n- `adapter.lua` 只处理大厅接入（NanoVG 上下文、事件订阅），不实现具体玩法逻辑。\n- `logic/` 为纯 Lua 逻辑层，禁止引入任何渲染 API（与 ADR-004/005/006 逻辑/渲染分离一致）。\n- `view/` 封装所有 NanoVG 绘制代码，仅通过只读方式访问逻辑层状态。\n- 关卡数据放在 `data/levels.lua`（游戏内部数据），不放在 `scripts/config/`（大厅配置）。\n- 方块类型、分值、目标、步数、掉落权重统一走 `data/levels.lua`，禁止硬编码。\n- 全局事件处理函数使用 `P3M3_` 前缀（如 `P3M3_HandleNanoVGRender`、`P3M3_HandleUpdate`），避免与 P1 的 `P1PZ_`、P2 的 `P2MF_` 前缀冲突。`onExit` 时须将这些全局函数置 nil 清理。"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Editing file failed: The provided `old_string` does not appear in the file: \"### 0.2 推荐目录结构（M1）\n\n```text\nscripts/\n  games/p3-match-3/\n    init.lua\n    adapter.lua\n    state.lua\n    logic.lua\n    ui.lua\n    level-config.lua\n  config/games/p3-match-3.lua\n  config/games/p3-match-3-levels.lua\n```\n\n约束：\n- `init.lua` 仅做生命周期编排（进入/退出/重开），不堆业务细节。\n- `adapter.lua` 只处理大厅接入，不实现具体玩法。\n- 方块类型、分值、目标、步数、掉落权重统一走 `scripts/config/`，禁止硬编码。\".\n\nNo edits were applied.",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:45.772Z",
+          "execution_time": 21.6,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1254,
+            "cache_read_tokens": 99304,
+            "cache_creation_tokens": 1642
+          }
+        },
+        {
+          "step_id": 19,
+          "phase": "localization",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "Grep",
+            "tool_use_id": "toolu_vrtx_018Z9bQnwfYhEAR1w4QDeX2A",
+            "args": {
+              "pattern": "推荐目录结构",
+              "path": "/workspace/docs/P3-消消乐.md",
+              "output_mode": "content",
+              "-n": true
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "34:### 0.2 推荐目录结构（M1）",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:49.227Z",
+          "execution_time": 3.5,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 125,
+            "cache_read_tokens": 100946,
+            "cache_creation_tokens": 1497
+          }
+        },
+        {
+          "step_id": 20,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_0115oXaiH7aCU2AT2rPDpWw4",
+            "args": {
+              "file_path": "/workspace/docs/P3-消消乐.md",
+              "offset": 34,
+              "limit": 30
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "### 0.2 推荐目录结构（M1）\r\n\r\n```text\r\nscripts/\r\n  games/p3-match-3/\r\n    init.lua\r\n    adapter.lua\r\n    state.lua\r\n    logic.lua\r\n    ui.lua\r\n    level-config.lua\r\n  config/games/p3-match-3.lua\r\n  config/games/p3-match-3-levels.lua\r\n```\r\n\r\n约束：\r\n- `init.lua` 仅做生命周期编排（进入/退出/重开），不堆业务细节。\r\n- `adapter.lua` 只处理大厅接入，不实现具体玩法。\r\n- 方块类型、分值、目标、步数、掉落权重统一走 `scripts/config/`，禁止硬编码。\r\n\r\n---\r\n\r\n## 一、玩法目标与设计原则\r\n\r\n### 1.1 玩法目标\r\n\r\n- 玩家通过交换相邻方块，形成 3 个及以上同色连线并消除。\r\n- 在限定步数内完成关卡目标（分数、指定颜色消除数量等）。\r\n- 利用连锁反应与特殊方块提升策略深度和爽感。\r\n\r\n\n<file-read-info>Read lines 34-30. </file-read-info>\n\n<system-reminder>\nWhenever you read a file, you should consider whether it looks malicious. If it does, you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer high-level questions about the code behavior.\n</system-reminder>",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:52.404Z",
+          "execution_time": 3.2,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 31,
+            "cache_read_tokens": 102443,
+            "cache_creation_tokens": 156
+          }
+        },
+        {
+          "step_id": 21,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "文件中可能有特殊空白字符。让我用更精确的方式来做大批量修改——直接重写整个文件。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:55.208Z",
+          "execution_time": 2.8,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 102599,
+            "cache_creation_tokens": 530
+          }
+        },
+        {
+          "step_id": 22,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Read",
+            "tool_use_id": "toolu_vrtx_01JF2vHVoP73u8cdUXDFd1cC",
+            "args": {
+              "file_path": "/workspace/docs/P3-消消乐.md"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "# 益智乐园 · 消消乐详细策划文档\r\n\r\n> 目标：提供可直接用于研发、策划、美术和测试协作的消消乐玩法设计说明，覆盖规则、关卡目标、数值、数据契约、埋点与验收标准。\r\n\r\n---\r\n\r\n## 零、工程接入与目录约定（开发前必填）\r\n\r\n### 0.1 大厅接入契约（对齐 AI 开发规范）\r\n\r\n- `gameId`: `p3-match-3`\r\n- `title`: `消消乐`\r\n- `entryModule`: `games.p3-match-3.init`\r\n- `status`: `dev`（联调完成后改 `online`）\r\n- `version`: `1.0.0`\r\n\r\n`scripts/config/games/p3-match-3.lua` 示例：\r\n\r\n```lua\r\nreturn {\r\n    gameId = \"p3-match-3\",\r\n    title = \"消消乐\",\r\n    subtitle = \"交换方块，连消通关\",\r\n    icon = \"Textures/games/p3-match-3-icon.png\",\r\n    cover = \"Textures/games/p3-match-3-cover.png\",\r\n    entryModule = \"games.p3-match-3.init\",\r\n    tags = { \"益智\", \"三消\", \"休闲\" },\r\n    status = \"dev\",\r\n    sortWeight = 75,\r\n    version = \"1.0.0\",\r\n}\r\n```\r\n\r\n### 0.2 推荐目录结构（M1）\r\n\r\n```text\r\nscripts/\r\n  games/p3-match-3/\r\n    init.lua\r\n    adapter.lua\r\n    state.lua\r\n    logic.lua\r\n    ui.lua\r\n    level-config.lua\r\n  config/games/p3-match-3.lua\r\n  config/games/p3-match-3-levels.lua\r\n```\r\n\r\n约束：\r\n- `init.lua` 仅做生命周期编排（进入/退出/重开），不堆业务细节。\r\n- `adapter.lua` 只处理大厅接入，不实现具体玩法。\r\n- 方块类型、分值、目标、步数、掉落权重统一走 `scripts/config/`，禁止硬编码。\r\n\r\n---\r\n\r\n## 一、玩法目标与设计原则\r\n\r\n### 1.1 玩法目标\r\n\r\n- 玩家通过交换相邻方块，形成 3 个及以上同色连线并消除。\r\n- 在限定步数内完成关卡目标（分数、指定颜色消除数量等）。\r\n- 利用连锁反应与特殊方块提升策略深度和爽感。\r\n\r\n### 1.2 设计原则\r\n\r\n1. **规则清晰**：一次交换只在“能触发消除”时生效，降低学习成本。\r\n2. **反馈明确**：交换、消除、连锁、目标进度和失败原因都可感知。\r\n3. **难度递进**：从纯分数关到复合目标关，逐步引入特殊方块组合。\r\n4. **可复盘可调参**：关卡参数、掉落权重、目标阈值配置化。\r\n\r\n---\r\n\r\n## 二、核心玩法规则\r\n\r\n### 2.1 棋盘与基础术语\r\n\r\n- 棋盘默认 `8x8`（后续可配置）。\r\n- 每格最多存在 1 个方块，方块有 `colorId`（颜色/类型）。\r\n- 相邻定义：上下左右四方向（不含斜向）。\r\n\r\n### 2.2 有效交换规则（必须）\r\n\r\n1. 玩家拖拽或点击交换两个相邻方块。\r\n2. 系统先模拟交换结果：\r\n   - 若产生任意 `>=3` 连线，则交换生效；\r\n   - 若未产生消除，则交换回退（播放“无效交换”反馈，不扣步数）。\r\n3. 有效交换生效后，步数 `-1`，再进入消除结算流程。\r\n\r\n### 2.3 消除判定规则\r\n\r\n- 连线判定仅计算水平或垂直连续同色块。\r\n- 同一步内可同时命中多组消除，统一归并结算。\r\n- 特殊方块触发产生的二次消除也计入本步连锁。\r\n\r\n### 2.4 掉落与补齐\r\n\r\n每轮消除后按以下顺序处理：\r\n\r\n1. 清空被消除格；\r\n2. 重力下落：列内方块向下填充空位；\r\n3. 顶部按掉落池生成新方块补齐；\r\n4. 再次检测是否形成新消除（连锁），若有则继续循环；\r\n5. 直到棋盘稳定（无自动消除）结束本步。\r\n\r\n### 2.5 连锁定义\r\n\r\n- 同一次玩家有效交换触发的后续自动消除统称“连锁”。\r\n- 连锁层级从 1 开始计数（首次手动触发为 `combo=1`，后续自动触发为 `combo=2+`）。\r\n- 连锁越高，得分倍率越高（见第五章）。\r\n\r\n### 2.6 无",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:55.601Z",
+          "execution_time": 0.4,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 113,
+            "cache_read_tokens": 102599,
+            "cache_creation_tokens": 530
+          }
+        },
+        {
+          "step_id": 23,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "由于修改内容覆盖面很大，我直接重写整个文件会更高效和准确。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:15:58.528Z",
+          "execution_time": 2.9,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 103129,
+            "cache_creation_tokens": 5808
+          }
+        },
+        {
+          "step_id": 24,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Write",
+            "tool_use_id": "toolu_vrtx_0185b4RkpsbqW4wGU5C74ixB",
+            "args": {
+              "file_path": "/workspace/docs/P3-消消乐.md",
+              "content": "# 益智乐园 · 消消乐详细策划文档\n\n> 目标：提供可直接用于研发、策划、美术和测试协作的消消乐玩法设计说明，覆盖规则、关卡目标、数值、数据契约、埋点与验收标准。\n\n---\n\n## 零、工程接入与目录约定（开发前必填）\n\n### 0.1 大厅接入契约（对齐 AI 开发规范）\n\n- `gameId`: `p3-match-3`\n- `title`: `消消乐`\n- `entryModule`: `games.p3-match-3.init`\n- `status`: `dev`（联调完成后改 `online`）\n- `version`: `1.0.0`\n\n`scripts/config/games/p3-match-3.lua` 示例：\n\n```lua\nreturn {\n    gameId = \"p3-match-3\",\n    title = \"消消乐\",\n    subtitle = \"交换方块，连消通关\",\n    icon = \"Textures/games/p3-match-3-icon.png\",\n    cover = \"Textures/games/p3-match-3-cover.png\",\n    entryModule = \"games.p3-match-3.init\",\n    tags = { \"益智\", \"三消\", \"休闲\" },\n    status = \"dev\",\n    sortWeight = 75,\n    version = \"1.0.0\",\n}\n```\n\n### 0.2 推荐目录结构（M1，对齐 P2 分层模式）\n\n```text\nscripts/\n  games/p3-match-3/\n    init.lua                    # 入口（仅转发 adapter，与 P1/P2 一致）\n    adapter.lua                 # 生命周期适配器（NanoVG 上下文管理、事件订阅、屏幕切换）\n    save.lua                    # 存档读写（最佳成绩、进度快照）\n    logic/\n      state.lua                 # 游戏状态机（Idle/Swapping/Eliminating/Falling/Settled/Cleared/Failed）\n      board.lua                 # 棋盘逻辑（消除判定、掉落补齐、连锁、死盘检测，纯 Lua，禁止引入渲染 API）\n    view/\n      board-renderer.lua        # 棋盘与方块绘制（NanoVG 矢量绘制）\n      hud-renderer.lua          # HUD 绘制（步数、分数、目标进度）\n      result-popup.lua          # 结算弹窗绘制\n      pause-overlay.lua         # 暂停菜单（NanoVG 自绘，不复用 UI 版 pause-menu）\n    screens/\n      level-select.lua          # 关卡选择屏幕\n      gameplay.lua              # 游玩主屏幕（编排 logic + view）\n    data/\n      levels.lua                # 关卡数据（方块类型、分值、目标、步数、掉落权重）\n  config/games/p3-match-3.lua   # 大厅接入配置（仅元信息）\n```\n\n约束：\n- `init.lua` 仅做一行转发 `return require(\"games.p3-match-3.adapter\")`，与 P1/P2 保持一致。\n- `adapter.lua` 只处理大厅接入（NanoVG 上下文、事件订阅），不实现具体玩法逻辑。\n- `logic/` 为纯 Lua 逻辑层，禁止引入任何渲染 API（与 ADR-004/005/006 逻辑/渲染分离一致）。\n- `view/` 封装所有 NanoVG 绘制代码，仅通过只读方式访问逻辑层状态。\n- 关卡数据放在 `data/levels.lua`（游戏内部数据），不放在 `scripts/config/`（大厅配置）。\n- 方块类型、分值、目标、步数、掉落权重统一走 `data/levels.lua`，禁止硬编码。\n- 全局事件处理函数使用 `P3M3_` 前缀（如 `P3M3_HandleNanoVGRender`、`P3M3_HandleUpdate`），避免与 P1 的 `P1PZ_`、P2 的 `P2MF_` 前缀冲突。`onExit` 时须将这些全局函数置 nil 清理。\n\n### 0.3 渲染方案（对齐 ADR-006）\n\n- 采用 **NanoVG 自绘**方案，`getUI()` 返回 nil，adapter 自管理 NanoVG 上下文。\n- 逻辑层/渲染层强制分离：`logic/` 不引入渲染 API，`view/` 仅只读访问逻辑层状态。\n- 详见 `docs/架构决策记录.md` ADR-006。\n\n**组件复用决策**：\n\n| 组件 | 方案 | 说明 |\n|------|------|------|\n| 屏幕转场 | 复用 `shared/components/screen-transition.lua` | P1/P2 已验证：UI.Panel 遮罩可与 NanoVG 内容叠加，代价极小 |\n| 暂停菜单 | NanoVG 自绘（`view/pause-overlay.lua`） | `shared/components/pause-menu.lua` 基于 UI 库，与 `getUI()` 返回 nil 矛盾；自绘仅需半透明背景 + 按钮 + 命中判定 |\n\n### 0.4 方块视觉方案（禁止 Emoji，对齐 AI 开发规范 &sect;6.3）\n\n> **强制约束**：根据 AI 开发规范 &sect;6.3，绝对禁止在代码中使用 Emoji 字符。方块视觉必须使用 NanoVG 矢量绘制。\n\n方块通过 `colorId` 映射到 **纯色圆角矩形 + 可选矢量图案** 的组合：\n\n```lua\n-- view/board-renderer.lua 中实现\n-- 方块配色调色板（确保同一关卡内颜色有足够区分度）\nlocal tileColors = {\n    [1] = nvgRGBA(231, 76, 60, 255),    -- 红\n    [2] = nvgRGBA(52, 152, 219, 255),   -- 蓝\n    [3] = nvgRGBA(46, 204, 113, 255),   -- 绿\n    [4] = nvgRGBA(241, 196, 15, 255),   -- 黄\n    [5] = nvgRGBA(155, 89, 182, 255),   -- 紫\n    [6] = nvgRGBA(230, 126, 34, 255),   -- 橙\n}\n\n-- 特殊方块标记使用矢量图标区分\n-- 直线方块：箭头图标    爆炸方块：星形图标    彩虹方块：同心圆图标\n```\n\n实现要点：\n- 普通方块使用圆角矩形 + 纯色填充 + 浅色高光描边。\n- 特殊方块在普通方块基础上叠加 NanoVG 矢量图标（箭头/星形/同心圆）。\n- 后续版本可替换为贴图资源，只需修改渲染函数。\n\n---\n\n## 一、玩法目标与设计原则\n\n### 1.1 玩法目标\n\n- 玩家通过交换相邻方块，形成 3 个及以上同色连线并消除。\n- 在限定步数内完成关卡目标（分数、指定颜色消除数量等）。\n- 利用连锁反应与特殊方块提升策略深度和爽感。\n\n### 1.2 设计原则\n\n1. **规则清晰**：一次交换只在\"能触发消除\"时生效，降低学习成本。\n2. **反馈明确**：交换、消除、连锁、目标进度和失败原因都可感知。\n3. **难度递进**：从纯分数关到复合目标关，逐步引入特殊方块组合。\n4. **可复盘可调参**：关卡参数、掉落权重、目标阈值配置化。\n\n---\n\n## 二、核心玩法规则\n\n### 2.1 棋盘与基础术语\n\n- 棋盘默认 `8x8`（后续可配置）。\n- 每格最多存在 1 个方块，方块有 `colorId`（颜色/类型）。\n- 相邻定义：上下左右四方向（不含斜向）。\n\n### 2.2 有效交换规则（必须）\n\n1. 玩家拖拽或点击交换两个相邻方块。\n2. 系统先模拟交换结果：\n   - 若产生任意 `>=3` 连线，则交换生效；\n   - 若未产生消除，则交换回退（播放\"无效交换\"反馈，不扣步数）。\n3. 有效交换生效后，步数 `-1`，再进入消除结算流程。\n\n### 2.3 消除判定规则\n\n- 连线判定仅计算水平或垂直连续同色块。\n- 同一步内可同时命中多组消除，统一归并结算。\n- 特殊方块触发产生的二次消除也计入本步连锁。\n\n### 2.4 掉落与补齐\n\n每轮消除后按以下顺序处理：\n\n1. 清空被消除格；\n2. 重力下落：列内方块向下填充空位；\n3. 顶部按掉落池生成新方块补齐；\n4. 再次检测是否形成新消除（连锁），若有则继续循环；\n5. 直到棋盘稳定（无自动消除）结束本步。\n\n### 2.5 连锁定义\n\n- 同一次玩家有效交换触发的后续自动消除统称\"连锁\"。\n- 连锁层级从 1 开始计数（首次手动触发为 `combo=1`，后续自动触发为 `combo=2+`）。\n- 连锁越高，得分倍率越高（见第五章）。\n\n### 2.6 无可行步处理（死盘）\n\n- 若棋盘稳定后不存在任何\"可触发消除\"的相邻交换，判定为死盘。\n- 死盘处理策略：\n  - 自动洗牌（仅重排现有方块，不改目标进度）；\n  - 洗牌后必须满足\"无初始自动消除 + 至少存在 1 个可行步\"。\n- 自动洗牌不消耗玩家步数。\n\n### 2.7 游戏状态机定义（必须实现）\n\n为避免动画期间并发交换导致棋盘状态错乱，运行时状态统一为：\n\n1. `Idle`：棋盘稳定，可响应玩家交换操作。\n2. `Swapping`：执行交换动画中，禁止输入。\n3. `SwapBack`：无效交换回退动画中，禁止输入。\n4. `Eliminating`：消除动画中（缩放+淡出），禁止输入。\n5. `Falling`：方块下落与补齐动画中，禁止输入。\n6. `ChainCheck`：下落结束后检测是否形成新消除，若有则回到 `Eliminating`，若无则进入 `Settled`。\n7. `Settled`：本步结算完成，检查胜负条件后进入 `Idle`、`Cleared` 或 `Failed`。\n8. `Cleared`：目标达成，仅响应结算/下一关/重开操作。\n9. `Failed`：步数耗尽且目标未完成，仅响应重试/返回操作。\n\n状态转移约束：\n- 正常流程：`Idle -> Swapping -> Eliminating -> Falling -> ChainCheck -> (Eliminating 循环 | Settled) -> Idle/Cleared/Failed`\n- 无效交换：`Idle -> Swapping -> SwapBack -> Idle`\n- 任意状态下收到 `Restart`，统一回到 `Idle` 并重置局内数据。\n- 非 `Idle` 状态下的玩家输入一律忽略（不队列缓冲，防止操作堆积）。\n\n---\n\n## 三、特殊方块与组合规则（v1）\n\n### 3.1 特殊方块生成规则\n\n当一次消除满足以下条件时，在参与消除的位置生成特殊方块（优先在玩家交换终点格生成）：\n\n- **4 连线**：生成\"直线消除方块\"（横向或纵向，方向与连线方向垂直）。\n- **T/L 形 5 连及以上**：生成\"范围爆炸方块\"（3x3）。\n- **5 连线（直线）**：生成\"彩虹方块\"（可与任意颜色匹配）。\n\n### 3.2 特殊方块触发效果\n\n- 直线消除方块：触发时清除整行或整列。\n- 范围爆炸方块：触发时清除中心 `3x3` 区域。\n- 彩虹方块：\n  - 与普通方块交换：清除棋盘上所有该颜色方块；\n  - 与特殊方块交换：触发\"增强清屏效果\"（由数值配置决定，默认全屏同类触发）。\n\n### 3.3 特殊方块组合（建议 M1 实现 3 组）\n\n- 直线 + 直线：清除一整行 + 一整列（十字）。\n- 直线 + 爆炸：清除 3 行 + 3 列（中心扩展）。\n- 彩虹 + 任意普通色：清除该颜色全部方块。\n\n> 其余高阶组合（彩虹+彩虹、彩虹+爆炸）可留到 M2。\n\n---\n\n## 四、关卡目标与失败条件\n\n### 4.1 目标类型（v1）\n\n每关配置一个主目标。v1 支持：\n\n1. **分数目标**：限定步数内达到目标分。\n2. **颜色收集目标**：限定步数内消除指定颜色数量。`targets` 数组支持单色或多色收集，多色收集（如\"红色 18 + 绿色 18\"）仍属于同一个 `collect_color` 目标类型，不算复合目标。\n3. **特殊方块触发目标**：限定步数内触发指定次数特殊效果。\n\n> M2 再支持真正的复合目标（同时满足不同类型目标，如\"分数 5000 + 收集红色 20\"）。\n\n### 4.2 关卡结束判定\n\n- **胜利**：在步数耗尽前达成该关目标。\n- **失败**：步数归零且目标未完成。\n- 达成目标后可立即结算，不强制打完剩余步数（剩余步数可转奖励分，见第五章）。\n\n### 4.3 步数与节奏建议\n\n- 新手关：`18-24` 步。\n- 进阶关：`20-28` 步。\n- 挑战关：`22-30` 步（目标同步抬升）。\n\n---\n\n## 五、计分与评级规则\n\n### 5.1 基础计分模型（建议）\n\n- 普通方块消除：每块 `10` 分。\n- 特殊方块触发附加：\n  - 直线：`+80`\n  - 爆炸：`+120`\n  - 彩虹：`+200`\n- 连锁倍率：`score * (1 + 0.25 * (combo - 1))`，上限可配（默认 `2.0x`）。\n\n### 5.2 剩余步数奖励\n\n- 通关结算时，剩余每步转化为 `bonusPerStep` 分（默认 `150`）。\n- 用于鼓励高效解题，不影响关卡目标完成判定。\n\n### 5.3 星级评级（按最终得分）\n\n每关配置 `starScore` 阈值（命名 key，语义清晰）：\n\n- `3星`: `finalScore >= starScore.three`\n- `2星`: `finalScore >= starScore.two`\n- `1星`: 通关即可\n\n示例：\n\n| 评级 | 条件 |\n|------|------|\n| 3 星 | 得分 >= 12000 |\n| 2 星 | 得分 >= 8500 |\n| 1 星 | 达成目标并通关 |\n\n---\n\n## 六、关卡设计（15 关建议）\n\n### 6.1 章节划分\n\n| 章节 | 关卡范围 | 目标类型 | 机制重点 |\n|------|----------|----------|----------|\n| 新手 | L1-L5 | 分数目标 | 教学交换、基础连消 |\n| 进阶 | L6-L10 | 颜色收集 | 引导做 4 连、简单连锁 |\n| 挑战 | L11-L15 | 特效触发/高分 | 组合技与步数效率 |\n\n### 6.1.1 关卡解锁机制\n\n- 采用**线性解锁**：通关 L(n) 后解锁 L(n+1)，与 P1/P2 一致。\n- 解锁条件：**任意星级通关即可**（1 星即算通关），不要求特定星级。\n- L1 默认解锁。\n- 选关界面中，未解锁关卡显示锁定图标，点击无响应。\n- `save.lua` 中通过 `completedLevels` 表判断解锁状态（键为 `levelId`，值为 `bestStar`）。\n\n### 6.2 单关参数建议\n\n| 关卡 | 目标 | 步数 | 三星分数 |\n|------|------|------|----------|\n| L1 | 分数 2000 | 22 | 3200 |\n| L2 | 分数 2600 | 22 | 4000 |\n| L3 | 分数 3200 | 21 | 5000 |\n| L4 | 分数 3800 | 20 | 5800 |\n| L5 | 分数 4500 | 20 | 6800 |\n| L6 | 收集红色 24 | 24 | 7200 |\n| L7 | 收集蓝色 26 | 24 | 7800 |\n| L8 | 收集黄色 30 | 23 | 8600 |\n| L9 | 收集红色 36 | 23 | 9400 |\n| L10 | 收集任意 60 | 22 | 10200 |\n| L11 | 触发直线 6 次 | 24 | 10800 |\n| L12 | 触发爆炸 4 次 | 24 | 11500 |\n| L13 | 触发彩虹 2 次 | 25 | 12500 |\n| L14 | 分数 9000 | 23 | 13800 |\n| L15 | 分数 10000 | 22 | 15000 |\n\n> v1.1 变更：L9 从\"收集红/绿 各18\"改为\"收集红色 36\"，保持 v1 单一目标类型约束（见 &sect;4.1）。\n\n### 6.3 掉落池与随机控制\n\n- 每关建议使用 5-6 种基础颜色。\n- 掉落权重支持按关卡配置（新手提高可配对色出现概率）。\n- 支持 `seed` 固定复现（调试与回归）。\n- 开局生成棋盘必须满足：\n  - 无自动消除；\n  - 至少存在 1 个可行交换。\n\n### 6.4 确定性与回放要求\n\n- 同一 `seed` + 同一操作序列，必须在所有设备上产生完全一致的棋盘状态与最终得分（确定性保证）。\n- 掉落随机数生成使用可序列化的伪随机算法（如基于 seed 的线性同余），不依赖系统 `math.random` 全局状态。\n- 关键埋点与结算记录需包含本局 `seed`，用于复盘争议成绩和边界问题排查。\n- M1 不要求完整回放文件格式，但逻辑层须保证确定性（为 M2 回放功能预留）。\n\n---\n\n## 七、数据结构与配置契约（建议）\n\n### 7.1 关卡配置 JSON 示例（设计稿）\n\n```json\n{\n  \"type\": \"match3\",\n  \"version\": 1,\n  \"levelId\": \"L6\",\n  \"board\": { \"rows\": 8, \"cols\": 8 },\n  \"steps\": 24,\n  \"tilePool\": [\n    { \"colorId\": 1, \"weight\": 20 },\n    { \"colorId\": 2, \"weight\": 20 },\n    { \"colorId\": 3, \"weight\": 20 },\n    { \"colorId\": 4, \"weight\": 20 },\n    { \"colorId\": 5, \"weight\": 20 }\n  ],\n  \"goal\": {\n    \"type\": \"collect_color\",\n    \"targets\": [\n      { \"colorId\": 1, \"count\": 24 }\n    ]\n  },\n  \"starScore\": { \"two\": 5200, \"three\": 7200 },\n  \"scoreRule\": {\n    \"basePerTile\": 10,\n    \"comboBonusRate\": 0.25,\n    \"comboCap\": 2.0,\n    \"bonusPerStep\": 150\n  },\n  \"animTiming\": {\n    \"swapMs\": 180,\n    \"swapBackMs\": 140,\n    \"eliminateMs\": 220,\n    \"fallMs\": 150\n  },\n  \"rng\": {\n    \"seedMode\": \"random\",\n    \"seed\": 0\n  }\n}\n```\n\n### 7.2 Lua 配置示例（工程落地）\n\n```lua\n-- scripts/games/p3-match-3/data/levels.lua\nreturn {\n    type = \"match3\",\n    version = 1,\n    levels = {\n        {\n            levelId = \"L1\",\n            board = { rows = 8, cols = 8 },\n            steps = 22,\n            tilePool = {\n                { colorId = 1, weight = 20 },\n                { colorId = 2, weight = 20 },\n                { colorId = 3, weight = 20 },\n                { colorId = 4, weight = 20 },\n                { colorId = 5, weight = 20 },\n            },\n            goal = {\n                type = \"score\",\n                targetScore = 2000,\n            },\n            starScore = { two = 2200, three = 3200 },\n            scoreRule = {\n                basePerTile = 10,\n                comboBonusRate = 0.25,\n                comboCap = 2.0,\n                bonusPerStep = 150,\n            },\n            animTiming = {\n                swapMs = 180,\n                swapBackMs = 140,\n                eliminateMs = 220,\n                fallMs = 150,\n            },\n        },\n        -- ... 完整 L1-L15 见 §6.2\n    },\n}\n```\n\n### 7.3 结算记录结构（本地/云端对齐）\n\n```json\n{\n  \"gameId\": \"p3-match-3\",\n  \"levelId\": \"L6\",\n  \"bestScore\": 9360,\n  \"bestStar\": 3,\n  \"goalType\": \"collect_color\",\n  \"goalProgress\": { \"colorId_1\": 24 },\n  \"clearCount\": 9,\n  \"lastClearAt\": 1762803821123\n}\n```\n\n### 7.4 进度快照结构（对齐 GameProgressSnapshot）\n\n```json\n{\n  \"gameId\": \"p3-match-3\",\n  \"nodeId\": \"L6\",\n  \"progressText\": \"L6 - 3200分 / 剩余12步\",\n  \"score\": 3200,\n  \"elapsedSec\": 45,\n  \"updatedAt\": 1762803821123,\n  \"boardState\": {\n    \"grid\": [[1,2,3,...], ...],\n    \"remainSteps\": 12,\n    \"goalProgress\": { \"colorId_1\": 16 },\n    \"seed\": 42,\n    \"rngState\": 12345\n  }\n}\n```\n\n---\n\n## 八、UI 与交互需求\n\n### 8.1 关卡内 HUD\n\n- 顶部：关卡编号、剩余步数、当前分数、目标进度。\n- 中部：棋盘区域（支持拖拽交换与点击交换）。\n- 底部：暂停按钮、重开按钮。\n\n> **暂停按钮**：点击后显示暂停菜单（`view/pause-overlay.lua`，NanoVG 自绘实现，见 &sect;0.3 组件复用决策），暂停时冻结动画和输入。暂停菜单提供\"继续\"和\"返回大厅\"两个按钮，使用矩形命中判定处理点击，与 Lifecycle `onPause/onResume/onExit` 对接（见 &sect;8.5）。\n\n### 8.2 通关/失败结算\n\n- 通关弹窗：`本次得分`、`星级`、`目标完成情况`、`历史最高分`。\n- 失败弹窗：`未完成目标`提示，按钮 `再试一次`、`返回关卡列表`。\n- 新纪录显示：`NEW BEST` 标签。\n\n### 8.3 动效反馈要求\n\n动效时间支持按关卡配置（`animTiming` 字段），以下为默认建议值：\n\n| 动效 | 配置键 | 默认值 | 说明 |\n|------|--------|--------|------|\n| 有效交换 | `swapMs` | 180ms | 位移动画 |\n| 无效交换回弹 | `swapBackMs` | 140ms | 快速回弹 |\n| 消除 | `eliminateMs` | 220ms | 缩放+淡出 |\n| 下落 | `fallMs` | 150ms | 每格下落时间 |\n\n- 连锁：逐级弹出 `Combo xN` 文案（可配置开关）。\n\n### 8.4 选关界面\n\n- 显示 L1-L15 关卡列表，每关展示：关卡编号、已获星级（无则灰显）、锁定状态。\n- 已通关的关卡可重复游玩以刷新最高分。\n- 未解锁关卡显示锁定图标，点击无响应（见 &sect;6.1.1）。\n\n### 8.5 中断恢复规则（对齐 GameLifecycleAdapter）\n\n| 触发场景 | Lifecycle 接口 | 游戏行为 |\n|---------|---------------|---------|\n| 切后台 | `onPause(\"app_background\")` | 暂停动画，保存当前快照（棋盘状态 + 已用步数 + 目标进度 + RNG 状态），不重置状态 |\n| 回前台 | `onResume(ctx)` | 恢复动画和输入，继续当前局 |\n| 用户点击暂停菜单\"继续\" | （游戏内部处理） | 关闭暂停菜单，恢复动画和输入 |\n| 用户点击暂停菜单\"返回大厅\" | `onExit(\"user_back\")` | 当前局直接结束，保存进度快照以便下次恢复 |\n| 崩溃/强退恢复 | `onEnter(ctx)` with `crash_recover` | 默认回到关卡选择，不直接恢复对局；可读取上次中断摘要用于提示（如\"上次进行到 L6\"） |\n| 定期自动保存 | `onSaveProgress(\"interval\")` | 保存当前快照（幂等），不影响游戏状态 |\n| 重开本关 | （游戏内部处理） | 重新洗牌、重置步数/分数/目标进度、状态机回到 Idle |\n\n- 仅\"完整通关且流程正常结束\"的成绩允许写入最佳记录。\n- 非正常结束（崩溃/强退）不写入最佳记录，仅保留进度快照用于恢复。\n\n---\n\n## 九、埋点与统计建议\n\n关键事件：\n\n- `match3_level_start`：进入关卡\n- `match3_swap`：每次交换（含 `isValid`）\n- `match3_clear`：每轮消除（含 `clearedCount`、`combo`）\n- `match3_shuffle`：死盘洗牌触发\n- `match3_level_clear`：通关（含 `finalScore`、`star`、`remainSteps`）\n- `match3_level_fail`：失败（含剩余目标）\n- `match3_level_restart`：重开本关\n\n事件公共字段（建议必填）：\n\n- `gameId`（固定 `p3-match-3`）\n- `levelId`\n- `seed`\n- `elapsedMs`\n- `score`\n- `remainSteps`\n- `goalProgress`\n- `sessionId`\n\n核心分析维度：\n\n- 关卡通过率、平均重开次数、平均剩余步数\n- 每关目标完成率与失败原因分布（分差不足/收集不足/特效不足）\n- 连锁次数分布（衡量策略深度与爽感）\n\n---\n\n## 十、验收标准（M1）\n\n### 10.1 功能验收\n\n- [ ] 相邻交换判定正确，无效交换不扣步。\n- [ ] 一次有效交换可完整触发\"消除 -> 下落 -> 补齐 -> 连锁\"闭环。\n- [ ] 状态机正确实现，动画期间禁止第二次交换操作（见 &sect;2.7）。\n- [ ] 死盘能稳定触发自动洗牌，洗牌后仍满足可行步条件。\n- [ ] 特殊方块生成与触发符合规则（4 连、T/L、5 连）。\n- [ ] 达成目标后可正确通关，步数耗尽未达标则失败。\n- [ ] `entryModule` 可加载，且 `GameLifecycleAdapter` 全部接口（`onEnter`/`onPause`/`onResume`/`onSaveProgress`/`onExit`）可正常工作。\n- [ ] 暂停菜单可正常弹出，\"继续\"恢复游戏，\"返回大厅\"正确退出。\n- [ ] 关卡线性解锁逻辑正确，通关 L(n) 解锁 L(n+1)。\n\n### 10.2 数值验收\n\n- [ ] L1-L15 关卡目标与步数配置完整可用。\n- [ ] 每关星级阈值单调递增（`two <= three`）。\n- [ ] 分数结算可复核（基础分、连锁倍率、剩余步奖励一致）。\n\n### 10.3 稳定性验收\n\n- [ ] 连续快速输入不会导致并发交换或棋盘状态错乱。\n- [ ] 固定 `seed` 能复现同一开局与同输入结果（确定性）。\n- [ ] 切后台再回前台不丢失局内状态。\n- [ ] 重开、下一关、退出大厅流程无残留状态。\n- [ ] 全局函数使用 `P3M3_` 前缀，退出后正确置 nil 清理。\n\n---\n\n## 十一、运行时错误码\n\n| 错误码 | 含义 |\n|--------|------|\n| `M3-001` | 非法交换（非相邻格或越界） |\n| `M3-002` | 棋盘状态异常（格数不匹配或方块重叠） |\n| `M3-003` | 关卡数据非法（目标类型未知、步数非正整数等） |\n| `M3-004` | 掉落池配置异常（颜色数 < 3 或权重全为 0） |\n| `M3-005` | 洗牌失败（连续 100 次重排仍不满足可行步条件） |\n| `M3-006` | 快照恢复失败（结构不完整或版本不匹配） |\n| `M3-007` | 确定性校验失败（重放结果不一致） |\n\n---\n\n## 十二、版本范围与后续扩展\n\n### 12.1 当前版本范围（v1）\n\n- 15 个基础关卡（分数/收集/特效触发目标）\n- 步数制核心三消循环\n- 3 类特殊方块与 3 组常用组合\n- 本地最佳分记录与三星评价\n- 关卡线性解锁\n\n### 12.2 后续版本方向（v2+）\n\n- 复合目标关（分数 + 收集同关）\n- 多色收集目标（同关收集 2 种以上颜色）\n- 障碍层系统（果冻、锁链、箱子等）\n- 局内道具（锤子、换色、重排）\n- 每日挑战（固定种子 + 排行榜）\n- 完整回放文件格式\n\n---\n\n*文档版本：v1.1*\n*更新时间：2026-03-18*\n*作者：Relic（AI 助手）*\n"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:08.005Z",
+          "execution_time": 189.5,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 103129,
+            "cache_creation_tokens": 5808
+          }
+        },
+        {
+          "step_id": 25,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "TodoWrite",
+            "tool_use_id": "toolu_vrtx_016fTnE7uHbB5dn5gohEe6dH",
+            "args": {
+              "todos": [
+                {
+                  "content": "修改 P3 策划案 §0.2 目录结构（对齐 P2 分层模式）",
+                  "status": "completed",
+                  "activeForm": "修改 §0.2 目录结构"
+                },
+                {
+                  "content": "新增 P3 策划案 §0.3 渲染方案声明",
+                  "status": "completed",
+                  "activeForm": "新增 §0.3 渲染方案"
+                },
+                {
+                  "content": "修复 init.lua 职责定义、全局函数前缀、关卡数据位置",
+                  "status": "completed",
+                  "activeForm": "修复 §0.2 约束条目"
+                },
+                {
+                  "content": "新增游戏状态机定义（§2.x）",
+                  "status": "completed",
+                  "activeForm": "新增状态机定义"
+                },
+                {
+                  "content": "新增关卡解锁机制（§6.x）",
+                  "status": "completed",
+                  "activeForm": "新增关卡解锁机制"
+                },
+                {
+                  "content": "修复 L9 目标与 v1 范围矛盾",
+                  "status": "completed",
+                  "activeForm": "修复 L9 目标矛盾"
+                },
+                {
+                  "content": "修复 starScore 数组结构",
+                  "status": "completed",
+                  "activeForm": "修复 starScore 结构"
+                },
+                {
+                  "content": "新增中断恢复规则（对齐 GameLifecycleAdapter）",
+                  "status": "completed",
+                  "activeForm": "新增中断恢复规则"
+                },
+                {
+                  "content": "新增 Emoji 禁令说明、暂停菜单方案、错误码、确定性要求",
+                  "status": "completed",
+                  "activeForm": "补充规范对齐内容"
+                },
+                {
+                  "content": "优化结算记录结构和动效配置",
+                  "status": "completed",
+                  "activeForm": "优化数据结构"
+                },
+                {
+                  "content": "新增 ADR-006 到架构决策记录",
+                  "status": "in_progress",
+                  "activeForm": "新增 ADR-006"
+                }
+              ]
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:19.927Z",
+          "execution_time": 11.9,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 26,
+            "cache_read_tokens": 108937,
+            "cache_creation_tokens": 10040
+          }
+        },
+        {
+          "step_id": 26,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "P3 策划案已全部修改完毕。现在新增 ADR-006 到架构决策记录。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:23.097Z",
+          "execution_time": 3.2,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 118977,
+            "cache_creation_tokens": 1299
+          }
+        },
+        {
+          "step_id": 27,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Edit",
+            "tool_use_id": "toolu_vrtx_01H2QX6LUvJnuo4sXS4gCUwW",
+            "args": {
+              "file_path": "/workspace/docs/架构决策记录.md",
+              "old_string": "| ADR-005 | 记忆翻牌渲染：NanoVG 自绘 + 矢量图案 | 已决定 | 2026-03-18 |",
+              "new_string": "| ADR-005 | 记忆翻牌渲染：NanoVG 自绘 + 矢量图案 | 已决定 | 2026-03-18 |\n| ADR-006 | 消消乐渲染：NanoVG 自绘 + 纯色方块 | 已决定 | 2026-03-18 |"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Index: /workspace/docs/架构决策记录.md\n===================================================================\n--- /workspace/docs/架构决策记录.md\n+++ /workspace/docs/架构决策记录.md\n@@ -14,8 +14,9 @@\n | ADR-002 | 游戏容器：混合方案 | 已决定 | 2026-03-17 |\n | ADR-003 | 页面切换：轻量路由 | 已决定 | 2026-03-17 |\n | ADR-004 | 推箱子渲染：NanoVG 自绘 + 逻辑渲染分离 | 已决定 | 2026-03-17 |\n | ADR-005 | 记忆翻牌渲染：NanoVG 自绘 + 矢量图案 | 已决定 | 2026-03-18 |\n+| ADR-006 | 消消乐渲染：NanoVG 自绘 + 纯色方块 | 已决定 | 2026-03-18 |\n \n ---\n \n ## ADR-001：屏幕方向\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:26.176Z",
+          "execution_time": 3.1,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 118977,
+            "cache_creation_tokens": 1299
+          }
+        },
+        {
+          "step_id": 28,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Edit",
+            "tool_use_id": "toolu_vrtx_011Xn9BjLv3mFNPeoFVKZV5G",
+            "args": {
+              "file_path": "/workspace/docs/架构决策记录.md",
+              "old_string": "---\n\n## 记录模板",
+              "new_string": "---\n\n## ADR-006：消消乐渲染方案\n\n- **状态**：已决定\n- **日期**：2026-03-18\n- **背景**：消消乐（P3）作为第三个实装子游戏，需要选择渲染方案。同时需要确定方块视觉的实现方式——AI 开发规范 &sect;6.3 禁止使用 Emoji 字符，需要明确替代方案。\n- **候选方案**：\n  - A：使用 UrhoX UI 库（Yoga + NanoVG 封装），方块作为 UI 组件\n  - B：NanoVG 自绘，方块使用纯色圆角矩形 + 矢量图标区分特殊方块\n  - C：NanoVG 自绘，方块使用贴图资源\n- **决策**：选择 **方案 B（NanoVG 自绘 + 纯色方块）**，与 ADR-004/005 保持一致。\n- **理由**：\n  1. 消消乐同样是规则网格，与推箱子/记忆翻牌场景一致，NanoVG 直绘效率高\n  2. 三消方块以颜色区分为主，纯色圆角矩形 + 高光描边即可满足 M1 视觉需求\n  3. 特殊方块通过叠加矢量图标（箭头/星形/同心圆）区分，无需额外美术资源\n  4. 严格遵守 Emoji 禁令，使用 NanoVG 绑定 API 绘制\n  5. 逻辑/渲染分离架构不变，`logic/board.lua` 为纯 Lua，`view/board-renderer.lua` 封装绘制\n  6. 后续版本可替换为贴图资源（主题皮肤），只需替换渲染函数\n- **影响范围**：\n  - `view/board-renderer.lua` 实现方块与特殊方块的矢量绘制\n  - `data/levels.lua` 定义关卡数据（游戏内部数据，不放在 `scripts/config/`）\n  - adapter 结构与 P1/P2 一致（NanoVG 上下文管理、事件订阅）\n  - 全局函数使用 `P3M3_` 前缀\n  - game-container 无需修改\n\n---\n\n## 记录模板"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Index: /workspace/docs/架构决策记录.md\n===================================================================\n--- /workspace/docs/架构决策记录.md\n+++ /workspace/docs/架构决策记录.md\n@@ -106,8 +106,34 @@\n   - game-container 无需修改\n \n ---\n \n+## ADR-006：消消乐渲染方案\n+\n+- **状态**：已决定\n+- **日期**：2026-03-18\n+- **背景**：消消乐（P3）作为第三个实装子游戏，需要选择渲染方案。同时需要确定方块视觉的实现方式——AI 开发规范 &sect;6.3 禁止使用 Emoji 字符，需要明确替代方案。\n+- **候选方案**：\n+  - A：使用 UrhoX UI 库（Yoga + NanoVG 封装），方块作为 UI 组件\n+  - B：NanoVG 自绘，方块使用纯色圆角矩形 + 矢量图标区分特殊方块\n+  - C：NanoVG 自绘，方块使用贴图资源\n+- **决策**：选择 **方案 B（NanoVG 自绘 + 纯色方块）**，与 ADR-004/005 保持一致。\n+- **理由**：\n+  1. 消消乐同样是规则网格，与推箱子/记忆翻牌场景一致，NanoVG 直绘效率高\n+  2. 三消方块以颜色区分为主，纯色圆角矩形 + 高光描边即可满足 M1 视觉需求\n+  3. 特殊方块通过叠加矢量图标（箭头/星形/同心圆）区分，无需额外美术资源\n+  4. 严格遵守 Emoji 禁令，使用 NanoVG 绑定 API 绘制\n+  5. 逻辑/渲染分离架构不变，`logic/board.lua` 为纯 Lua，`view/board-renderer.lua` 封装绘制\n+  6. 后续版本可替换为贴图资源（主题皮肤），只需替换渲染函数\n+- **影响范围**：\n+  - `view/board-renderer.lua` 实现方块与特殊方块的矢量绘制\n+  - `data/levels.lua` 定义关卡数据（游戏内部数据，不放在 `scripts/config/`）\n+  - adapter 结构与 P1/P2 一致（NanoVG 上下文管理、事件订阅）\n+  - 全局函数使用 `P3M3_` 前缀\n+  - game-container 无需修改\n+\n+---\n+\n ## 记录模板\n \n ```markdown\n ## ADR-XXX：标题\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:44.202Z",
+          "execution_time": 18.0,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 24,
+            "cache_read_tokens": 120276,
+            "cache_creation_tokens": 627
+          }
+        },
+        {
+          "step_id": 29,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "现在更新架构决策记录的版本号。",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:47.032Z",
+          "execution_time": 2.8,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 120903,
+            "cache_creation_tokens": 1668
+          }
+        },
+        {
+          "step_id": 30,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "mcp__mkr__Edit",
+            "tool_use_id": "toolu_vrtx_01AQPfizZC1fKZTkdhsSzWu6",
+            "args": {
+              "file_path": "/workspace/docs/架构决策记录.md",
+              "old_string": "*文档版本：v1.4*\n*更新时间：2026-03-18*",
+              "new_string": "*文档版本：v1.5*\n*更新时间：2026-03-18*"
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Index: /workspace/docs/架构决策记录.md\n===================================================================\n--- /workspace/docs/架构决策记录.md\n+++ /workspace/docs/架构决策记录.md\n@@ -155,6 +155,6 @@\n - **已废弃**：决策被后续新决策替代（保留记录，注明替代编号）\n \n ---\n \n-*文档版本：v1.4*\n+*文档版本：v1.5*\n *更新时间：2026-03-18*\n",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:19:48.316Z",
+          "execution_time": 1.3,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 173,
+            "cache_read_tokens": 120903,
+            "cache_creation_tokens": 1668
+          }
+        },
+        {
+          "step_id": 31,
+          "phase": "editing",
+          "thinking": null,
+          "thought": null,
+          "action": {
+            "tool_name": "TodoWrite",
+            "tool_use_id": "toolu_vrtx_016zuDo33JHsBZgL1sx1LRkQ",
+            "args": {
+              "todos": [
+                {
+                  "content": "修改 P3 策划案 §0.2 目录结构（对齐 P2 分层模式）",
+                  "status": "completed",
+                  "activeForm": "修改 §0.2 目录结构"
+                },
+                {
+                  "content": "新增 P3 策划案 §0.3 渲染方案声明",
+                  "status": "completed",
+                  "activeForm": "新增 §0.3 渲染方案"
+                },
+                {
+                  "content": "修复 init.lua 职责定义、全局函数前缀、关卡数据位置",
+                  "status": "completed",
+                  "activeForm": "修复 §0.2 约束条目"
+                },
+                {
+                  "content": "新增游戏状态机定义（§2.x）",
+                  "status": "completed",
+                  "activeForm": "新增状态机定义"
+                },
+                {
+                  "content": "新增关卡解锁机制（§6.x）",
+                  "status": "completed",
+                  "activeForm": "新增关卡解锁机制"
+                },
+                {
+                  "content": "修复 L9 目标与 v1 范围矛盾",
+                  "status": "completed",
+                  "activeForm": "修复 L9 目标矛盾"
+                },
+                {
+                  "content": "修复 starScore 数组结构",
+                  "status": "completed",
+                  "activeForm": "修复 starScore 结构"
+                },
+                {
+                  "content": "新增中断恢复规则（对齐 GameLifecycleAdapter）",
+                  "status": "completed",
+                  "activeForm": "新增中断恢复规则"
+                },
+                {
+                  "content": "新增 Emoji 禁令说明、暂停菜单方案、错误码、确定性要求",
+                  "status": "completed",
+                  "activeForm": "补充规范对齐内容"
+                },
+                {
+                  "content": "优化结算记录结构和动效配置",
+                  "status": "completed",
+                  "activeForm": "优化数据结构"
+                },
+                {
+                  "content": "新增 ADR-006 到架构决策记录",
+                  "status": "completed",
+                  "activeForm": "新增 ADR-006"
+                }
+              ]
+            }
+          },
+          "observation": {
+            "type": "tool_result",
+            "text": "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:20:08.824Z",
+          "execution_time": 20.5,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 26,
+            "cache_read_tokens": 122571,
+            "cache_creation_tokens": 331
+          }
+        },
+        {
+          "step_id": 32,
+          "phase": "editing",
+          "thinking": null,
+          "thought": "全部修改完成。以下是变更摘要：\n\n---\n\n## 变更摘要\n\n### P3-消消乐.md（v1.0 → v1.1）\n\n**结构性修复（5 项）**：\n1. **§0.2 目录结构** — 从扁平结构改为 `logic/` + `view/` + `screens/` + `data/` 分层，对齐 P2\n2. **新增 §0.3 渲染方案** — 声明 NanoVG 自绘 + 组件复用决策表\n3. **init.lua 职责** — 从\"生命周期编排\"改为\"一行转发 adapter\"\n4. **关卡数据位置** — 移除 `scripts/config/games/p3-match-3-levels.lua`，统一到 `data/levels.lua`\n5. **全局函数前缀** — 新增 `P3M3_` 前缀约定及退出清理要求\n\n**逻辑完整性修复（5 项）**：\n6. **新增 §2.7 游戏状态机** — 9 状态（Idle/Swapping/SwapBack/Eliminating/Falling/ChainCheck/Settled/Cleared/Failed），含转移约束\n7. **新增 §8.5 中断恢复规则** — 对齐 GameLifecycleAdapter 的 7 种场景\n8. **新增 §6.1.1 关卡解锁机制** — 线性解锁，与 P1/P2 一致\n9. **修复 L9 目标** — 从\"收集红/绿 各18\"改为\"收集红色 36\"，消除与 §4.1 v1 单目标约束的矛盾\n10. **修复 starScore 结构** — 从 `[0, 2200, 2800, 3200]` 改为 `{ two = 2200, three = 3200 }` 命名 key\n\n**规范对齐补充（7 项）**：\n11. **新增 §0.4 方块视觉方案** — Emoji 禁令声明 + NanoVG 矢量绘制方案\n12. **暂停菜单** — §8.1 补充实现方案说明（NanoVG 自绘）\n13. **新增 §11 运行时错误码** — M3-001 到 M3-007\n14. **新增 §6.4 确定性与回放要求** — seed 确定性保证\n15. **结算记录** — §7.3 新增 `goalType`/`goalProgress` 字段\n16. **新增 §7.4 进度快照结构** — 对齐 GameProgressSnapshot\n17. **动效配置化** — §8.3 改为表格 + `animTiming` 配置键，§7.1/7.2 配置示例同步新增\n\n### 架构决策记录.md（v1.4 → v1.5）\n\n- 新增 **ADR-006：消消乐渲染方案**（NanoVG 自绘 + 纯色方块）",
+          "action": {
+            "tool_name": "respond_to_user",
+            "tool_use_id": "",
+            "args": {}
+          },
+          "observation": {
+            "type": "text",
+            "text": "",
+            "exit_code": null
+          },
+          "state": null,
+          "status": "ok",
+          "timestamp": "2026-03-18T04:20:31.700Z",
+          "execution_time": 22.9,
+          "usage": {
+            "input_tokens": 1,
+            "output_tokens": 1,
+            "cache_read_tokens": 122902,
+            "cache_creation_tokens": 1297
+          }
+        }
+      ],
+      "run_summary": {
+        "steps_count": 17,
+        "tool_calls_count": 11
+      }
+    }
+  ],
+  "phases": [
+    {
+      "name": "Editing",
+      "name_zh": "补丁生成",
+      "start_step": 1,
+      "end_step": 18,
+      "label": "editing"
+    },
+    {
+      "name": "Localization",
+      "name_zh": "问题定位",
+      "start_step": 19,
+      "end_step": 19,
+      "label": "localization"
+    },
+    {
+      "name": "Editing",
+      "name_zh": "补丁生成",
+      "start_step": 20,
+      "end_step": 32,
+      "label": "editing"
+    }
+  ],
+  "markers": [
+    {
+      "step": 1,
+      "type": "milestone",
+      "reason": "Session start"
+    },
+    {
+      "step": 4,
+      "type": "drift-start",
+      "reason": "4 consecutive edits without verification"
+    },
+    {
+      "step": 23,
+      "type": "drift-start",
+      "reason": "4 consecutive edits without verification"
+    },
+    {
+      "step": 32,
+      "type": "milestone",
+      "reason": "Session end"
+    }
+  ],
+  "subagents": [
+    {
+      "agent_id": "a0f62c5",
+      "messages": [
+        {
+          "turn_id": 1,
+          "role": "user",
+          "content": "Warmup",
+          "timestamp": "2026-03-18T04:11:37.803Z"
+        },
+        {
+          "turn_id": 1,
+          "agent_run_id": "run_t1",
+          "steps": [
+            {
+              "step_id": 1,
+              "phase": "",
+              "thinking": null,
+              "thought": "I'm ready to help with file searching and code exploration tasks. \n\nAs a read-only file search specialist, I can:\n- Find files using glob patterns\n- Search code contents with regex patterns\n- Read and analyze file contents\n- Navigate and explore codebases efficiently\n\nWhat would you like me to search for or explore in the codebase?",
+              "action": {
+                "tool_name": "respond_to_user",
+                "tool_use_id": "",
+                "args": {}
+              },
+              "observation": {
+                "type": "text",
+                "text": "",
+                "exit_code": null
+              },
+              "state": null,
+              "status": "ok",
+              "timestamp": "2026-03-18T04:11:44.488Z",
+              "execution_time": 6.7,
+              "usage": {
+                "input_tokens": 9,
+                "output_tokens": 1,
+                "cache_read_tokens": 28250,
+                "cache_creation_tokens": 0
+              }
+            }
+          ],
+          "run_summary": {
+            "steps_count": 1,
+            "tool_calls_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "agent_id": "ac85974",
+      "messages": [
+        {
+          "turn_id": 1,
+          "role": "user",
+          "content": "Warmup",
+          "timestamp": "2026-03-18T04:11:37.825Z"
+        },
+        {
+          "turn_id": 1,
+          "agent_run_id": "run_t1",
+          "steps": [
+            {
+              "step_id": 1,
+              "phase": "",
+              "thinking": null,
+              "thought": "Ready. I have reviewed the workspace context and understand the UrhoX Lua development environment. I can explore the codebase, read documentation, and design implementation plans whenever you need. What would you like me to work on?",
+              "action": {
+                "tool_name": "respond_to_user",
+                "tool_use_id": "",
+                "args": {}
+              },
+              "observation": {
+                "type": "text",
+                "text": "",
+                "exit_code": null
+              },
+              "state": null,
+              "status": "ok",
+              "timestamp": "2026-03-18T04:11:42.604Z",
+              "execution_time": 4.8,
+              "usage": {
+                "input_tokens": 10,
+                "output_tokens": 3,
+                "cache_read_tokens": 28216,
+                "cache_creation_tokens": 0
+              }
+            }
+          ],
+          "run_summary": {
+            "steps_count": 1,
+            "tool_calls_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "agent_id": "af11d06",
+      "messages": [
+        {
+          "turn_id": 1,
+          "role": "user",
+          "content": "Warmup",
+          "timestamp": "2026-03-18T04:11:37.892Z"
+        },
+        {
+          "turn_id": 1,
+          "agent_run_id": "run_t1",
+          "steps": [
+            {
+              "step_id": 1,
+              "phase": "",
+              "thinking": null,
+              "thought": "Ready. How can I help you?",
+              "action": {
+                "tool_name": "respond_to_user",
+                "tool_use_id": "",
+                "args": {}
+              },
+              "observation": {
+                "type": "text",
+                "text": "",
+                "exit_code": null
+              },
+              "state": null,
+              "status": "ok",
+              "timestamp": "2026-03-18T04:11:40.922Z",
+              "execution_time": 3.0,
+              "usage": {
+                "input_tokens": 10,
+                "output_tokens": 53,
+                "cache_read_tokens": 19462,
+                "cache_creation_tokens": 0
+              }
+            }
+          ],
+          "run_summary": {
+            "steps_count": 1,
+            "tool_calls_count": 0
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_turns": 2,
+    "total_steps": 32,
+    "total_tool_calls": 22,
+    "total_subagents": 3,
+    "total_input_tokens": 77,
+    "total_output_tokens": 2732,
+    "total_cache_read_tokens": 2760038,
+    "total_cache_creation_tokens": 224206,
+    "exit_reason": "end_of_conversation",
+    "status": "completed",
+    "first_user_prompt": "检查[@P3-消消乐.md](file:///workspace/docs/P3-消消乐.md)策划案，根据其他文档检查是否有需要修改和优化的内容",
+    "phase_labels": [
+      "editing",
+      "localization"
+    ],
+    "marker_count": 4
+  }
+}

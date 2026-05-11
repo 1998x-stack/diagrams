@@ -1,0 +1,70 @@
+I detect **investigation/analysis** intent — analyzing a trajectory session to extract reusable behavioral patterns (Genes). My approach: read input files → extract trajectory summary → identify patterns → check existing genes for overlap → create/enhance genes.
+
+Let me start by gathering context in parallel.
+This session has only 1 prompt. Let me check the trajectory details to see if there's a notable pattern.
+This session has only **1 prompt** (17 steps, 1 user turn). Per the rules: "prompt数少于3个的session不要生成gene（除非模式非常突出）".
+
+Let me check if the pattern here is distinctive enough to warrant extraction despite the low prompt count.
+This session has only **1 prompt** with 17 steps. The trajectory reveals a notable pattern: the agent attempted an edit *before* proper localization, built, then realized the approach was wrong, switched to Grep-based localization, found the correct file (`tile-renderer.lua`), and made the correct edit.
+
+Let me check if this pattern overlaps with existing genes.
+Now let me read the existing workflow genes.json to understand the format and check for overlap.
+This session has only 1 prompt, but the trajectory reveals a distinctive pattern worth examining. Let me check the full trajectory flow more carefully.
+Now I have the full picture. Let me analyze this session:
+
+**Session 3fbb80e7**: Only 1 prompt, 17 steps. The trajectory shows a distinctive pattern:
+- S0-S3: respond → **Edit (premature)** → respond → **build** (without proper localization)
+- S6-S11: Read → **Grep "drop"** → **Grep "artKey"** → respond → Read (proper localization)
+- S13-S15: **Edit (correct)** → respond → **build** (verified fix)
+
+This is an **"Edit-First Impulse"** pattern — the agent tried to edit before localizing the correct file, built, then realized it needed to find the right location via Grep.
+
+Let me check for overlap with existing genes:
+Now I have a clear picture. This session has only 1 prompt but shows a distinctive **"Edit-First Impulse"** pattern: the agent attempted an Edit at S1 *before* any localization, built at S3, then realized it needed to find the right file (Grep at S8-S9, Read at S11), and finally made the correct Edit at S13 followed by a second build at S15.
+
+No existing gene captures this "edit before localize → build → realize wrong → grep → correct edit → build" pattern. The closest genes (`gene_fm_layout_param_surgical`, `gene_fm_text_localization_pipeline`) both assume "localize first, then edit" — the opposite of what happened here.
+
+Despite only 1 prompt, this pattern is prominent enough to extract as a diagnostic gene (it's a behavioral failure mode that can be corrected).
+Now I have a complete picture. This session has only **1 prompt** but reveals a distinctive pattern:
+
+**Trajectory analysis:**
+- S0: respond (announce)
+- S1: **Edit** (premature — no prior Read/Grep!)
+- S2-S3: respond → build (first build after premature edit)
+- S6: Read (realizing it needs to find the right file)
+- S8-S9: **Grep "drop"** → **Grep "artKey"** (proper localization)
+- S11: Read (tile-renderer.lua)
+- S13: **Edit** (correct edit after localization)
+- S15: build (second build, verification)
+
+This is an **"Edit-First Impulse"** pattern — the agent attempted an edit *before* proper localization, built, realized it was wrong, then did Grep-based localization and made the correct edit. This is the inverse of the established `gene_fm_layout_param_surgical` (heavy localization, light edit) and `gene_fm_text_localization_pipeline` (Grep-first) patterns.
+
+The rule says "prompt数少于3个的session不要生成gene（除非模式非常突出）". This pattern IS prominent — it captures a common failure mode (premature edit) with self-correction. Let me create this gene.
+Now regenerate the index:
+JSON parse error. Let me check the edit area:
+Line 1574 is missing the opening quote. Let me fix it:
+Index regenerated successfully. Let me verify the new gene is properly indexed:
+**Analysis complete.**
+
+Session `3fbb80e7` had only **1 prompt** (below the 3-prompt threshold), but the trajectory revealed a distinctive enough pattern to extract:
+
+### New Gene Created: `gene_fm_edit_first_impulse_with_self_correction`
+
+**Category:** workflow  
+**Title:** 编辑冲动-自修正模式 / Edit-First Impulse with Self-Correction
+
+**What happened in the trajectory:**
+1. S1: **Premature Edit** — no prior Read/Grep localization
+2. S3: First build (after premature edit)
+3. S6: Read — agent realized it needed to find the right file
+4. S8-S9: **Grep "drop"** → **Grep "artKey"** — two-dimensional localization
+5. S11: Read `tile-renderer.lua` to confirm
+6. S13: **Correct Edit** — precise fix after proper localization
+7. S15: Second build — verification
+
+**Why this is distinct from existing genes:**
+- `gene_fm_layout_param_surgical` assumes "heavy localization → light edit" (Read≥5, Edit=1)
+- `gene_fm_text_localization_pipeline` assumes "Grep-first → Read → Edit"
+- This new gene captures the **inverse** — "edit-first impulse → build → realize wrong → grep fallback → correct edit → double build"
+
+**Strategy encoded:** When modifying visual elements without knowing the file location, **localize first** (Grep element name + rendering function params) rather than editing blindly. If a premature edit already happened, proactively verify via Grep rather than waiting for user feedback.

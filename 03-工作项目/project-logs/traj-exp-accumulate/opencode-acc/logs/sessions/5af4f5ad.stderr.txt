@@ -1,0 +1,469 @@
+[0m
+> Sisyphus (Ultraworker) · qwen3.6-plus
+[0m
+[0m→ [0mRead examples/wzp/5af4f5ad.json
+[0m
+[0m$ [0mcd /Users/xd/Desktop/work/project-logs/traj-data-new/wzp && python3 -c "
+import json, sys
+with open('5af4f5ad.traj') as f:
+    data = json.load(f)
+print('Session hash:', data.get('session_hash', 'N/A'))
+print('Total messages:', len(data.get('messages', [])))
+print('Total steps:', data.get('total_steps', 'N/A'))
+print()
+
+# Per-turn summary
+for i, msg in enumerate(data.get('messages', [])):
+    user = msg.get('user_message', '')[:80]
+    intent = msg.get('intent_primary', '?')
+    target = msg.get('target_artifact', '?')
+    steps = msg.get('total_steps', 0)
+    actions = msg.get('action_summary', {})
+    phases = msg.get('phase_distribution', {})
+    tokens = msg.get('token_usage', {})
+    print(f'T{i}: intent={intent} target={target} steps={steps} user_msg=\"{user}\"')
+    if actions:
+        print(f'    actions: {actions}')
+    if phases:
+        print(f'    phases: {phases}')
+    if tokens:
+        inp = tokens.get('input_tokens', 0)
+        out = tokens.get('output_tokens', 0)
+        print(f'    tokens: in={inp} out={out}')
+" 2>&1 | head -200
+
+Session hash: N/A
+Total messages: 2
+Total steps: N/A
+
+T0: intent=? target=? steps=0 user_msg=""
+T1: intent=? target=? steps=0 user_msg=""
+[0m
+[0m$ [0mcd /Users/xd/Desktop/work/project-logs/traj-data-new/wzp && python3 -c "
+import json
+with open('5af4f5ad.traj') as f:
+    data = json.load(f)
+
+# Print top-level keys
+print('Top keys:', list(data.keys()))
+print()
+
+# Print each message's structure
+for i, msg in enumerate(data.get('messages', [])):
+    print(f'=== Message {i} ===')
+    print('Keys:', list(msg.keys()))
+    user_msg = msg.get('user_message', '')
+    if user_msg:
+        print('User message:', user_msg[:200])
+    runs = msg.get('agent_runs', [])
+    print('Agent runs:', len(runs))
+    for j, run in enumerate(runs):
+        steps = run.get('steps', [])
+        print(f'  Run {j}: {len(steps)} steps')
+        # Tool distribution
+        tools = {}
+        for s in steps:
+            tn = s.get('tool_name', 'unknown')
+            tools[tn] = tools.get(tn, 0) + 1
+        print(f'  Tools: {tools}')
+    print()
+" 2>&1 | head -100
+
+Top keys: ['schema_version', 'conversation_id', 'agent', 'session_metadata', 'messages', 'phases', 'markers', 'subagents', 'summary']
+
+=== Message 0 ===
+Keys: ['turn_id', 'role', 'content', 'timestamp']
+Agent runs: 0
+
+=== Message 1 ===
+Keys: ['turn_id', 'agent_run_id', 'steps', 'run_summary']
+Agent runs: 0
+
+
+[Category+Skill Reminder]
+
+**Built-in**: playwright, frontend-ui-ux, git-master, dev-browser, review-work, ai-slop-remover
+**⚡ YOUR SKILLS (PRIORITY)**: benchmark, plan-design-review, prefab-search, autoplan, design-consultation, freeze, careful, cso (+43 more)
+
+> User-installed skills OVERRIDE built-in defaults. ALWAYS prefer YOUR SKILLS when domain matches.
+
+```typescript
+task(category="visual-engineering", load_skills=["benchmark"], run_in_background=true)
+```
+[0m
+[0m$ [0mcd /Users/xd/Desktop/work/project-logs/traj-data-new/wzp && python3 -c "
+import json
+with open('5af4f5ad.traj') as f:
+    data = json.load(f)
+
+# Message 0: user message
+msg0 = data['messages'][0]
+print('=== User Message (T0) ===')
+print('Content:', msg0.get('content', '')[:300])
+print()
+
+# Message 1: agent run
+msg1 = data['messages'][1]
+print('=== Agent Run ===')
+print('Run ID:', msg1.get('agent_run_id', ''))
+steps = msg1.get('steps', [])
+print('Total steps:', len(steps))
+
+# Tool distribution
+tools = {}
+for s in steps:
+    tn = s.get('tool_name', 'unknown')
+    tools[tn] = tools.get(tn, 0) + 1
+print('Tool distribution:', dict(sorted(tools.items(), key=lambda x: -x[1])))
+
+# Phase distribution
+phases = {}
+for s in steps:
+    p = s.get('phase', 'unknown')
+    phases[p] = phases.get(p, 0) + 1
+print('Phase distribution:', phases)
+
+# Count edits, builds, errors
+edits = sum(1 for s in steps if s.get('tool_name') == 'Edit')
+writes = sum(1 for s in steps if s.get('tool_name') == 'Write')
+builds = sum(1 for s in steps if s.get('tool_name') == 'build' or 'build' in str(s.get('tool_name', '')).lower())
+errors = sum(1 for s in steps if s.get('observation', {}).get('exit_code') not in (None, 0) or 'error' in str(s.get('observation', {})).lower())
+print(f'Edits: {edits}, Writes: {writes}, Builds: {builds}, Errors: {errors}')
+
+# Print first 10 steps detail
+print()
+print('=== First 10 steps ===')
+for i, s in enumerate(steps[:10]):
+    tn = s.get('tool_name', '?')
+    args = s.get('args', {})
+    # Truncate args
+    args_str = {}
+    for k, v in args.items():
+        if isinstance(v, str) and len(v) > 100:
+            args_str[k] = v[:100] + '...'
+        else:
+            args_str[k] = v
+    obs = s.get('observation', {})
+    obs_text = ''
+    if isinstance(obs, dict):
+        obs_text = str(obs.get('text', ''))[:100]
+    elif isinstance(obs, str):
+        obs_text = obs[:100]
+    print(f'S{i}: tool={tn} args={args_str} obs={obs_text}')
+
+# Print last 5 steps
+print()
+print('=== Last 5 steps ===')
+for i, s in enumerate(steps[-5:]):
+    tn = s.get('tool_name', '?')
+    args = s.get('args', {})
+    args_str = {}
+    for k, v in args.items():
+        if isinstance(v, str) and len(v) > 100:
+            args_str[k] = v[:100] + '...'
+        else:
+            args_str[k] = v
+    print(f'S{len(steps)-5+i}: tool={tn} args={args_str}')
+
+# Summary
+print()
+print('=== Summary ===')
+summary = data.get('summary', {})
+print(json.dumps(summary, indent=2, ensure_ascii=False)[:1000])
+" 2>&1 | head -150
+
+=== User Message (T0) ===
+Content: 为我生成新的游戏音效，需要是休闲游戏的音效，适合益智游戏，小孩游玩的音效
+
+=== Agent Run ===
+Run ID: run_t1
+Total steps: 3
+Tool distribution: {'unknown': 3}
+Phase distribution: {'editing': 3}
+Edits: 0, Writes: 0, Builds: 0, Errors: 0
+
+=== First 10 steps ===
+S0: tool=? args={} obs=
+S1: tool=? args={} obs=🔊 批量音效生成完成！
+
+📊 统计: 8 成功, 0 失败
+
+✅ 成功生成的文件:
+  - ui_tap: workspace/assets/audio/sfx/ui_tap.ogg
+  - corr
+S2: tool=? args={} obs=
+
+=== Last 5 steps ===
+S-2: tool=? args={}
+S-1: tool=? args={}
+S0: tool=? args={}
+
+=== Summary ===
+{
+  "total_turns": 1,
+  "total_steps": 3,
+  "total_tool_calls": 1,
+  "total_subagents": 3,
+  "total_input_tokens": 21,
+  "total_output_tokens": 3,
+  "total_cache_read_tokens": 134819,
+  "total_cache_creation_tokens": 32452,
+  "exit_reason": "end_of_conversation",
+  "status": "completed",
+  "first_user_prompt": "为我生成新的游戏音效，需要是休闲游戏的音效，适合益智游戏，小孩游玩的音效",
+  "phase_labels": [
+    "editing"
+  ],
+  "marker_count": 2
+}
+[0m
+[0m$ [0mcd /Users/xd/Desktop/work/project-logs/traj-data-new/wzp && python3 -c "
+import json
+with open('5af4f5ad.traj') as f:
+    data = json.load(f)
+
+# Print full step data
+steps = data['messages'][1].get('steps', [])
+for i, s in enumerate(steps):
+    print(f'=== Step {i} ===')
+    print(json.dumps(s, indent=2, ensure_ascii=False)[:2000])
+    print()
+" 2>&1 | head -200
+
+=== Step 0 ===
+{
+  "step_id": 1,
+  "phase": "editing",
+  "thinking": null,
+  "thought": "好的，我来为你生成一套适合儿童益智休闲游戏的音效。",
+  "action": {
+    "tool_name": "respond_to_user",
+    "tool_use_id": "",
+    "args": {}
+  },
+  "observation": {
+    "type": "text",
+    "text": "",
+    "exit_code": null
+  },
+  "state": null,
+  "status": "ok",
+  "timestamp": "2026-03-20T10:37:13.089Z",
+  "execution_time": 6.8,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 1,
+    "cache_read_tokens": 39670,
+    "cache_creation_tokens": 15809
+  }
+}
+
+=== Step 1 ===
+{
+  "step_id": 2,
+  "phase": "editing",
+  "thinking": null,
+  "thought": null,
+  "action": {
+    "tool_name": "mcp__sce-urhox__batch_sound_effects",
+    "tool_use_id": "toolu_vrtx_01MfXazRMyKp8ywhvHe1pfNW",
+    "args": {
+      "sounds": [
+        {
+          "name": "ui_tap",
+          "text": "Soft, friendly UI button tap click sound, bright and gentle, suitable for children's puzzle game, bubbly and pleasant",
+          "duration": 0.5
+        },
+        {
+          "name": "correct_answer",
+          "text": "Cheerful correct answer chime, ascending bright xylophone notes, playful and rewarding, children's puzzle game success feedback",
+          "duration": 1
+        },
+        {
+          "name": "wrong_answer",
+          "text": "Gentle wrong answer sound, soft descending tone, not scary or harsh, friendly and encouraging, suitable for kids game",
+          "duration": 0.8
+        },
+        {
+          "name": "star_collect",
+          "text": "Magical star or gem collect sparkle sound, twinkling and shimmery, bright and delightful, casual puzzle game pickup",
+          "duration": 0.6
+        },
+        {
+          "name": "bubble_pop",
+          "text": "Cute bubbly pop sound, soft and satisfying, like a soap bubble popping, playful and fun for children",
+          "duration": 0.4
+        },
+        {
+          "name": "level_complete",
+          "text": "Joyful level complete victory fanfare, bright and celebratory, short trumpet and bells melody, children's game achievement",
+          "duration": 1.5
+        },
+        {
+          "name": "combo_chain",
+          "text": "Quick ascending combo chain sound, sparkly and energetic, multiple bright tones going up in pitch, puzzle game combo reward",
+          "duration": 0.8
+        },
+        {
+          "name": "piece_place",
+          "text": "Soft satisfying puzzle piece placement snap click, gentle wooden block fitting sound, tactile and pleasant for kids",
+          "duration": 0.4
+        }
+      ]
+  
+
+=== Step 2 ===
+{
+  "step_id": 3,
+  "phase": "editing",
+  "thinking": null,
+  "thought": "全部 8 个音效已成功生成，存放在 `assets/audio/sfx/` 目录下：\n\n| 文件 | 用途 | 时长 |\n|------|------|------|\n| `ui_tap.ogg` | UI 按钮点击 | 0.5s |\n| `correct_answer.ogg` | 答对/正确反馈 | 1.0s |\n| `wrong_answer.ogg` | 答错/错误反馈（温和不吓人） | 0.8s |\n| `star_collect.ogg` | 收集星星/宝石 | 0.6s |\n| `bubble_pop.ogg` | 泡泡弹出/消除 | 0.4s |\n| `level_complete.ogg` | 关卡通关庆祝 | 1.5s |\n| `combo_chain.ogg` | 连击/连消奖励 | 0.8s |\n| `piece_place.ogg` | 拼图/方块放置 | 0.4s |\n\n在代码中可以这样使用：\n\n```lua\n-- 加载并播放音效\nlocal sound = cache:GetResource(\"Sound\", \"audio/sfx/ui_tap.ogg\")\nlocal soundSource = scene_:CreateComponent(\"SoundSource\")\nsoundSource:Play(sound)\n```\n\n如果需要调整某个音效或补充其他类型，随时告诉我。",
+  "action": {
+    "tool_name": "respond_to_user",
+    "tool_use_id": "",
+    "args": {}
+  },
+  "observation": {
+    "type": "text",
+    "text": "",
+    "exit_code": null
+  },
+  "state": null,
+  "status": "ok",
+  "timestamp": "2026-03-20T10:37:53.421Z",
+  "execution_time": 31.9,
+  "usage": {
+    "input_tokens": 1,
+    "output_tokens": 1,
+    "cache_read_tokens": 55479,
+    "cache_creation_tokens": 834
+  }
+}
+[0m
+[0m$ [0mgrep -r "content_creation\|audio\|sound\|sfx\|batch_sound\|batch_generate" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json 2>/dev/null | head -30
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/genes.json:      "evidence": "014354fc: T3: debug按钮无法点击→读取sound-test-panel.lua→3次edit→1次build→修复。T4: 音效测试UI位置异常→读取sound-test-panel.lua→2次edit→1次build→修复。两个bug均为read→edit→build的简洁循环，无多余操作。13683faf: 扩展了game_logic类bug模式。T2: 章节标题重叠('第一章和第二章同时显示')→1 Edit+1 build→修复。T3: 章节-页码错位('第三页显示第四章')→Read+Edit+build→修复。T5: 点击穿透('点击忠告页面直接进入关卡')→2 Reads+3 Greps+2 Edits+1 build→修复。T5展示了game_logic bug需要Grep辅助定位的特点（搜索事件处理、遮罩层相关代码），与UI bug的纯Read定位不同。",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/genes.json:      "evidence": "4 subagents launched (a53e615, a5ca1be, a9418bf, a9b1bff). a9b1bff partially explored /workspace/scripts/ via Bash before also hitting 404. Agent then fell back to Glob (steps 3-4, 9-10) and mcp__mkr__Read (steps 6-8, 11-12), reading 6 files: router.lua, storyline/init.lua, adventure-sfx.lua, adventure/init.lua, home/init.lua, main menu. Session terminated by API error before any edit could be made. Pattern: 404 -> Glob -> Read -> terminate.",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "evidence": "T0: 用户要求增加未成年人游戏时间限制。Agent先Task子agent探索→6次Glob→7次Read（router.lua, storyline/init.lua, adventure-sfx.lua, adventure/init.lua, home/init.lua, play-time-guard.lua, game/init.lua）→发现PlayTimeGuard模块已完整实现（isPlayable()、getRestrictedMessage()），且adventure页面已在两处集成（关卡点击拦截+中间弹窗提示）→Grep确认全项目集成情况→TodoWrite列出审计清单→向用户报告现状。T1: 用户要求增加测试开关，Agent读取settings-save.lua后API 404终止。整个会话0次edit、0次build，纯探索+报告模式。",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:content_creation",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "batch_generate_then_individual",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "第二步：使用batch_generate_images一次性生成多个角色的初稿（如效率更高）。",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "evidence": "T4: '为我生成这些角色的参考图'→26步(10 respond+7 TodoWrite+6 generate_image+1 batch_generate_images+1 Read+1 Bash)。流程：S1 batch生成初稿→S3-S20逐个生成6个角色（狐狸、猫头鹰、猫、兔子、浣熊、额外角色），每个角色prompt包含Q版风格、头身比1:1、颜色/服饰精细描述→S5读取角色形象设计.md确保一致性→S7/S10/S13/S16/S19/S22 TodoWrite跟踪进度→S23 Bash创建assets/Textures/character目录并复制文件。典型的'文档→批量生成→逐个精化→资产整理'管线。",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:    "id": "gene_cc_doc_driven_content_creation",
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json:      "intent:content_creation",
+[0m
+[0m$ [0mls /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/
+diagnostic
+informational
+operational
+session_rhythm
+workflow
+[0m
+[0m$ [0mpython3 -c "
+import json
+with open('/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json') as f:
+    genes = json.load(f)
+cc_genes = [g for g in genes if 'content_creation' in str(g.get('signals_match', []))]
+for g in cc_genes:
+    print(f'ID: {g[\"id\"]}')
+    print(f'  signals: {g.get(\"signals_match\", [])}')
+    print()
+"
+
+ID: gene_cc_ai_character_image_pipeline
+  signals: ['intent:content_creation', 'target:asset_resource', 'target:narrative', 'ai_image_generation', 'batch_generate_then_individual', 'character_design_to_asset', 'mcp_image_tools', 'asset_directory_organization']
+
+ID: gene_cc_doc_driven_content_creation
+  signals: ['intent:content_creation', 'has_attached_doc', 'doc_first_read_pattern', 'narrative_design_doc_creation', 'npc_character_design', 'create_then_refine_cycle']
+[0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [limit=5][0m
+[0m→ [0mRead opencode-acc/plugins/workflow/genes.json[90m [offset=2045][0m
+[0m
+[0m← [0mEdit opencode-acc/plugins/workflow/genes.json
+Index: /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+===================================================================
+--- /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
++++ /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/genes.json
+@@ -2051,6 +2051,59 @@
+       "prompt_indices": [0],
+       "evidence": "T0: '为我准备一个空项目，屏幕中间显示\"初始化成功\"'→8步(4 respond+2 Read+1 Write+1 build)。S0 respond确认方案→S1-S2 Read现有项目结构→S3 Write创建project.json→S4-S5 Read确认project.json内容→S6-S7 respond确认→S8 mcp__sce-urhox__build验证。典型的'确认→读取→Write配置→Read验证→build→respond确认'管线。8步完成最小可运行项目初始化，无多余探索或编辑。",
+       "session_count": 1
+     }
++  },
++  {
++    "type": "Gene",
++    "id": "gene_cc_batch_audio_generation",
++    "category": "workflow",
++    "signals_match": [
++      "intent:content_creation",
++      "target:audio",
++      "mcp_batch_sound_effects",
++      "batch_audio_generation",
++      "english_prompt_for_audio",
++      "no_code_no_build",
++      "assets_audio_sfx_output",
++      "usage_code_example_in_response"
++    ],
++    "preconditions": [
++      "用户要求生成游戏音效/音效素材（如'生成音效'、'需要音效'、'做音效'）。",
++      "项目已接入支持AI音频生成的MCP工具（如 mcp__sce-urhox__batch_sound_effects）。",
++      "用户未指定具体音效列表，而是给出风格描述（如'休闲游戏'、'儿童益智'）。",
++      "Agent需要自行设计音效清单（名称+英文描述+时长），覆盖UI交互、正/负反馈、收集、通关等常见场景。",
++      "这是纯内容创建任务——不涉及代码修改、bug修复或功能开发。"
++    ],
++    "strategy": [
++      "根据用户描述的游戏类型（休闲/益智/儿童等），推断需要的音效类别：UI交互（点击/放置）、反馈（正确/错误）、收集（星星/宝石）、成就（通关/连击）。",
++      "使用 batch_sound_effects MCP工具一次性生成所有音效，每个音效包含：name（文件名）、text（英文描述，包含风格/情绪/乐器/时长关键词）、duration（秒）。",
++      "英文描述应包含：情绪形容词（cheerful/gentle/soft）、乐器/音色参考（xylophone/bells/trumpet）、风格限定（children's puzzle game/not scary）、时长暗示（short/bright）。",
++      "音效输出到 assets/audio/sfx/ 目录，以 .ogg 格式存储。",
++      "生成完成后，向用户输出汇总表（文件名→用途→时长），并附带Lua代码使用示例。",
++      "如果用户需要调整某个音效或补充新类型，可再次调用MCP工具单独生成。"
++    ],
++    "constraints": {
++      "no_code_edit": true,
++      "no_build": true,
++      "max_sounds_per_batch": 10,
++      "output_format": "ogg",
++      "output_dir": "assets/audio/sfx/"
++    },
++    "validation": [
++      "所有音效文件成功生成并存储在 assets/audio/sfx/ 目录",
++      "音效数量覆盖用户描述的游戏场景所需的基本类别",
++      "向用户输出了汇总表和代码使用示例"
++    ],
++    "title_zh": "批量音效生成管线",
++    "title_en": "Batch Audio Generation Pipeline — MCP Sound Effects with English Prompt Design",
++    "_provenance": {
++      "source": "traj-exp-accumulate",
++      "project": "wzp",
++      "session_hashes": ["5af4f5ad"],
++      "turn_range": "5af4f5ad:T0",
++      "prompt_indices": [0],
++      "evidence": "T0: '为我生成新的游戏音效，需要是休闲游戏的音效，适合益智游戏，小孩游玩的音效'→3步(respond_to_user→mcp__sce-urhox__batch_sound_effects→respond_to_user)。S0: Agent确认方案→S1: batch_sound_effects一次性生成8个音效(ui_tap/correct_answer/wrong_answer/star_collect/bubble_pop/level_complete/combo_chain/piece_place)，每个包含英文风格描述和时长→S2: 输出汇总表+Lua代码示例。全程0代码编辑0构建，纯MCP音频生成管线。与gene_cc_ai_character_image_pipeline(图像生成)对比：音频生成更简洁，无需逐个精化，batch一次完成所有音效。",
++      "session_count": 1
++    }
+   }
+ ]
+
+[0m
+[0m$ [0mpython3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins 2>&1
+/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/diagnostic/index.md (6 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/informational/index.md (1 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/operational/index.md (7 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/session_rhythm/index.md (7 genes)
+  /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/index.md (39 genes)
+  (5 categories indexed)
+[0m
+[0m$ [0mgrep -A5 "gene_cc_batch_audio" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/workflow/index.md
+| 39 | `gene_cc_batch_audio_generation` | Batch Audio Generation Pipeline — MCP Sound Effects with English Prompt Design | workflow | 1x: 5af4f5ad | `intent:content_creation`, `target:audio`, `mcp_batch_sound_effects` |
+
+---
+
+## `gene_fm_sequential_ui_polish_same_component`
+
+--
+## `gene_cc_batch_audio_generation`
+
+**批量音效生成管线** / Batch Audio Generation Pipeline — MCP Sound Effects with English Prompt Design
+
+Category: `workflow`
+[0m

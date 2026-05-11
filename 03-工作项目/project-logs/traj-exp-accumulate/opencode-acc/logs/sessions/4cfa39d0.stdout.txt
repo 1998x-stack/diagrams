@@ -1,0 +1,79 @@
+Now let me check overlap with existing genes and examine the relevant files.
+Good — `4cfa39d0` is already referenced in `gene_ir_pre_implementation_doc_review`. Let me check the current state of that gene and the operational gene for doc refinement.
+Now I have a clear picture. This session has only 3 turns (22 steps total) — very lightweight. Let me check what patterns are unique vs already covered.
+
+**Session summary:**
+- **T0** (inspection_review, 7 steps): Read 3 docs + Task → respond. **Already in `gene_ir_pre_implementation_doc_review`** (4cfa39d0:T0 listed).
+- **T1** (feature_modification→doc, 11 steps): Read → TodoWrite×3 → Write → Edit×2 → respond. Doc optimization with TodoWrite anchoring.
+- **T2** (documentation, 4 steps): Read 2 docs → respond. Pure doc review, no edits.
+
+T0 is already covered. T2 is too minimal (4 steps, no edits). The only potentially new pattern is T1's doc optimization workflow. Let me check if it overlaps with existing operational genes.
+Now I have a complete picture. Let me analyze this session thoroughly.
+
+**Session 4cfa39d0 summary:**
+- 3 turns, 22 steps total, ~24 min duration
+- All "Editing" phase, 1 drift-start marker (step 4: 4 consecutive edits)
+- Model: claude-opus-4-6
+
+**Turn breakdown:**
+| Turn | Intent | Target | Steps | Tools | Edits | Builds |
+|------|--------|--------|-------|-------|-------|--------|
+| T0 | inspection_review | audio | 7 | 3 Read + 3 respond + 1 Task | 0 | 0 |
+| T1 | feature_modification | documentation | 11 | 2 Edit + 1 Write + 3 TodoWrite + 2 Read + 3 respond | 3 | 0 |
+| T2 | documentation | documentation | 4 | 2 Read + 2 respond | 0 | 0 |
+
+**Overlap check:**
+- T0 → **Already in `gene_ir_pre_implementation_doc_review`** (4cfa39d0 already listed in provenance)
+- T1 → Doc optimization with TodoWrite anchoring. Check against `gene_doc_single_doc_refinement_cascade` — different pattern (single-turn optimization, not generate→iterative-condense cascade)
+- T2 → Too minimal (4 steps, pure Read+respond)
+
+Let me check if T1's pattern is covered by any existing gene:
+Now I have a complete picture. This is a very lightweight session — only 3 turns, 22 steps. Let me analyze what's extractable.
+
+**Session summary:**
+| Turn | Intent | Target | Steps | Edits | Builds | Pattern |
+|------|--------|--------|-------|-------|--------|---------|
+| T0 | inspection_review | audio | 7 | 0 | 0 | Pre-implementation blocker probe |
+| T1 | feature_modification | documentation | 11 | 3 (1W+2E) | 0 | Doc optimization with TodoWrite |
+| T2 | documentation | documentation | 4 | 0 | 0 | Minimal doc review |
+
+**Overlap analysis:**
+- **T0** → Already in `gene_ir_pre_implementation_doc_review` (4cfa39d0 already listed in provenance). No action needed.
+- **T1** → Doc optimization: Read→TodoWrite×3→Write→Edit×2→respond. This is a single-turn doc optimization pattern. Checking against `gene_doc_single_doc_refinement_cascade` — that gene requires `consecutive_same_doc_ge_3` and `generate_then_iterative_refine`. T1 is a single optimization turn, not a cascade. However, only 1 session of this exact pattern — too weak for a new gene.
+- **T2** → 4 steps, Read+respond only. Too minimal.
+
+**Verdict:** This session has only 3 prompts. T0 is already covered. T1+T2 together don't form a strong enough pattern for a new gene (only 1 session evidence). The session is essentially a "design doc review→optimize→final check" pipeline, but this is a very specific scenario that doesn't generalize well beyond this single session.
+
+**No new genes to create.** The session is already represented in `gene_ir_pre_implementation_doc_review`. The session is too lightweight (3 prompts) to justify additional genes — quality over quantity.
+
+Let me verify the existing gene's evidence is accurate and consider if the provenance needs any update:
+Good — `4cfa39d0` is already referenced in `gene_ir_pre_implementation_doc_review`. Now let me do a thorough analysis of what NEW patterns this session might contribute.
+
+**Session 4cfa39d0 Summary:**
+- **3 turns, 22 steps, ~24 min duration** — extremely lightweight
+- T0: `inspection_review` (audio) → 7 steps: Read 3 docs + Task → respond. **0 edits, 0 builds.**
+- T1: `feature_modification` (documentation) → 11 steps: Read → TodoWrite×3 → Write → Edit×2 → respond. **0 builds.**
+- T2: `documentation` (documentation) → 4 steps: Read 2 docs → respond. **0 edits, 0 builds.**
+- Phase: 100% Editing. 1 drift-start marker (step 4: 4 consecutive edits without verification).
+
+**Overlap Analysis:**
+
+1. **T0 → `gene_ir_pre_implementation_doc_review`** — ALREADY COVERED. The evidence already cites `4cfa39d0:T0` with the exact pattern (Read 2 docs + Task → respond, 7 steps, 0 edits 0 builds). ✅ No action needed.
+
+2. **T1 → Doc optimization with TodoWrite** — Read→TodoWrite→Write→Edit×2→respond. This is a single-turn doc optimization. Checking against existing genes:
+   - `gene_doc_single_doc_refinement_cascade` requires `consecutive_same_doc_ge_3` — T1 is only 1 turn on this doc. ❌ No match.
+   - `gene_doc_post_implementation_sync` requires post-code-change doc update — T1 is doc optimization, not post-code-change. ❌ No match.
+   - `gene_mw_todo_driven_workflow` — T1 uses TodoWrite×3, but the gene requires `intent:new_feature` or `intent:documentation` as primary. T1's primary is `feature_modification`. Weak partial match but not strong enough for a standalone gene from 1 session.
+
+3. **T2 → Pure Read+respond** — 4 steps, 0 edits. Too lightweight for any gene. Matches `gene_ir_minimal_inspection_rhythm` pattern but that gene already has stronger evidence from 06335c24.
+
+4. **Full session pipeline: T0(审查)→T1(优化)→T2(复查)** — This is a "design doc assessment→optimization→final review" pipeline. But with only 3 turns total, this is too thin for a new workflow gene. The pattern is essentially a subset of `gene_ir_pre_implementation_doc_review` (T0) + doc maintenance (T1→T2).
+
+**Conclusion: No new genes to create from this session.**
+
+The session is already well-covered by `gene_ir_pre_implementation_doc_review` (T0 evidence already includes 4cfa39d0). T1 and T2 are too lightweight (11 and 4 steps respectively) and don't form a distinct pattern not already captured by existing genes. The session has only 3 prompts — borderline for gene extraction.
+
+**Final report:**
+- ✅ `gene_ir_pre_implementation_doc_review` — already includes 4cfa39d0:T0 evidence. No update needed.
+- ❌ No new genes — session too lightweight (3 turns, all doc-focused, no code edits/builds).
+- The drift-start marker at step 4 (4 consecutive edits during T1 doc optimization) is noted but not significant enough for a standalone gene — it's a minor doc edit drift during the TodoWrite→Write→Edit sequence.

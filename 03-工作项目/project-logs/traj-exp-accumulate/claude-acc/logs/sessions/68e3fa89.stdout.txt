@@ -1,0 +1,8 @@
+Session `68e3fa89` had only 1 prompt ("build") — too short to warrant a new gene. I enhanced the existing `gene_cfg_build_entry_missing_fix` (operational) instead:
+
+- Added two new signals: `terse_build_trigger`, `proactive_glob_before_build`
+- Added a 4th precondition documenting the proactive variant (Glob-before-build vs. error-then-recover)
+- Added a 5th strategy step describing the proactive path
+- Updated `_provenance`: `session_hashes` now includes `68e3fa89`, `session_count` 1→2, evidence appended with this session's behavior
+
+The key distinction this session reveals: when the user sends a bare "build" prompt, the agent proactively Globs the project structure to discover the entry point *before* calling build — the preventive counterpart to the existing error-recovery pattern.

@@ -1,0 +1,679 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_inq_design_doc_preflight_review",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "intent:inquiry",
+      "has_attached_doc",
+      "target:documentation",
+      "pre_implementation_review",
+      "blockers_mentioned",
+      "readiness_check",
+      "reference_impl_reading",
+      "cn_keywords:jiancha,zudian,buchong,shifoukeyi,kaishi,zhizuo,xiugai",
+      "target:audio",
+      "engine_api_docs_check",
+      "cn_keywords:zudian,youhua,fengxian,yinxiao",
+      "code_pattern_reusability_check",
+      "bash_project_state_inspection",
+      "multi_doc_review",
+      "governance_doc_cross_read",
+      "multi_dimension_review_question"
+    ],
+    "preconditions": [
+      "用户通过 @文件名 或 file:/// 路径附加了一份设计文档（通常是新功能/新游戏的完整策划方案）。",
+      "用户的提问围绕「能否开始制作」「是否有缺失内容」「是否有阻碍点」等准备就绪性判断，而非要求立即实现。",
+      "这是某个新系统或新关卡的首次实施评审，代码库中该功能尚未存在。"
+    ],
+    "strategy": [
+      "使用 Read 或 mcp__mkr__Read 读取附加的设计文档全文，不要跳过或分段读取。",
+      "若项目中已有类似系统（如另一个已完成的同类游戏），读取其入口文件（如 init.lua、adapter.lua）作为参考实现，对照当前策划案检查文档的完备性（命名约定、生命周期接口、存档格式等是否已明确）。",
+      "分两栏输出评估结论：①【无阻碍点】列出文档中已明确定义、可直接开工的模块/规则；②【需确认或补充】用表格列出模糊/缺失项，每行包含：问题描述、影响范围（具体到文件名）、建议默认策略。",
+      "对每个需确认项，直接提出合理的「默认策略」（M1 简化做法），而非只是抛出问题——这让用户可以选择是否沿用默认值。",
+      "结尾提供一张汇总表（含所有待确认项及默认策略），明确问用户：是按默认策略直接开始，还是希望逐项讨论？",
+      "若用户随后发送了极短的模糊指令（如「调整」「修改」），不要猜测具体意图，而是将全部待确认项以编号表格重新呈现，请用户指定要调整的项目和方向（例如「3: 全部做」「5: 用竖向列表」）。"
+    ],
+    "constraints": {
+      "no_code_edits": true,
+      "must_read_full_doc": true,
+      "output_format": "structured_gap_analysis_table"
+    },
+    "validation": [
+      "评估结论包含「无阻碍点」和「需确认」两个部分",
+      "每个需确认项均附有影响范围（具体文件）和建议默认策略",
+      "结尾明确询问用户是否按默认策略开始制作",
+      "没有在用户未确认的情况下修改任何代码文件"
+    ],
+    "title_zh": "设计文档实施前缺口分析：阻碍点审查与默认策略提案",
+    "title_en": "Design Doc Preflight Review — Gap Analysis with Default Strategy Proposals",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "06335c24",
+        "11e7ed86",
+        "4cfa39d0",
+        "4d80bab3",
+        "5634a485",
+        "5c2aeaee",
+        "6b8bf0cd",
+        "9bbd20cc"
+      ],
+      "turn_range": "06335c24:T01-T03, 11e7ed86:T01, 11e7ed86:T03, 4cfa39d0:T1, 4d80bab3:T0, 5634a485:T06-T07, 5c2aeaee:T1, 6b8bf0cd:T0, 9bbd20cc:T00",
+      "prompt_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        0,
+        2,
+        0,
+        3
+      ],
+      "evidence": "06335c24 (5 prompts, 81 min, 0 code edits): T01 — user attached P3-消消乐.md via @-mention and asked '是否有阻碍点/缺失内容'. Agent: Read doc → Output structured analysis: 8 non-blockers (工程结构、核心玩法、特殊方块等) + 8-row ambiguity table (交换操作方式、特殊方块生成位置、彩虹组合规则、L10目标判定、选关布局、音效、掉落权重、收集计数) each with scope+default strategy + summary 'no hard blockers'. T02 (same message fragmented by UI @-mention parsing): identical response. T03 — user sent terse '调整'; agent reframed all 8 items as interactive numbered table asking user to specify which to adjust. Pattern: design doc + readiness question → structured gap table + defaults → terse ambiguous follow-up → disambiguation table. | 11e7ed86 T01 (12 steps): user attached P2-记忆翻牌.md + AI开发规范.md and asked '如果要开始制作有什么需要修改的地方'. Agent: Read P2-记忆翻牌.md → Read AI开发规范.md → Read 策划案-大厅.md → Read 架构决策记录.md → Glob scripts/**/*.lua → Read demo-memory-flip.lua (existing config) → Read p1-puzzle-land/init.lua + adapter.lua (reference implementation) → respond_to_user with structured modification list. Key variant: agent read P1's init.lua and adapter.lua as reference implementation before critiquing P2 design doc completeness. 11e7ed86 T03 (17 steps): user re-checked '是否有需要补充和完善的地方，是否有阻碍点' after T02 doc revisions. Agent read P2-记忆翻牌.md (revised) + save.lua + pause-menu.lua + game-lifecycle SDK + colors.lua + layout.lua + game-container + screen-transition + adapter.lua → structured readiness report (all infra available, no blockers). Second-pass variant: direct infra code reading (10 files) instead of structured ambiguity table. | 4cfa39d0 T1 (7 steps, 0 edits): user attached 音效系统设计方案.md + 架构决策记录.md via file:// links and asked '如果要根据设计方案制作音效系统，有什么阻碍，有什么需要优化的内容，有什么风险'. Agent: (1) respond_to_user. (2) Read 音效系统设计方案.md. (3) Read 架构决策记录.md. (4) respond_to_user. (5) Task subagent '探索项目代码结构' — examined scripts/shared/, p3-match-3/, p1-puzzle-land/ adapter.lua onEnter/onExit, board-renderer.lua NanoVG functions. (6) Read engine-docs/api/audio.md (engine audio API verification). (7) respond_to_user — structured obstacle/optimization/risk report. Key variant: user attaches BOTH a design doc AND the ADR; agent reads engine API docs (audio.md) in addition to user-provided docs — to verify that the NanoVG/engine audio functions referenced in the design actually exist in the runtime. Prompt asks for three dimensions (阻碍 + 优化点 + 风险) rather than just blockers/gaps — agent produces a three-section structured report. | 4d80bab3 T0 (14 steps, 0 edits): user attached P4-连连看.md + AI开发规范.md via file:// links and asked 「有什么阻碍点，有什么需要补充的内容」. Agent: (1) respond_to_user. (2) Read AI开发规范.md. (3) Read P4-连连看.md. (4) respond_to_user. (5) Task SA1 「探索项目目录结构」 -- mapped existing games (p1/p2/p3), shared/ components, config/ structure, confirmed p4-link-match not yet created. (6) Task SA2 -- searched for reusable pattern drawing code (shapes_easy, artPool, drawCircle/drawStar) across scripts/ to check if P2 shape library could be reused for P4 tile graphics. (7) Read 架构决策记录.md. (8-11) 4x Grep for NanoVG pattern-drawing functions (function.*draw, PATTERNS, nvgBeginPath, nvgCircle). (12) Read p2-memory-flip/view/card-renderer.lua (auditing reusable shape code). (13) respond_to_user -- structured two-dimension report: ①[无阻碍点] (6 items: 路径搜索算法, 关卡数据格式, 状态机设计, 存档格式, HUD/弹窗设计, 游戏注册) + ②[需补充内容] (4 items: 矢量图案绘制实现, 死盘检测策略, 音效设计, P4特有的提示辅助系统). Key variant: user asks two dimensions (阻碍点 + 补充内容) rather than three (阻碍/优化/风险); agent explicitly searches for reusable code patterns (Grep for shape drawing functions + Read P2 card-renderer) to assess whether tile-renderer.lua must be built from scratch. Two Task subagents: SA1 structure exploration, SA2 code pattern search. | 5634a485 T06-T07 (9 steps, 0 edits): user attached TWO docs via file:// links (AI开发规范.md + 策划案-大厅.md) and asked \"如果开始制作，是否有阻碍点，是否有需要补充的内容\". Agent: (1) Read AI开发规范.md. (2) Read 策划案-大厅.md. (3) Read 架构决策记录.md (proactively, not user-attached). (4) respond_to_user (thinking phase). (5-7) 3x mcp__mkr__Bash: `find /workspace/scripts -type f | sort` (inspect current code structure), `cat .project/project.json` (inspect project config), `cat .project/settings.json` (inspect build settings). (8) Read 文档维护规范.md (proactively, not user-attached). (9) respond_to_user — structured readiness analysis. New variant signals: (a) user attaches TWO docs simultaneously (design spec + dev guidelines) rather than one; (b) agent uses Bash to inspect actual project file structure and config files alongside doc reading — verifying whether code already exists, what entry points are configured, what build targets are set; (c) agent proactively reads ADR and doc-registry even though user did not attach them, treating them as governance context. Bash state inspection is a new sub-step: inspect real project state to verify claims in docs (e.g., \"no scripts directory means no code written yet\"). Session context: this is a very early session (session 2026-03-17, project still in planning) — the Bash inspection confirmed that the scripts/ directory had only a stub main.lua from T01. | 5c2aeaee T1 (5 steps, 0 edits): user attached THREE docs simultaneously (AI开发规范.md + 策划案-大厅.md + P1-推箱子关卡详细设计.md) via @-mention file:// links and asked '如果要开始制作推箱子，有什么需要补充的地方，有什么需要优化的地方，有什么阻碍点' — three-dimension question (补充内容 + 优化点 + 阻碍点). Agent: (1) Read all 3 attached docs. (2) Task SA1 '探索项目当前结构' — surveyed scripts/ directory to understand what's already been built. (3) Task SA2 '检查架构决策记录' — read ADR to understand existing architectural decisions. Zero code edits — pure readiness analysis. Key variant: user asks THREE dimensions simultaneously (supplement + optimize + blockers) and attaches all 3 relevant docs in one prompt. ADR read is proactive (not user-attached) but necessary to check for conflicts with existing decisions. Prior session context: this is the early-phase session where wzp project just had lobby + color-match scaffold; p1-puzzle-land didn't exist yet. | 6b8bf0cd T0 (9 steps, 0 edits): EARLIEST session in the project — only main.lua stub exists. User attached TWO docs via @-mention (AI开发规范.md + 策划案-大厅.md) and asked '是否可以开始开发，是否有阻碍点'. Agent: (1) respond_to_user. (2) Read AI开发规范.md. (3) Read 策划案-大厅.md. (4) respond_to_user. (5) Glob docs/架构决策记录* (proactively, not user-attached). (6) Glob scripts/**/*.lua (to confirm code state — returns only main.lua stub). (7) Read 架构决策记录.md (proactively). (8) Read main.lua (verify entry point state). (9) respond_to_user — structured readiness analysis. Minimal-project variant: Glob scripts/ confirms almost no code yet (only stub main.lua) → this verifies project is truly fresh → blocker analysis based solely on doc content. Notable: no Task subagents used (9 steps total vs 12-17 in other sessions); no Bash inspection (unlike 5634a485); read sequence is Read both user docs → proactive Glob + Read ADR → Read entry file → respond. This is the simplest variant in the gene. | 9bbd20cc T00 (7 steps, 0 edits): user opened AI开发规范.md (via <document> tag) and attached P2-记忆翻牌.md via @-mention, asking '如果要开始制作，是否有需要补充的内容，是否有阻碍点'. Agent: (1) respond_to_user. (2) Read P2-记忆翻牌.md. (3) Read AI开发规范.md. (4) respond_to_user. (5) Task SA — explored scripts/ game structure, confirmed existing P1 implementation and available infrastructure for P2. (6) Read 架构决策记录.md. (7) respond_to_user — structured gap analysis for P2 development readiness. Variant: two user-attached docs (design spec + dev guidelines) + Task SA for infra exploration + ADR proactive read. Matches 11e7ed86 T01 structure.",
+      "session_count": 8
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_current_impl_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "target:ui_layout",
+      "target:game_logic",
+      "target:build_config",
+      "current_state_question",
+      "feature_existence_check",
+      "no_attached_doc",
+      "cn_keywords:shifou,youmeiyou,shixian,xianzai,dangqian,shidou,jizhi,tanchu,chujian,peizhi,kaiguan,shebei",
+      "game_mechanic_trigger_question"
+    ],
+    "preconditions": [
+      "用户询问某个功能/机制当前是否已实现、实现程度如何（如「现在是否有自适应」「当前 UI 缩放是基于什么」「通关后是否有弹窗」）。",
+      "提问不附带设计文档，也不要求立即修改代码，纯粹是在了解现状。",
+      "需要读取代码才能准确回答，仅凭对话历史无法得出结论。"
+    ],
+    "strategy": [
+      "不要凭假设直接回答。对于简单的存在性问题（「是否有弹窗」「是否有某功能」），直接派发 Task 子代理搜索相关代码（指定关键词：触发条件名、弹窗函数名、特定页面路径等）；对于复杂状态评估，先用 Glob 扫描项目结构再多维搜索。",
+      "等子代理返回后，读取几个关键文件（布局常量文件、主 adapter 文件、关键入口文件），验证子代理结论并补充具体数值或代码实例。",
+      "以结构化格式输出审计结论：① 已有的适配/支持部分（列举具体机制）；② 未覆盖的部分（列举盲区）；③ 总体评估（「已部分实现」「尚未实现」「已完整实现」）。",
+      "如果用户的问题是 yes/no 型（「是否已实现」），在结构化结论之外先给出一句直接的 yes/no 总结。",
+      "不要主动建议实现方案（除非用户紧接着询问如何改），保持回答聚焦在「现状描述」而非「方案设计」。"
+    ],
+    "constraints": {
+      "no_code_edits": true,
+      "must_read_code_before_answering": true,
+      "answer_must_cite_specific_files_or_values": true
+    },
+    "validation": [
+      "回答中引用了具体文件名、函数名或常量值，而非泛泛描述",
+      "已有和未有的部分均明确列出",
+      "未在无代码依据的情况下给出「有」或「没有」的结论"
+    ],
+    "title_zh": "当前实现状态审计：先探索代码再结构化回答",
+    "title_en": "Current Implementation Status Audit — Explore-First Structured Answer",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "08e306a0",
+        "44926b0f",
+        "5dbc4646",
+        "9bbd20cc",
+        "d8f96672",
+        "e948a3d9"
+      ],
+      "session_count": 6,
+      "turn_range": "08e306a0:T01, 44926b0f:T01, 5dbc4646:T1, 9bbd20cc:T07, d8f96672:T16-T17, e948a3d9:T2",
+      "prompt_indices": [
+        0,
+        0,
+        0
+      ],
+      "evidence": "08e306a0 T01 (9 steps): user asked 现在UI是否有自适应 (does current UI have adaptive/responsive behavior?). Agent: (1) Glob scripts/**/*.lua to get project structure. (2) Glob .project/settings.json. (3) Read layout.lua (layout constants). (4) Read main.lua (entry). (5) Task subagent SA acabb62 searched for UIScaler, getWidth/getHeight, dpr/DPR, and board-renderer patterns. (6) Agent synthesized results: output structured assessment — ✓ DPR adaptation (all NanoVG uses Mode B), ✓ touch input DPR conversion, ✗ no layout constants scaling (fixed px values like TITLE_FONT_SIZE=38), ✗ no screen-size-aware game board sizing. Pattern: inquiry about current state → Glob project structure → Explore subagent → read key files → structured present/absent breakdown with specific values cited. | 44926b0f T01 (3 steps): user asked '现在在通关第四关后，是否有弹窗提示，可以进入自由模式' (simple yes/no feature existence question). Agent: (1) respond_to_user — declared intent to check code. (2) Task subagent — searched /workspace/scripts/ for level-4 completion logic and popup trigger. (3) respond_to_user — confirmed: yes, popup exists, described the code flow in adventure page that triggers the free-mode unlock dialog. Pattern (simplified variant): yes/no feature trigger question → respond_to_user (will check) → Task search subagent → answer with code path confirmation. No Glob, no direct file reads by main agent — Task subagent handles all discovery. 3 steps vs 9 steps in 08e306a0. Use this simpler variant when the question is binary (exists/not) about a specific named trigger condition rather than asking about system-wide coverage or degree of implementation. | 5dbc4646 T1 (3 steps, 0 edits): user asked 自由模式，记忆翻牌，不同关卡的卡牌数量是怎样的 (how many cards per level in free-mode memory-flip?). Agent: (1) respond_to_user. (2) Task Explore subagent — searched /workspace/scripts/games/p2-memory-flip/ for level data + free mode config. (3) respond_to_user — reported card counts per level range from levels.lua. Simplified variant matching 44926b0f: game-specific factual inquiry + no Glob/direct reads by main agent + 1 Task SA handles all discovery + 3 total steps. | 9bbd20cc T07 (3 steps, 0 edits): user asks '检查 推箱子、翻牌。目前通关进度是否有保存'. Agent: (1) Task SA1 — read P1-推箱子 save-related code in p1-puzzle-land/ (save.lua, clientCloud usage, progress key format). (2) Task SA2 — read P2-记忆翻牌 save-related code in p2-memory-flip/ (save.lua, same). (3) respond_to_user — structured yes/yes answer with specific file citations and save mechanism description for both games. Multi-game parallel-SAs variant: 2 simultaneous Task subagents each auditing one game's save system. No main-agent file reads — all discovery delegated to subagents. Precedes T08-T09 chain (local→cloud save migration) — this turn is the discovery inquiry that sets up the migration request. | d8f96672 T16 (no agent run) + T17 (1 step, respond_to_user): '现在的游戏，是否有做分辨率适配' (T16, no agent run — user immediately re-sent) → '现在的游戏，是否有做分辨率自适应' (T17). Agent processed only T17 with a single respond_to_user step — answered from session context with no file reads. Duplicate-rephrase consecutive inquiry variant: user sends a vague inquiry, then immediately re-sends with a slightly different phrasing before the agent responds. Agent processes only the second turn and answers from existing session knowledge (no Glob, no Task SA, no file reads) because the relevant code was already visible in session context. Contrast with 08e306a0 T01 (9 steps, full Glob+Explore+Read) where resolution adaptation was a fresh inquiry at session start with no prior context. | e948a3d9 T2 (16 steps, 0 edits): user asked '现在配置中，是否有测试设置，当前游戏是否是未成年人的开关' (Does the current config have test settings? Is there an underage/minor mode switch for the game?). Agent: (1) respond_to_user — acknowledged. (2-3) Glob .project/**/*.json and scripts/**/*.lua to survey project structure. (4-6) mcp__mkr__Read settings.json, project.json, and game-config-schema. (7) respond_to_user (interim). (8) Grep for '未成年|minor|child|age|isMinor|kid|青少年|儿童' across workspace. (9) Grep with extended terms including 'test|debug'. (10-15) mcp__mkr__Read play-time-guard.lua, health-advice component, settings component, anti-addiction.lua, settings-save.lua, feature-flags.lua. (16) respond_to_user — full answer. Target variant: build_config. Pattern: yes/no feature-existence question about config/feature-flags → Glob structure survey → Read config files → Grep for feature keywords → Read specific feature-related files → structured factual answer citing specific files and their content."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_new_system_feasibility",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "intent:planning_design",
+      "new_system_proposed",
+      "no_attached_doc",
+      "feasibility_question",
+      "architecture_exploration_needed",
+      "cn_keywords:shifoukeyi,kexing,shifoupanduan,ruhe,shifou,zengjia,xinxitong"
+    ],
+    "preconditions": [
+      "用户提出了一个尚未开始实现的新功能/新系统构想（如「增加主线剧情」「添加角色成长系统」），并询问「是否可行」或「如何实现」，而非直接要求开始实现。",
+      "提问不附带设计文档，用户描述的是目标效果（「主页显示主角形象」「游戏随主线解锁」），而非实现路径。",
+      "回答需要基于对现有代码架构（路由、数据存储、模块结构）的理解，仅凭通用知识无法给出有依据的可行性判断。"
+    ],
+    "strategy": [
+      "不要仅凭通用知识直接给出可行性判断。先派发 Explore/Task 子代理，让其全面扫描当前项目架构：路由系统、游戏注册机制、存档系统、UI 框架、入口页面等。",
+      "等子代理返回后，对照用户描述的功能目标，逐一分析现有架构对哪些方面已有天然支持（「可直接利用」）、哪些需要新增（「需要新建」）、哪些有潜在风险（「需要确认」）。",
+      "以结构化格式输出可行性判断：① 总体结论（「完全可行」/「部分可行，有障碍」/「较难，建议调整方案」）；② 已就绪的基础设施（具体列举可复用的模块/机制）；③ 需要新增的模块或改动；④ 技术风险或待定项。",
+      "结尾给出一个推荐的下一步行动（如「建议先生成设计文档」），而非停留在可行性分析层面。",
+      "不要主动启动实现——用户的提问是判断，不是开工指令。"
+    ],
+    "constraints": {
+      "no_code_edits": true,
+      "must_explore_architecture_before_answering": true,
+      "answer_must_be_architecture_grounded": true
+    },
+    "validation": [
+      "可行性结论中引用了具体的现有模块名（如 router.lua、game-registry、clientCloud）",
+      "对「需要新增」的部分给出了足够具体的说明",
+      "未在用户未要求的情况下开始修改任何代码文件",
+      "结尾有明确的推荐下一步"
+    ],
+    "title_zh": "新系统构想可行性判断：探索架构后结构化分析",
+    "title_en": "New System Feasibility Check — Architecture-Grounded Structured Analysis",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "0997e370"
+      ],
+      "session_count": 1,
+      "turn_range": "0997e370:T01",
+      "prompt_indices": [
+        0
+      ],
+      "evidence": "0997e370 T01 (3 steps): user proposed wrapping the 4-game lobby with a main storyline (protagonist character page + progressive game unlocking) and asked '先判定一下这样做，是否可行'. Agent: (1) respond_to_user — declared 'let me check the code first'. (2) Task subagent — Explore /workspace/scripts/: mapped 82 files, identified router (replace/push/pop), game registry (config/games/*.lua), save system (clientCloud). (3) respond_to_user — structured feasibility: '完全可行，且现有架构天然支持' + breakdown: router supports multi-page nav (add new main storyline route), game registry has per-game config (add unlock flag), save system tracks per-game progress (reuse). Pattern: new system idea + '是否可行' → Explore subagent maps architecture → structured feasibility (ready vs. to-add) → recommended next step ('建议先生成设计文档')."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_pre_impl_blocker_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "follows_planning_design_session",
+      "no_attached_doc",
+      "pre_implementation_readiness",
+      "technical_dependency_check",
+      "design_doc_already_exists",
+      "cn_keywords:shifou,zudian,chongtu,keyi,kaishi,zhizuo,wenti,fengxian",
+      "iterative_post_revision_re_audit"
+    ],
+    "preconditions": [
+      "当前 session 已完成了规划阶段（设计文档已生成或确认），用户准备进入实现阶段，询问「是否有阻碍」或「有什么需要提前解决的」。",
+      "提问不附带新文档，而是基于本 session 已有的设计文档或代码库状态发问。",
+      "判断是否有阻碍需要检查技术依赖项（现有数据格式、API 接口、存档结构、引擎能力等），仅凭设计文档无法得出结论。"
+    ],
+    "strategy": [
+      "读取本 session 已生成的设计文档，梳理实现目标和各子系统的依赖关系。",
+      "若当前 session 已多次阅读过相关基础设施文件（SDK、组件库、存档模块等），也可直接 Read 关键基础设施文件（生命周期 SDK、暂停菜单组件、存档模块、布局常量、游戏容器等），逐项验证设计文档中各子系统的可落地性，不必为每个依赖单独派发子代理——仅在依赖项跨多个游戏/涉及未知集成点时再使用子代理。",
+      "识别需要跨游戏/跨模块的集成点，对每个集成点单独派发 Task 子代理进行定向技术审计——不要用一个大子代理同时调查多个独立依赖，分开以便结果清晰。",
+      "等子代理返回后，以「阻碍/无阻碍」两栏输出结论，每项包含：问题描述、当前状态（已就绪/需适配/需新建）。",
+      "明确区分「真正的阻碍」（不解决就无法推进的技术依赖）和「待定事项」（可以先做再回来处理的低优先级问题）。",
+      "给出一个推荐的开始顺序：哪些模块可以并行先行，哪些需要串行依赖前序完成。"
+    ],
+    "constraints": {
+      "no_code_edits": true,
+      "dispatch_separate_subagents_per_dependency": true,
+      "output_must_separate_blockers_from_ambiguities": true
+    },
+    "validation": [
+      "阻碍分析中的每个技术依赖项均有子代理实际审计结果支撑，而非假设",
+      "区分了「阻碍」和「待定项」两类",
+      "给出了明确的推荐开始顺序"
+    ],
+    "title_zh": "实施前技术阻碍审计：子代理定向调查各依赖项",
+    "title_en": "Pre-Implementation Blocker Audit — Subagent-Driven Technical Dependency Check",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "0997e370",
+        "11e7ed86"
+      ],
+      "session_count": 2,
+      "turn_range": "0997e370:T06, 11e7ed86:T03",
+      "prompt_indices": [
+        5,
+        2
+      ],
+      "evidence": "0997e370 T06 (9 steps): after T01-T05 produced feasibility analysis + design docs + character assets, user asked '如果要开始制作，是否有阻碍'. Agent: (1) Read 策划案-主线系统.md + 总体进度.md + p4 game config. (2) Task SA1 — audit save system for all 4 games (key name, data structure, clientCloud usage). (3) Task SA2 — audit level ID formats across all 4 games. (4) Structured blocker answer: NO blockers for character assets (generated), design docs (ready), architecture (ADR written); PENDING: save system migration (adapt progress tracking to unified main-storyline format), level ID mapping (confirmed format per game). Pattern: post-planning + '是否有阻碍' → read design docs → dispatch separate subagents per technical dependency → structured blocker/no-blocker analysis with recommended start order. | 11e7ed86 T03 (17 steps): after T01 reviewed P2-记忆翻牌.md and T02 applied doc fixes, user asked '是否有需要补充和完善的地方，是否有阻碍点'. Agent: (1) Read P2-记忆翻牌.md (revised v1.2). (2) Read p1-puzzle-land/save.lua (reference save format). (3) Read pause-menu.lua (component exists). (4) Read game-lifecycle/init.lua (SDK lifecycle hooks). (5) Read colors.lua + layout.lua (shared constants). (6) Read game-container/init.lua (container API). (7) Read screen-transition.lua (transition component). (8) Re-read P2-记忆翻牌.md + pause-menu.lua + save.lua + adapter.lua + screen-transition.lua. (9) Structured readiness report: all infrastructure verified available (save format matches, pause menu component reusable, lifecycle SDK covers all events, game container handles transitions) — no blockers. Variant: direct code reading (10 infra files) without subagents, triggered after doc revision rounds."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_full_product_readiness_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "open_ended_product_review",
+      "no_attached_doc",
+      "no_specific_target_artifact",
+      "full_game_assessment",
+      "launch_readiness_question",
+      "cn_keywords:tuichu,wanzheng,wenti,weitian,yousheme,gaiyin,ruhe,chajian,queshi"
+    ],
+    "preconditions": [
+      "用户提出开放性问题，评估当前游戏作为完整产品发布时存在的问题（如「如果作为完整游戏推出，有什么问题」「现在的游戏还缺什么」）。",
+      "问题没有附带自查清单或具体检查维度，也没有指定目标功能或文件——用户期望 AI 自行识别问题维度。",
+      "这是一次整体产品成熟度评估，而非对某单一功能的现状调查。"
+    ],
+    "strategy": [
+      "声明将全面审查项目后再作答，然后派发多个 Task 子代理，每个子代理负责读取项目的不同层面：项目结构总览、设计文档与进度文档、核心游戏逻辑文件（adapter/logic）、游戏数据文件（levels/save）、UI 与 HUD 细节、结算弹窗与交互流程。",
+      "子代理之间可按逻辑顺序依次执行（先结构 → 再文档 → 再游戏文件），也可并行发送；每个子代理只负责读取和汇报，不执行修改。",
+      "等所有子代理返回后，从产品角度（而非纯技术角度）综合识别问题：内容完整性（关卡数量、难度曲线）、功能完整性（暂停、结算、保存等核心流程）、体验质量（UI 一致性、中文文本规范、合规要求）、技术稳定性（已知 bug、状态仍为 dev 的配置项）。",
+      "按优先级分层输出问题清单（P0 阻断发布 / P1 强烈建议修复 / P2 可选优化），每条问题附具体表现和影响范围（文件或页面）。",
+      "最后给出一个总体评估（「基本可发布」「需先修复若干问题」），并推荐修复优先级顺序。"
+    ],
+    "constraints": {
+      "no_code_edits": true,
+      "must_read_all_major_dimensions": true,
+      "output_must_be_priority_tiered": true
+    },
+    "validation": [
+      "审查维度涵盖了内容、功能、体验、技术等多个产品层面",
+      "每个问题都有具体文件名或功能位置引用",
+      "按优先级分层，而非平铺式列表",
+      "最终给出总体评估结论和推荐修复顺序",
+      "未修改任何代码文件"
+    ],
+    "title_zh": "完整游戏产品就绪性审查：全维度读取后分层问题报告",
+    "title_en": "Full-Game Product Readiness Audit — Multi-Subagent Read-All, Priority-Tiered Issue Report",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "24a716d1"
+      ],
+      "session_count": 1,
+      "turn_range": "24a716d1:T00",
+      "prompt_indices": [
+        0
+      ],
+      "evidence": "24a716d1 T00 (10 steps, 0 edits): user asked '当前的游戏，如果作为一个完整游戏推出，有什么问题'. No checklist, no attached doc, no specific target. Agent: (1) respond_to_user — announced comprehensive review. (2) Task SA1 'Explore game project structure'. (3) respond_to_user. (4) Task SA2 'Read project docs and progress' — 6 design/progress docs. (5) Task SA3 'Read key game files for review' — 5 core game files. (6) Task SA4 'Read game adapters and saves' — 9 adapter/save files. (7) respond_to_user. (8) Task SA5 'Read gameplay and UI details' — 9 gameplay/UI files. (9) Task SA6 'Read result popups and HUDs' — 8 result/HUD files. (10) respond_to_user — structured report. Pattern: open-ended 'what issues if released?' → 5 sequential Task SAs covering structure/docs/logic/adapters/UI/results → holistic product-quality analysis → priority-tiered issue list. Distinct from gene_ir_checklist_guided_parallel_audit (requires attached checklist) and gene_inq_current_impl_audit (targets single feature). Agent self-derives dimensions from full-project read."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_dev_progress_next_task",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "intent:inquiry",
+      "no_attached_doc",
+      "compound_audit_plus_recommend",
+      "project_completion_gap_query",
+      "next_step_question",
+      "cn_keywords:jiancha,wendang,jiexiazuoshenme,jierla_zuoshenme,xiayibu"
+    ],
+    "preconditions": [
+      "用户发出「检查文档/项目」+「接下来做什么/应该做什么」的复合式指令，同时包含现状核查和下一步任务推荐两个诉求。",
+      "问题不附带具体设计文档或检查清单，是面向整体项目开发进度的开放性询问。",
+      "项目尚处于开发中期，存在已完成模块和待实现模块的混合状态（即部分游戏/功能有代码，部分只有配置或完全缺失）。"
+    ],
+    "strategy": [
+      "不要仅停留在「检查文档」字面义——「接下来应该做什么」意味着需要全面了解项目实施状态，要对整个代码库（代码 + 配置 + 文档）进行扫描，而不只读 docs/ 目录。",
+      "先用 Bash ls + Glob scripts/**/*.lua 建立代码库地图，统计文件总量、模块结构和总行数，快速判断项目规模。",
+      "派发 Task 子代理深入读取各游戏/模块的关键文件（config/*.lua、adapter.lua、init.lua），按「已完成可上线」「有配置无代码」「完全缺失」三种状态分类各模块。同时识别非代码资产的缺失（图标、截图、音效等）。",
+      "以结构化进度矩阵形式输出审计结果：逐模块列出实现状态（已完成/部分实现/仅配置/缺失），明确标注缺失的资产类型和影响范围。",
+      "基于矩阵分析，给出优先级排序的下一步任务推荐：哪些最紧迫（直接影响发布的缺口）、哪些是独立任务（可并行推进）、哪些是基础依赖（必须先做）。"
+    ],
+    "constraints": {
+      "no_code_edits": true,
+      "scope_must_cover_code_not_just_docs": true
+    },
+    "validation": [
+      "审计结果覆盖了代码层面（各游戏/模块实现状态），而非仅对文档进行摘要",
+      "输出包含每个模块的具体状态分类（而非笼统「项目进行中」），并标注了缺失内容",
+      "推荐任务按优先级排序，有依据说明（而非笼统「继续开发」）",
+      "未修改任何代码或文档文件"
+    ],
+    "title_zh": "开发进度盘点：全项目扫描后推荐下一步任务",
+    "title_en": "Development Progress Audit — Full Project Scan to Recommend Next Task",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "2bc63c91"
+      ],
+      "session_count": 1,
+      "turn_range": "2bc63c91:T00",
+      "prompt_indices": [
+        0
+      ],
+      "evidence": "2bc63c91 T00 (10 main steps + 38 subagent steps, 0 edits, 161s): user said '检查文档，接下来应该做什么'. Single-prompt session. Agent: (1) respond_to_user (thinking: check project state first). (2) Bash ls /workspace/scripts + /workspace/assets + cat project.json. (3) Glob scripts/**/*.lua. (4) respond_to_user. (5) Read main.lua. (6) Bash cat project.json + settings.json. (7) Bash: wc -l on all lua files → 33 files, 7386 total lines. (8) respond_to_user (thinking: understand module status). (9) Task subagent (38 steps): Bash ls tree → Read 18 key files (main.lua, router.lua, game-registry, game-container, home/init.lua, game/init.lua, p1 adapter+config, demo-color-match adapter+config, all 4 game configs, game-card, pause-menu, colors, layout, board, gameplay, levels.lua) → respond_to_user with comprehensive architecture summary. (10) respond_to_user — structured status matrix: 平台框架=已完成, p1-puzzle-land=已完成可上线, demo-color-match=已完成开发阶段, demo-number-puzzle=仅有配置无代码, demo-memory-flip=仅有配置无代码, 发布资源=全部缺失. Plus prioritized next-task recommendations. Pattern: compound '检查文档+接下来做什么' → Bash+Glob code map → Task subagent reads 18+ files → implementation status matrix per module (done/config-only/missing) → prioritized next task list. Key insight: agent expanded '检查文档' to full codebase scan because '接下来做什么' requires understanding complete implementation state, not just doc contents."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_checklist_guided_parallel_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "has_attached_doc",
+      "compliance_checklist_attached",
+      "pre_launch_review",
+      "multi_dimension_check",
+      "priority_tiered_output",
+      "cn_keywords:jiancha,zizha,zhidao,wenti,xiugai,yingxiang,chali",
+      "save_to_new_doc_requested"
+    ],
+    "preconditions": [
+      "用户通过 @文件名 或 file:/// 路径附加了一份「自查方向指南」或「检查清单」类文档，要求对游戏项目进行全面检查。",
+      "用户的提问是「检查游戏是否有需要修改的内容」，而非针对某个具体功能或代码文件，检查范围是整个项目。",
+      "检查范围横跨多个独立维度（合规政策、文本规范、数值一致性、结构逻辑、音画性能等），无法通过单次读取几个文件完成，需要多专项并行调查。"
+    ],
+    "strategy": [
+      "使用 Read/mcp__mkr__Read 读取自查指南文档全文，按文档中列出的检查维度，用 TodoWrite 建立对应的审计任务清单（每个维度一条 todo）。",
+      "先用 Glob 获取项目整体文件结构，再派发一个 Explore 子代理了解项目架构（入口、页面结构、游戏模块、配置文件位置等），作为后续专项子代理的基础上下文。",
+      "按检查维度并行派发多个专项 Task 子代理，每个子代理负责一个独立维度（如合规政策、文本规范、数值一致性、结构逻辑、音画性能）；每个子代理的 prompt 应指定：要检查哪些具体文件、用什么检查方法（Grep 特定模式、Read 指定文件对比内容、搜索特定关键词等），避免子代理自由发挥。",
+      "等所有子代理返回后，汇总各维度发现，按严重程度分层输出报告：P0（阻断上架/必须修复）→ P1（高优先级）→ P2（中优先级）→ P3（待确认/建议项）。",
+      "报告格式使用表格：每行包含序号、维度类别、问题描述、具体位置（文件名/函数名/行内容）。",
+      "末尾给出简洁摘要：P0/P1/P2/P3 各几条，最紧迫的是什么，建议优先处理顺序。"
+    ],
+    "constraints": {
+      "must_read_guide_first": true,
+      "parallel_subagents_per_dimension": true,
+      "no_code_edits": true,
+      "output_format": "priority_tiered_issue_table"
+    },
+    "validation": [
+      "输出的问题按 P0/P1/P2/P3 分层，而非平铺式列表",
+      "每个问题有具体文件/位置引用，而非泛泛描述",
+      "各检查维度均已覆盖（与自查指南中的维度数量对应）",
+      "末尾有各优先级问题数量的汇总摘要",
+      "未修改任何代码文件"
+    ],
+    "title_zh": "自查指南驱动的多维度并行游戏审计",
+    "title_en": "Checklist-Guide-Driven Parallel Multi-Dimension Game Audit",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "0ea2a577",
+        "762afe73"
+      ],
+      "session_count": 2,
+      "turn_range": "0ea2a577:T00-T01 | 762afe73:T00",
+      "prompt_indices": [
+        0,
+        0
+      ],
+      "evidence": "0ea2a577 T01 (20 steps): user attached 游戏自查方向指南.md via @-mention and asked '检查游戏是否有需要修改的内容'. Agent: (1) mcp__mkr__Read — read self-check guide. (2) Glob — project structure. (3) respond_to_user — 'large project, need systematic check'. (4) TodoWrite — 7 audit dimensions: 项目结构和核心配置、合规政策（健康游戏忠告/适龄提示/防沉迷）、文本规范（标点/语言一致性）、数值文案一致性（配置参数 vs 文案描述）、结构逻辑一致性（章节/里程碑/解锁链）、用户体验与交互、音画与性能。 (5) Task SA1 — Explore project structure. (6-10) 5 parallel Task subagents: SA2 checked compliance (health advisory text completeness, age rating, anti-addiction SDK); SA3 checked text norms (ASCII punctuation, English text residuals); SA4 checked numeric/text consistency (config values vs. copy descriptions); SA5 checked story/level structure and unlock chain consistency; SA6 checked BGM/font memory leaks (nvgCreateFont in render loops). (11) respond_to_user — structured P0/P1/P2/P3 report: 5 P0 (mainly anti-addiction formal SDK not integrated, health advisory non-compliant text), 3 P1, 14 P2 (84 ASCII '!' instances, 24 six-dot ellipsis, text inconsistencies), 4 P3. Pattern: attach checklist guide + broad review request → read guide → Glob + Explore subagent for structure → TodoWrite dimensions → 5 parallel specialist subagents → P0/P1/P2/P3 priority-tiered report with location-specific details. | 762afe73 T00 (11 steps): user attached 自查清单.md via @-mention and asked '根据自查清单检查游戏，将检查到的问题，保存为一个新的文档，后续统一修复'. Agent: (1) Read self-check guide. (2) Glob project structure. (3) 8 parallel Task subagents per checklist dimension (compliance, text norms, numeric consistency, level structure, chapter logic, UX, audio/visual, code quality). (4) Write 自查问题报告.md — structured report with P0/P1/P2 sections, numbered issues (1.1–4.4), summary table, and changelog table. Variant: 'save to new doc' suffix → output is a Write of 自查问题报告.md rather than a respond_to_user inline report. The doc becomes the reference artifact for all subsequent fix turns."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_issue_report_sequential_triage",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "has_attached_doc",
+      "target:documentation",
+      "existing_issue_report_attached",
+      "issue_status_check",
+      "feasibility_triage_needed",
+      "external_dependency_blocker",
+      "cn_keywords:zifanbaogao,jiancha,wenti,keyi_xiugai,buke_xiugai"
+    ],
+    "preconditions": [
+      "用户通过 @文件名 或 file:/// 附加了一份已有的自查问题报告（包含已发现问题列表及其当前修复状态，如「自查问题报告.md」），而非设计文档或检查指南。",
+      "用户询问「有什么需要修改的」或「检查一下需要修改的内容」，期望 AI 识别哪些开放问题可以修复、哪些存在外部依赖阻碍。",
+      "问题报告中通常混有「需要外部 SDK / 服务端配合」的阻碍性问题（如防沉迷 SDK 接入）和「代码层面可直接修复」的问题（如文字样式、布局调整）。",
+      "本轮目的是纯分析，不做任何代码修改——输出结果供下一轮「修复 X.X」terse 指令使用。"
+    ],
+    "strategy": [
+      "完整读取附加的问题报告，梳理所有「未修复」或「待确认」状态的问题编号及描述。",
+      "用 TodoWrite 列出所有待评估的问题项，每项写清问题编号和关键词。",
+      "针对每个开放问题，定向读取相关源文件（如 result-popup.lua、adventure/init.lua），确认当前代码状态与问题描述是否一致。",
+      "对于需要外部依赖（SDK、服务接口、第三方库）的问题，用 Glob/Grep 验证相关模块是否已存在；若不存在则标记为「不可修复」，说明具体阻碍和建议（如「等待防沉迷 SDK 接入文档」）。",
+      "输出结构化的可行性分析：✓ 可修复（列明文件路径和修改点）、✗ 不可修复（列明阻碍原因）、⚠️ 待确认（需要额外信息）。",
+      "本轮不写任何代码修改——纯分析输出，为用户下一轮「修复 X.X」terse 指令提供精准上下文。"
+    ],
+    "constraints": {
+      "no_code_edits_in_this_turn": true,
+      "must_read_source_per_open_issue": true
+    },
+    "validation": [
+      "报告中每个开放问题均有明确的可行性结论（可修复/不可修复/待确认）",
+      "可修复问题列明了具体文件路径和修改方式",
+      "不可修复问题说明了具体阻碍（非笼统表述），并给出后续建议",
+      "本轮 edits=0，纯信息输出"
+    ],
+    "title_zh": "自查问题报告逐项可行性审查：逐文件验证后输出修复分层",
+    "title_en": "Issue Report Sequential Triage — Per-File Verification with Can-Fix/Cannot-Fix Stratification",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "4463c53b"
+      ],
+      "turn_range": "4463c53b:T01",
+      "prompt_indices": [
+        0
+      ],
+      "evidence": "4463c53b T01 (16 steps, 0 edits, 0 builds): user attached 自查问题报告.md via file:// link and asked '检查是否有内容需要修改的'. Agent: (1) respond_to_user — 'let me read the report'. (2) Read 自查问题报告.md (full doc with open issues). (3) respond_to_user — summarized open issues found: 1.3 (防沉迷 SDK), 3.x (profile page), 5.3 (result popup title shadow), 5.4 (adventure type label shadow). (4) TodoWrite — list each open issue as evaluation task. (5) Read outfit-manager.lua (for skin-related issue). (6) Read result-popup.lua (for issue 5.3 popup title). (7) Read adventure/init.lua (for issue 5.4 type label). (8) Read profile/init.lua (for profile-related issues). (9) respond_to_user — 'checking outfit-unlock-popup existence and health advisory pay text'. (10) Glob scripts/shared/components/outfit-unlock-* (verify if component exists). (11) Grep '付费|充值|购买|消费' (check health advisory pay content). (12) Read outfit-unlock-popup.lua. (13) Read health-advisory.lua. (14) respond_to_user — building analysis. (15) TodoWrite (update task statuses). (16) respond_to_user — structured triage: 1.3 [✗ 不可修复] needs external SDK, no workaround; 5.3 [✓ 可修复] add text-shadow in result-popup.lua; 5.4 [✓ 可修复] add text-shadow in adventure/init.lua; others [⚠️/✓]. Zero code edits. Output sets context for T02 '修复5.3,5.4' (3 edits, 1 build). Pattern: attached issue report + '有什么需要修改' → read report → TodoWrite per issue → sequential source file reads → external-dep check via Glob/Grep → structured triage → zero edits.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_fix_proposal_logic_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "has_attached_doc",
+      "target:documentation",
+      "fix_proposals_in_doc",
+      "proposal_correctness_question",
+      "code_verification_needed",
+      "data_accuracy_plus_logic_check",
+      "cn_keywords:xiufufangan,shifou_youwen,fangxiang,fangan_zhengque,jiancha_xiufufangan"
+    ],
+    "preconditions": [
+      "用户通过 @文件名 或 file:/// 路径附加了一份包含「问题分析 + 修复方案」的报告文档——文档中既有已识别的问题（问题现象、数据引用），也有具体的修复策略（如「调整参数 X → Y」「增加/删除某元素」）。",
+      "用户提问聚焦于修复方案本身的正确性（典型措辞：「这些修复方案是否有问题」），而非询问「有什么问题需要修复」。",
+      "判断修复方案是否正确需要双重验证：① 数据层核实（报告引用的当前值是否与实际代码/配置一致）；② 逻辑层审查（修复方向是否与问题描述的目标一致，是否存在方向反转）。"
+    ],
+    "strategy": [
+      "respond_to_user — 声明将先阅读文档再核实数据（避免基于摘要回答）。",
+      "Read 附加文档 — 理解所有问题描述、当前值引用和每条修复方案的具体策略。",
+      "respond_to_user — 声明将核实文档中的数据声明是否与代码一致。",
+      "Task SA — 读取报告中引用的实际代码/配置文件，逐一核实引用值是否准确（不要凭记忆或推断）。",
+      "respond_to_user — 输出两层结构化审查结果：① 数据核实状态（各引用值是否准确）；② 每条修复方案的逻辑审查，重点识别「修复方向与问题目标矛盾」——如问题描述目标是「降低难度」，但方案实际进一步提升难度。",
+      "对每条有问题的修复方案给出正确的修正方向建议；不在本 turn 直接修改文档（等待用户确认后再修改）。"
+    ],
+    "constraints": {
+      "no_code_edits_in_audit_turn": true,
+      "no_doc_edits_in_audit_turn": true,
+      "must_verify_via_subagent": true
+    },
+    "validation": [
+      "审查结果明确区分了「数据核实」和「逻辑审查」两个维度",
+      "Task SA 实际读取了报告引用的代码/配置文件（非凭记忆作答）",
+      "每条有问题的修复方案都识别了具体的矛盾点并提供了修正方向",
+      "本 turn 未对文档或代码做任何修改（修改推迟到用户确认后的下一 turn）"
+    ],
+    "title_zh": "修复方案逻辑正确性审查：数据核实 + 修复方向合理性双重验证",
+    "title_en": "Fix Proposal Logic Audit — Two-Pass Verification of Data Accuracy and Fix Direction",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "4807e6ed"
+      ],
+      "turn_range": "4807e6ed:T01",
+      "prompt_indices": [
+        0
+      ],
+      "evidence": "4807e6ed T01 (5 steps): user attached 主线关卡一致性问题报告.md via file:// link and asked '检查这些修复方案是否有问题'. The doc contained both: problem analysis (3 issues with data tables showing timeLimit/targetScore/starScore values across 35 story-mode levels) and specific fix proposals (e.g. 'reduce story-11 timeLimit 80→75s and story-15 80→70s' for Problem 1: 三连平难度曲线). Agent: (1) respond_to_user — will read doc first. (2) Read 主线关卡一致性问题报告.md — understood all 3 issues plus their proposed fixes. (3) respond_to_user — will verify code claims. (4) Task SA — read story-6.lua, story-11.lua, story-15.lua, story-19.lua, story-24.lua, story-32.lua config files; verify all referenced timeLimit/targetScore/starScore/dialogue values against actual code. SA result: all data claims accurate. (5) respond_to_user — structured audit: data all correct; BUT Problem 1 fix direction is REVERSED — problem goal is to ease difficulty curve (score rises but time is flat), proposed fix REDUCES time 80→75→70s (makes it harder), correct fix should INCREASE time or DECREASE score; identified 5 other correction points across 6 total fix proposals (missing combo analysis, level-35 score citation gap, level-18 text should keep '记忆力' not change to '眼力', level-24 suggestion overly verbose, level-32 scope too broad). Pattern: attached fix-proposal report + '修复方案是否有问题' → Read doc → Task SA verifies referenced config values → reasoning audit of each fix's logical direction → 2-layer structured report (data accuracy + direction/logic issues). Session note: 2-prompt session; pattern deemed distinctive because it audits PROPOSED SOLUTIONS rather than identifying problems, requiring code verification combined with logical contradiction detection.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_single_doc_quality_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "has_attached_doc",
+      "single_doc_attached",
+      "target:documentation",
+      "doc_quality_question",
+      "issues_existence_check",
+      "no_implementation_question",
+      "glob_project_context_discovery",
+      "cn_keywords:jiancha,shifou_you_wenti,you_wenti_ma,wenzhang,guifan,wenti",
+      "cross_doc_reference_requested",
+      "cn_keywords:genju_qita_wendang,jianchayoumei,youhua"
+    ],
+    "preconditions": [
+      "用户通过 @文件名 或 file:/// 路径附加了一份文档（规范文档、设计文档、方案文档等），并询问「是否有问题」或「检查一下是否有问题」——聚焦于文档本身的质量，而非对实现可行性的评估。",
+      "用户的提问不包含「能否开始制作」「是否有阻碍点」等实施就绪性问题——这是对文档质量/完整性/一致性的独立审查。",
+      "代码库当前状态与该文档的关联可能需要探索（如文档中的目录结构是否存在，规范中引用的文件是否真实存在），但用户没有提供任何额外上下文。",
+      "（变体）用户明确要求「根据其他文档检查」——此时跨文档一致性是主要目标，代理应直接 Read 相关项目文档进行内容比对，而非仅用 Glob 验证路径存在性。"
+    ],
+    "strategy": [
+      "首先使用 Read 读取附加文档的全文，不要分段或跳读。",
+      "使用 Glob 探索项目相关目录（如 `docs/**/*.md`、`scripts/config/**/*.lua`、`scripts/tests/**/*`），确认文档中引用的文件路径/目录结构是否真实存在于项目中——这有助于发现文档与实际代码不一致的地方。",
+      "读取项目的文档维护规范（如 `docs/文档维护规范.md`），确认文档的格式是否符合项目约定（如版本号、更新日期、文件注册等）。",
+      "输出结构化审查报告：① 【无问题项】列出已正确定义、格式符合规范的内容；② 【发现的问题】按类型（逻辑矛盾、路径不存在、格式不符、内容缺失）分类列出，每项指明具体位置（章节/行）和问题描述。",
+      "不在本 turn 修改任何文件——审查结果输出后等待用户的下一步指令（通常是「修复」或「生成推荐方案」）。",
+      "（变体 — 跨文档交叉引用）若用户明确说明「根据其他文档检查」：跳过纯路径验证的 Glob 步骤，改为直接 Read 指定或推断出的其他项目文档（如相邻模块的设计文档、主规范文档、已发布版本策划案等），对比其与目标文档在数值、机制描述、接口约定上的差异，将不一致之处作为问题列入审查报告。"
+    ],
+    "constraints": {
+      "no_edits": true,
+      "must_read_full_doc_first": true,
+      "glob_for_context_before_report": true
+    },
+    "validation": [
+      "审查报告区分「无问题项」和「发现的问题」两类",
+      "每个问题项指明了具体位置（章节名称或行数）",
+      "对文档引用的外部路径/文件，已通过 Glob 验证其是否存在",
+      "没有修改任何文件（0 edits, 0 builds）"
+    ],
+    "title_zh": "单文档质量审查：Glob 探索项目上下文后输出结构化问题报告",
+    "title_en": "Single-Doc Quality Audit — Glob Project Context Discovery + Structured Issues Report",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "5634a485",
+        "d02df5f6"
+      ],
+      "turn_range": "5634a485:T02-T03, d02df5f6:T00",
+      "prompt_indices": [
+        1,
+        0
+      ],
+      "evidence": "5634a485 T02-T03 (10 steps, 0 edits, 0 builds): user attached AI开发规范.md via @-mention and asked \"检查AI开发规范.md文档，是否有问题\". Agent: (1) mcp__mkr__Read /workspace/docs/AI开发规范.md — full read. (2) respond_to_user (analyzing). (3-8) 5x Glob: `docs/**/*.md` (discover all docs), `**/*AI开发规范*` (check if multiple copies exist), `scripts/config/**/*.lua` (verify config directory path referenced in doc), `scripts/tests/**/*` (verify test directory referenced in doc), `docs/文档维护规范.md` (check doc formatting standards). (9) respond_to_user — structured analysis report. (10) respond_to_user — detailed findings (doc references paths that don't yet exist: scripts/config/, scripts/tests/; formatting is consistent with 文档维护规范.md conventions; found 5 specific improvable items in sections 2, 4, 6, 7). Zero edits. Output is read-only analysis. Key pattern: user attaches ONE doc + asks \"是否有问题\" (not \"能否开始制作\") → Read full doc → Glob to verify all path references exist in project → Read doc registry → structured report of issues found. Distinct from gene_inq_design_doc_preflight_review: this gene audits doc QUALITY (inconsistencies, missing sections, path references) rather than implementation READINESS (blockers, gaps before coding starts). Session context: this is T02 (second prompt in session, right after empty project scaffold was built in T01). | d02df5f6 T00 (15 steps, 7 reads, 2 Bash, 0 edits): user @-attached P3-消消乐.md and asked '检查[@P3-消消乐.md]策划案，根据其他文档检查是否有需要修改和优化的内容'. The explicit '根据其他文档' directive caused agent to Read multiple other project docs (other design documents in the workspace) rather than using Glob for path discovery. Agent produced a structured review report listing issues and optimization opportunities found by cross-referencing the target doc against other project documents. Zero edits. Pure read-and-report. Variant: cross-doc referencing requested → Read-based strategy, not Glob-based.",
+      "session_count": 2
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_open_ended_optimization_audit",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "optimization_opportunities_requested",
+      "open_ended_product_optimization",
+      "no_attached_doc",
+      "multi_subagent_explore",
+      "structured_prioritized_output",
+      "cn_keywords:youhua,gaijin,keyi",
+      "doc_write_followup"
+    ],
+    "preconditions": [
+      "用户发送开放式提问「游戏有什么可以优化的地方」或类似语句，未附加任何文档，也未指定具体系统或范围。",
+      "Agent 可访问项目完整代码库（/workspace/scripts/），项目已有一定实现量（非从零开始）。",
+      "下一回合用户有可能发送「记录在文档上」「保存下来」，将本回合的优化建议写入文件。"
+    ],
+    "strategy": [
+      "使用至少 2 个 Task Explore 子代理（可并行）全面扫描项目代码，覆盖：性能敏感区（渲染循环、NanoVG 调用、资产加载）、稳定性风险区（资源生命周期、事件订阅/取消订阅、跨页面共享状态）和代码质量区（重复代码、硬编码常量、可提取共享模块）。",
+      "综合子代理扫描结果，将优化项按影响维度归为 3-5 个优先级分类（如：优先级1=性能、优先级2=稳定性、优先级3=代码质量），每项说明：问题描述、涉及文件、建议修复方向、预期收益。",
+      "以结构化 Markdown 格式输出全部优化项（通常 10-20 条），包含带复选框的分组 checklist，每条注明文件名，以便用户可直接要求「把这个记录成文档」。",
+      "若用户随后发送「记录在文档上」「保存下来」等指令，立即将该优化列表 Write 写入 docs/ 下的新 .md 文件（如 optimization-notes.md），格式为优先级分组 checklist（☐/☑ 状态），供后续「优化优先级N」指令按需消费。"
+    ],
+    "constraints": {
+      "no_immediate_code_changes": true,
+      "output_format": "priority_grouped_markdown_checklist"
+    },
+    "validation": [
+      "优化建议分为 3-5 个优先级组，每组有明确的影响维度标签（性能/稳定性/代码质量等）",
+      "每条优化项注明受影响的文件名（而非只描述抽象现象）",
+      "未在用户确认前修改任何代码文件",
+      "若用户随后要求保存文档，立即执行 Write 写入新 .md 文件，文件名可复用（如 optimization-notes.md）"
+    ],
+    "title_zh": "开放式优化机会审查：多子代理代码扫描 → 优先级分组清单 → 可选文档写入",
+    "title_en": "Open-Ended Optimization Audit — Multi-Subagent Code Scan to Priority-Grouped Checklist",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "a09c411b",
+        "f14c92eb"
+      ],
+      "session_count": 2,
+      "turn_range": "a09c411b:T00-T01, f14c92eb:T00-T01",
+      "prompt_indices": [
+        0,
+        1
+      ],
+      "evidence": "a09c411b T00 (38 steps, 0 edits): user prompt '游戏有什么可以优化的地方' — no doc attached, no scope specified. Agent: (1) respond_to_user — announced comprehensive review. (2) Task Explore SA1 — scanned scripts/shared/components/ and scripts/pages/ for performance issues (NanoVG calls in render loops, image handle patterns, animation timers, event subscription/unsubscription). (3) Task Explore SA2 — scanned all game modules (p1/p2/p3/p4) for stability and code quality issues (hardcoded constants, duplicate drawing code, missing nil guards, incomplete destroy() cleanup). (4) respond_to_user — structured output: 5 priority levels, 16 optimization items total: 优先级1=性能(3项: render-loop NanoVG text caching, fox-mascot re-render guard, animation timer cleanup), 优先级2=稳定性(4项: event unsubscription, nil guards, destroy lifecycle), 优先级3=代码质量(4项: shared constants extraction, duplicate logic), 优先级4=用户体验(3项: UX polish), 优先级5=测试(2项: coverage gaps). Each item included file name, problem description, fix direction, expected benefit. Output was Markdown checklist format. T01 (5 steps, 1 write): user sent '将可优化的内容记录在文档上保存下来'. Agent: (1) respond_to_user. (2) Write /workspace/docs/optimization-notes.md — full structured document with all 5 priority groups, 16 items as ☐ checklist, each with file path, problem, fix direction, expected benefit. (3) respond_to_user. Zero edits to code. Pattern: open-ended inquiry → multi-SA scan → structured prioritized output → immediate doc write on user request. Downstream: T02/T04/T05 consumed this doc sequentially by priority level (see gene_fm_optimization_backlog_doc_sequential_consume). | f14c92eb T00 (17 steps, 0 edits): user prompt '检查目前的游戏，有什么可以优化或丰富的内容' (inspection_review, no doc, no scope). Agent: Task(1) + mcp__mkr__Read(12) + respond_to_user(4) — dispatched subagent to scan codebase, produced structured multi-category checklist. T01 (3 steps): user '将这些内容保存为文档，后续我视情况进行修改' → mcp__mkr__Write(1) wrote docs/optimization-suggestions.md. Pattern: open-ended audit → immediate doc write."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_mcp_tool_poll_loop",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "consecutive_identical_prompts_ge_5",
+      "mcp_tool_invocation_command",
+      "explicit_anti_cache_instruction",
+      "no_attached_doc",
+      "tool_name_specified_in_prompt"
+    ],
+    "preconditions": [
+      "User prompt contains an explicit instruction to call a named MCP/API tool by name",
+      "Prompt includes anti-caching instruction ('重新调用', 'must re-call', 'no cached results', '不要依赖历史记录')",
+      "Same prompt has been sent 2+ consecutive times",
+      "No other task context beyond the tool invocation command"
+    ],
+    "strategy": [
+      "Call the specified MCP/API tool immediately on every turn — do not question the repetition",
+      "Return the tool result verbatim or as a clean formatted summary",
+      "Do not add commentary about the repetition until turn count exceeds ~15",
+      "At high repetition counts (≥15), briefly note the count and stable result pattern, but still comply and call the tool",
+      "Never claim to return cached results — always invoke fresh"
+    ],
+    "constraints": [
+      "Do not ask the user why they are repeating the prompt — it may be an automated polling script",
+      "Do not skip the tool call even if the result is expected to be identical",
+      "If the tool becomes unavailable mid-session, report immediately rather than fabricating a result"
+    ],
+    "validation": [
+      "Tool was actually called (not described or simulated)",
+      "Result returned matches actual tool output, not cached or hallucinated values",
+      "No unnecessary repetition commentary for first ~15 turns"
+    ],
+    "title_zh": "MCP工具轮询循环：连续相同工具调用指令",
+    "title_en": "MCP Tool Polling Loop: Consecutive Identical Tool Invocation Prompts",
+    "_provenance": {
+      "sessions": [
+        "019c99e5"
+      ],
+      "projects": [
+        "zzj"
+      ],
+      "pattern_type": "session_rhythm",
+      "turn_range": "1-22",
+      "notes": "All 22 prompts byte-for-byte identical: call list_tap_developers, don't use cached results. Turn 1 tool unavailable (agent listed alternatives). Turns 2-22: mcp__sce-urhox__list_tap_developers called each turn, stable result (2 developers). Session spans 3.56 days (Feb 26 - Mar 2), consistent with automated polling script. Agent noted repetition at turn 16."
+    }
+  }
+]

@@ -1,0 +1,14 @@
+Done. One new gene was added to the `informational` category:
+
+**`gene_ir_dev_progress_next_task`** — *Development Progress Audit — Full Project Scan to Recommend Next Task*
+
+**What it captures:** The session `2bc63c91` had a single 161-second prompt: "检查文档，接下来应该做什么". The agent did something noteworthy — it expanded "check docs" into a full codebase scan (Bash + Glob + 38-step Task subagent reading 18 key files), then delivered a per-module implementation status matrix (done / config-only / missing) plus prioritized next task recommendations.
+
+**Why a new gene vs. enhancing existing:** This is distinct from all 6 existing informational genes:
+- Not `gene_inq_full_product_readiness_audit` (that's "what's wrong if released" → P0/P1/P2 quality issues)
+- Not `gene_inq_current_impl_audit` (that's single-feature status check)
+- Not `gene_inq_design_doc_preflight_review` (that requires an attached doc)
+
+The key behavioral insight: when the user asks "检查 + 接下来做什么", the agent correctly infers that answering "what to do next" requires understanding *code completeness*, not just doc contents — so it expands its scope beyond what the literal words suggest.
+
+**Note on quality threshold:** Session has only 1 prompt, but the pattern is flagged as highly distinctive because the compound "audit + recommend next task" trigger is a recurring developer workflow that doesn't appear in any existing gene.

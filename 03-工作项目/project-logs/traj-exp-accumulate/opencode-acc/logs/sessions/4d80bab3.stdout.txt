@@ -1,0 +1,51 @@
+I detect **investigation + implementation** intent — analyze a specific session trajectory, extract behavioral patterns, and write Gene objects to the plugins directory. My approach: read input files → extract traj summary → identify patterns → deduplicate against existing genes → write output.
+The traj schema differs from my extraction script. Let me inspect the actual structure.
+Now I have a comprehensive understanding of the session. Let me check for overlaps with existing genes and then create/enhance.
+Now I have a clear picture. Let me identify the genes and check existing files for enhancement opportunities.
+Now I have a comprehensive understanding. Let me identify the genes:
+
+**Session 4d80bab3 Summary:**
+- 2 turns, 95 steps, 69 tool calls, 7 subagents, ~22 min
+- T1 (inquiry, 14 steps): Read 4 docs + Grep 4 + Task 2 + respond 4. Pure blocker analysis, 0 edits, 0 builds.
+- T2 (new_feature, 81 steps): Write 15 new files, Read 23, respond 22, TodoWrite 11, Build 1. Full P4 link-match game implementation.
+- 3/7 subagents returned "Warmup" only (43% waste).
+- 3 drift-start markers. 1 search-loop marker.
+
+**New genes to create:**
+1. `gene_inq_blocker_analysis_to_immediate_implementation` (workflow) — T1 blocker analysis → T2 "开始开发" → full 81-step implementation
+2. `gene_nf_reference_driven_architecture_replication` (workflow) — Read P2 module structure (7 files), replicate architecture for P4 with 15 new files
+3. `gene_nf_write_heavy_scaffold_and_fill` (workflow) — 15 consecutive Write operations, no intermediate build, TodoWrite-anchored
+
+**Existing genes to enhance:**
+1. `gene_op_subagent_warmup_waste` (operational) — 7 subagents, 3 warmup (43% waste)
+2. `gene_mw_todo_driven_workflow` (operational) — 11 TodoWrite calls, 14-item implementation checklist
+Now I'll create the 3 new genes and enhance 2 existing ones. Let me do the workflow genes first.
+Now enhance the two existing operational genes:
+## 会话 4d80bab3 分析完成
+
+**会话概览：**
+- 项目: wzp (脑力大冒险) | 时长: ~22分钟 | 2 turns, 95 steps, 69 tool calls, 7 subagents
+- T1 (inquiry, 14步): 阻碍分析 — Read 4文档 + Grep 4 + Task 2, 0 edits, 0 builds
+- T2 (new_feature, 81步): 从零创建P4连连看 — Write 15新文件 + Read 23 + TodoWrite 11 + Build 1
+
+---
+
+### 新建 3 个 Gene
+
+| # | ID | Category | 核心模式 |
+|---|---|---|---|
+| 35 | `gene_inq_blocker_analysis_to_immediate_implementation` | workflow | 阻碍分析(go/no-go)→用户确认→全规模实施(81步,15新文件) |
+| 36 | `gene_nf_reference_driven_architecture_replication` | workflow | 读取P2参考模块7文件→复制目录结构→按子系统逐项实施 |
+| 37 | `gene_nf_write_heavy_scaffold_and_fill` | workflow | 15次Write新文件无中间build→TodoWrite锚定→末尾单次build |
+
+### 增强 2 个已有 Gene
+
+| Gene | 更新 |
+|---|---|
+| `gene_op_subagent_warmup_waste` | session_count 2→3, 新增4d80bab3证据(7子agent中3个Warmup, 43%浪费) |
+| `gene_mw_todo_driven_workflow` | session_count 2→3, 新增4d80bab3证据(11次TodoWrite管理14项实施清单) |
+
+### 输出文件
+- `opencode-acc/plugins/workflow/genes.json` — +3 genes (现37个)
+- `opencode-acc/plugins/operational/genes.json` — 2 genes enhanced
+- 所有 `*/index.md` 已通过 `gen_index.py` 重新生成

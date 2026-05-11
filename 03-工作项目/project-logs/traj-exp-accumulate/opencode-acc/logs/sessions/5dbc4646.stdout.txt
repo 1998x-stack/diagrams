@@ -1,0 +1,35 @@
+I detect **implementation** intent — analyzing a specific session trajectory to extract reusable behavioral patterns (Genes) and write them to the plugins directory. Let me start by gathering context.
+Now I have a clear picture. Let me check for overlapping genes before creating new ones.
+Now let me read the existing gene files I need to enhance:
+Now I have a clear picture. Let me read the session_rhythm genes to find the edit_drift gene for enhancement, then create new genes.
+Now I have the full picture. Let me execute the enhancement and creation plan.
+Now create the 3 new genes:
+Now regenerate the index:
+Let me verify the changes are correct:
+All done. Here's the summary of the analysis for session `5dbc4646` (wzp):
+
+## Session Profile
+- **3 prompts**, **79 total steps**, **59 tool calls**, **10 subagents**
+- Extremely lightweight session: only 3 turns, ending after a heavy design turn
+- 0 errors, clean exit
+
+## Turn Breakdown
+| Turn | Intent | Target | Steps | Key Actions |
+|------|--------|--------|-------|-------------|
+| T0 | inquiry | game_logic | 3 | 2 respond + 1 Task (card count query) |
+| T1 | feature_modification | visual_style | 21 | 5 Read + 4 TodoWrite + 2 Edit + 1 build (reference 连连看 graphics) |
+| T2 | new_feature | game_logic | 55 | 18 Read + 12 Write + 4 Grep + 2 Edit + 1 build (design levels 17-28) |
+
+## Genes Generated/Enhanced
+
+### Enhanced (2):
+1. **`gene_nf_edit_drift_without_verification`** (session_rhythm) — 5dbc4646 has 3 drift-start markers (steps 4, 35, 61) during the Write-heavy design turn. Session count: 14→**15**.
+
+2. **`gene_nf_write_heavy_scaffold_and_fill`** (workflow) — T2's 12 Write operations (story-17 through story-28) match the Write-heavy scaffold pattern, but as a "narrative content" variant rather than code scaffold. Session count: 2→**3**.
+
+### Created (3):
+3. **`gene_inq_to_nf_design_cascade`** (workflow) — inquiry(3步)→fm(21步)→nf设计(55步) escalating complexity cascade. User goes from asking about card counts to designing 12 new story levels.
+
+4. **`gene_fm_reference_by_visual_style`** (workflow) — T1 uses 连连看's graphics as visual reference to modify memory flip card rendering. Distinct from existing reference-by-example (UI layout) and reference-by-implementation (game logic behavior) genes.
+
+5. **`gene_nf_design_without_build`** (workflow) — T2's 55 steps with 18 Read + 12 Write + only 1 build at end. Content design mode where Write targets narrative data files (story-XX.lua), not code logic files, so intermediate build verification is unnecessary.

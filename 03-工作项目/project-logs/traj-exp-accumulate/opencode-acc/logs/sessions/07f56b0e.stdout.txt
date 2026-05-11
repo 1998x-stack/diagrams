@@ -1,0 +1,61 @@
+I detect **investigation/analysis** intent — analyzing a session trajectory to extract reusable behavioral patterns (Genes). My approach: read input files → extract trajectory summary → identify patterns → check overlap with existing genes → write new/enhanced genes.
+
+Let me start by gathering context in parallel.
+The .traj file structure differs from my parsing assumptions. Let me inspect it properly.
+Now I have a clear picture. Let me check for gene overlap before creating new ones.
+Now let me read the existing genes that might overlap to ensure I don't duplicate.
+Now I have a clear picture. Let me also read the diagnostic genes to check overlap:
+Now let me check the operational genes too:
+Now I have a complete picture. Let me also check the subagent details and the drift marker context:
+Now I have a complete picture of the session. Let me analyze the patterns:
+
+**Session 07f56b0e key findings:**
+- **2 turns, 26 steps, 19 tool calls, 4 subagents, 0 edits, 0 builds**
+- T0: User asks to add minor protection → Agent explores extensively (7 reads, 6 globs, 1 Task, 1 Grep) → **Discovers feature ALREADY EXISTS** (PlayTimeGuard module fully implemented) → Reports back
+- T1: User asks to add test toggle → Agent reads settings → API 404 error terminates session
+- 1 subagent (ac9524e) did useful exploration (16 steps, 8 reads); 3 others failed immediately
+- `respond_to_user` ratio: 7/26 = 27% (near the 30% threshold)
+- TodoWrite used twice in T0 for tracking PlayTimeGuard integration audit
+
+**Pattern identified:** "Feature Already Exists Discovery" — agent does extensive exploration only to find the requested feature is already implemented, resulting in zero edits. This is distinct from `gene_nf_systematic_read_before_edit` (which reads before editing) because the outcome is **no edit needed**.
+
+Let me create the new gene:
+I've created the new gene `gene_nf_feature_already_exists`. Let me now regenerate the index and verify the output.
+Now let me verify the new gene was written correctly and check the updated index:
+Let me validate the JSON is well-formed and do a final check:
+All genes validate. Let me do a final quality check on the new gene:
+Analysis complete. Here's the summary:
+
+---
+
+## Session 07f56b0e Analysis Summary
+
+**Session Profile:**
+- **Project:** wzp (脑力大冒险)
+- **Turns:** 2 | **Steps:** 26 | **Tool calls:** 19 | **Subagents:** 4
+- **Edits:** 0 | **Builds:** 0 | **Exit:** end_of_conversation
+- **Tokens:** cache_read=1.8M, cache_creation=57K, output=988
+
+**Turn Breakdown:**
+| Turn | Intent | Steps | Tools | Outcome |
+|------|--------|-------|-------|---------|
+| T0 | new_feature (未成年人游戏限制) | 22 | 7 Read, 6 Glob, 5 respond, 2 TodoWrite, 1 Task, 1 Grep | **Feature already exists** — PlayTimeGuard module fully implemented |
+| T1 | configuration (测试开关) | 4 | 2 respond, 1 Read, 1 Grep | API 404 error, session terminated |
+
+---
+
+## Gene Created: 1 new
+
+### `gene_nf_feature_already_exists` (workflow)
+
+**功能已存在发现模式** / Feature Already Exists Discovery
+
+This is the standout pattern of the session. User requested a new feature (minor protection time limit), but the agent's exploration revealed the `PlayTimeGuard` module was **already fully implemented** — with `isPlayable()`, `getRestrictedMessage()`, and integration in the adventure page (level-click blocking + mid-screen dialog). The agent then audited cross-page integration status before reporting back. **Zero edits, zero builds** — pure exploration-to-report workflow.
+
+**Key signals:** `intent:new_feature`, `zero_edits_zero_builds`, `feature_already_exists`, `exploration_then_report`, `existing_module_discovery`, `multi_file_scan_no_edit`, `cross_page_integration_audit`
+
+**Why no other genes?**
+- T1 was too thin (4 steps, API error before any edit) to extract a configuration pattern
+- `respond_to_user` ratio (7/26 = 27%) is close to the 30% threshold of `gene_sr_respond_think_before_act` but doesn't quite qualify — and this session had no edits to announce
+- The subagent pattern (1 succeeded, 3 failed) is already covered by `gene_nf_subagent_fallback_to_direct`
+- Per the rules, sessions with <3 prompts should only generate genes if the pattern is very strong — this one is

@@ -1,0 +1,12 @@
+Session `bdf118ee` analysis complete. Here's what was added:
+
+**4 new genes** (total now 109 across all categories):
+
+| Gene | Category | Pattern |
+|------|----------|---------|
+| `gene_elp_board_init_bypass_data_transform_nil` | diagnostic | Story mode passes raw `levelData` directly to `Board.new()`, bypassing `levelLoader.load()` which builds `wallSet{}` — nil crash at render time. Fix: route through loader, then Grep all other adapters. |
+| `gene_elp_story_level_field_name_adapter_mismatch` | diagnostic | Adapters reference `lv.id` but story-level configs use `levelId` — nil concatenation crash. Pattern: read runtime log first, Grep all adapters for same mismatch, fix all. |
+| `gene_pd_devlog_guided_impl_start` | workflow | User opens dev log via `@mention` + says "开始开发" → 170-step implementation: Task SA parallel exploration, TodoWrite from doc steps, systematic Read→Write/Edit cycle, build+LSP check. |
+| `gene_aoc_wrong_target_page_revert_reapply` | workflow | Agent applied layout to wrong page (home vs adventure) → user corrects → agent: Write to restore wrong page, Read→6× Edit correct page, build. Two-task TodoWrite pattern. |
+
+**1 gene enhanced**: `gene_doc_pinpoint_section_condense` now has 2 sessions (a7d1b207 + bdf118ee T10/T11/T13/T14), with a retry-pattern note: when doc condense doesn't satisfy, user re-sends near-identical prompt — agent should re-Read before editing.

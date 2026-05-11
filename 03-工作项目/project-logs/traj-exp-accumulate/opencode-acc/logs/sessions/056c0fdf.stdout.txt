@@ -1,0 +1,54 @@
+Now let me get deeper details on the tool usage patterns and error context:
+Now I have a complete picture. Let me analyze the patterns and generate genes.
+
+**Session 056c0fdf analysis summary:**
+- 5 turns, 26.6min, 137 steps, all main-agent (no successful subagents)
+- Intent mix: feature_modification(game_logic) → new_feature(ui) → feature_modification(ui) → documentation → meta_workflow
+- Tool pattern: heavy `respond_to_user` (49), balanced Read(23)/Edit(23), TodoWrite(18), build only 3× (once per implement turn)
+- Key behaviors: think-before-edit via respond_to_user, batch-build-at-end, doc discovery via multi-glob, CRLF encoding fallback, dependency-ordered multi-file edits
+
+Let me check the existing genes more carefully for overlap, then write new ones:
+Now I have full context. Let me identify the distinct patterns and write new genes.
+
+**Analysis of 056c0fdf patterns vs existing genes:**
+
+| Pattern found | Existing overlap? | Decision |
+|---|---|---|
+| respond_to_user think-before-act (35% of steps) | None | **NEW** — session_rhythm |
+| Batch build-at-end (1 build per turn, after ALL edits) | `gene_nf_edit_drift` is negative pattern; this is the positive strategy | **NEW** — operational |
+| Doc discovery via multi-glob before update | `gene_doc_post_feature_sync` covers multi-doc update but NOT discovery | **NEW** — workflow |
+| CRLF encoding fallback (Edit→Bash sed→Python) | None | **NEW** — diagnostic |
+| Dependency-ordered file modification (view→screen→adapter) | None | **NEW** — workflow |
+| Task tool failure → direct execution | `gene_nf_subagent_fallback_to_direct` already covers | Skip |
+| TodoWrite per-turn decomposition | `gene_mw_todo_driven_workflow` already covers | Skip |
+
+Writing 4 new genes:
+Now I'll append the new genes to each category file:
+Now let me verify the writes and update the index:
+All 4 new genes written and validated. Here's the summary:
+
+---
+
+**Session 056c0fdf (wzp) — Gene Extraction Complete**
+
+| Metric | Value |
+|---|---|
+| Duration | 26.6 min |
+| Turns | 5 |
+| Steps | 137 |
+| Prompts | 5 (≥3 threshold met) |
+| New genes | 4 |
+| Total genes (all categories) | 12 |
+
+**4 new genes extracted:**
+
+| ID | Category | Pattern |
+|---|---|---|
+| `gene_sr_respond_think_before_act` | session_rhythm | respond_to_user as thinking buffer — 30-38% of all steps are announce-before-act cycles |
+| `gene_op_batch_build_verify` | operational | Single build at end of all edits per turn, never intermediate |
+| `gene_wf_doc_discovery_pipeline` | workflow | Vague "更新文档" → 6 glob patterns → read 3 docs → batch update + version sync |
+| `gene_wf_dependency_ordered_edit` | workflow | Bottom-up multi-file edits: view → screen → adapter, with interface consistency |
+
+**Skipped (covered by existing genes):**
+- TodoWrite per-turn decomposition → `gene_mw_todo_driven_workflow`
+- Task tool failure → `gene_nf_subagent_fallback_to_direct`

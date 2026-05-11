@@ -1,0 +1,62 @@
+I detect **investigation/analysis** intent — analyzing a trajectory session to extract reusable behavioral patterns (genes). My approach: read input files → extract trajectory summary → identify patterns → check overlap with existing genes → write new/enhanced genes.
+
+Let me start by reading the input files in parallel.
+The traj file structure seems different from expected. Let me check the actual structure.
+Now I have the full picture. Let me map the session structure and run overlap checks.
+Now I have the full structure. Let me extract per-turn tool distributions.
+Now I have comprehensive data. Let me read the existing genes that need enhancement.
+Now I have comprehensive data. Let me analyze and identify the genes. Based on my analysis:
+
+**Session 6346da75 key stats:**
+- 9 turns, 202 steps, 127 tool calls
+- 48 edits, 6 builds → 8:1 edit/build ratio
+- 75 respond_to_user / 127 total = **59%** (new record high!)
+- 23 TodoWrite, 5 drift-start markers
+- 4 subagents (1 useful + 3 warmup waste)
+
+**Intent sequence:** fm→nf→nf→fm→inq→nf→ir→inq→fm
+
+**Patterns identified:**
+1. **ENHANCE** `gene_sr_respond_think_before_act` — 59% is the new highest
+2. **ENHANCE** `gene_nf_edit_drift_without_verification` — 5 drift markers, 8:1 ratio
+3. **NEW** `gene_nf_animation_feature_cascade` — T1→T2→T3→T4 visual chain (nf+fm mixed)
+4. **NEW** `gene_inq_to_immediate_feature` — T5 inq→T6 implement swipe (lightweight)
+
+Let me implement these changes.
+Now I have all the data. Let me make the edits.
+
+**Enhancement 1:** `gene_sr_respond_think_before_act` — 6346da75 has 75/127 = 59.1% respond ratio, new all-time record.
+Now enhance `gene_nf_edit_drift_without_verification`:
+Now let me check the existing `gene_nf_animation_feature_cascade` to see if 6346da75 can enhance it:
+Now let me create the two new genes. First, let me find the end of the workflow/genes.json file:
+Now let me also enhance the `gene_op_subagent_warmup_waste` in operational/genes.json:
+Now let me check the `gene_inq_to_param_tweak_cascade` to see if T7→T8 fits:
+Now let me run the index generator:
+Let me verify the new genes appear in the index:
+All changes verified. Here's the summary:
+
+---
+
+## 会话 6346da75 分析完成
+
+**会话概览:** 9 turns, 202 steps, 127 tool calls, 48 edits, 6 builds, ~50分钟
+
+### 增强已有基因 (3个)
+
+| Gene | 增强内容 |
+|---|---|
+| `gene_sr_respond_think_before_act` | 59.1% (75/127) 刷新最高纪录，此前最高42.4% |
+| `gene_nf_edit_drift_without_verification` | 5个drift markers, edit/build比=8.0:1 刷新最高纪录 |
+| `gene_op_subagent_warmup_waste` | 75% warmup率(3/4)刷新最高纪录 |
+
+### 新建基因 (2个)
+
+| Gene ID | 类别 | 说明 |
+|---|---|---|
+| `gene_vdc_mixed_intent_visual_cascade` | workflow | 混合意图视觉设计级联 — T1(fm)→T2(nf)→T3(nf)→T4(fm) 连续4个visual turn，design→add→refine模式 |
+| `gene_inq_to_lightweight_feature` | workflow | 信息查询到轻量功能实现 — T5 inq(手机操作?)→T6 implement(滑动操控)，21步轻量实现 |
+
+### 未生成基因的模式
+
+- **gene_doc_maintenance_rhythm**: T7是inspection_review而非documentation，T8是inquiry而非doc update，信号不够强
+- **gene_nf_animation_feature_cascade**: T2→T3→T4只有2个连续nf(第3个是fm)，不满足ge_3阈值

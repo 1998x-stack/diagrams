@@ -1,0 +1,15 @@
+Session `e7d71628` analysis complete. Here's a summary of what was produced:
+
+**2 new genes created (diagnostic):**
+
+- **`gene_elp_lua_api_arg_type_table_not_string`** — T1 pattern: `bad argument #1 to 'Get' (string expected, got table)` at outfit-manager init. Fires when a new feature introduces a data struct (skinConfig table) that gets passed directly to a storage API expecting a string key. Strategy: Read the error line, identify the table arg, extract `.id`/`.key` field instead.
+
+- **`gene_elp_callback_closure_nil_entity_id`** — T2 pattern: `attempt to concatenate nil (local 'skinId')` inside a shared popup component callback. Fires when a shared confirmation popup invokes a parent-registered callback that references an entity ID variable not properly threaded through the closure or arg chain. Strategy: diagnose whether it's a capture-time issue or a missing arg from component → fix by closing over the ID at click time, or having the component pass it back via `cb(id)`.
+
+**3 existing genes enhanced (provenance + preconditions):**
+
+- **`gene_br_nanovg_cross_context_image_handle_white`** — T3: added `purchase_unlock_trigger` variant (white after purchase, not just after Router.replace). Now 2 sessions.
+
+- **`gene_fm_feature_scope_extension_new_content`** — T4: added "extend clear-save to cover new persistent state (purchase records)" as a new-data-type variant of scope extension. Now 2 sessions.
+
+- **`gene_doc_terse_breadth_first`** — T5: standard post-session `更新文档` confirmed. Now 26 sessions.

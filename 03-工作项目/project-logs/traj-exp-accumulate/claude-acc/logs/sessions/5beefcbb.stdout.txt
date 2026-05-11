@@ -1,0 +1,18 @@
+Done. Session `5beefcbb` (4 prompts, 40min) analyzed and 3 new genes written to `workflow/genes.json` (now 44 total):
+
+---
+
+**`gene_fm_narrative_gameplay_misalignment_fix`** — Narrative-Gameplay Misalignment Fix
+- Triggered when user names a specific character + level and says the dialogue references items/mechanics that don't exist in the actual game
+- Pattern: Task SA to find related files → Grep level config → Read preDialogue+storyText → Edit both fields to match actual gameplay → Build
+- Evidence: T02-T03 — "逗逗的锁链迷阵" dialogue said "宝石被锁链锁住" but the actual mechanic is 锁定方块 (locked blocks)
+
+**`gene_ir_followup_similarity_sweep`** — Follow-Up Similarity Sweep
+- Triggered by "检查是否有类似的" after fixing one text issue — expands from single-instance fix to full-scope audit
+- Pattern: Read all storyline config + Task SA reads all level files → identifies 4 categories of terminology mismatch → 11 sequential edits + Build
+- Evidence: T04-T05 — found systematic "宝石→图案", "锁链→锁定", wrong step counts across all 豆豆 levels
+
+**`gene_doc_named_single_doc_source_sync`** — Named Single-Doc Source Sync
+- Distinct from `gene_doc_terse_breadth_first`: user explicitly names ONE doc via @-mention, agent reads both that doc AND its source config side-by-side to diff them, then patches discrepancies + appends a fix history entry
+- Pattern: Read named doc → Read source config → TodoWrite discrepancies → Edit per discrepancy → append fix history record (no Build)
+- Evidence: T06-T07 — "更新[@主线关卡总览.md]" after storyline.lua changes; 8 edits syncing 6 stale fields + fix history entry

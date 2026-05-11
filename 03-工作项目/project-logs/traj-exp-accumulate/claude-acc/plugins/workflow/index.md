@@ -1,0 +1,2579 @@
+# workflow — Gene Index
+
+**Gene count:** 98
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_nf_design_doc_system_build` | Design-Doc-Driven New System Implementation Workflow | workflow | 2x: 014354fc, 61467d20 | `intent:new_feature`, `has_attached_doc`, `mentions_specific_file` |
+| 2 | `gene_doc_terse_breadth_first` | Terse 'Update Docs' Trigger — Breadth-First Documentation Sync | workflow | 29x: 014354fc, 056c0fdf, 08e306a0 +26 | `intent:documentation`, `terse_prompt_le_4_tokens`, `cn_keywords:gengxin,wendang,tongbu` |
+| 3 | `gene_nf_test_feature_explore_first` | New Test/Debug Feature — Explore-First Infrastructure Integration | workflow | 1x: 014354fc | `intent:new_feature`, `target:test_ui`, `debug_panel_mentioned` |
+| 4 | `gene_nf_global_test_flag_creation` | Global Test Flag Creation from Scratch — Explore Conventions, Define Boolean, Hook UI Entry | workflow | 2x: be94308f, ef2c887b | `intent:new_feature`, `target:game_logic`, `test_toggle_creation_from_scratch` |
+| 5 | `gene_fm_puzzle_level_redesign_with_simulation` | Puzzle Level Redesign with Simulation-First Solvability Verification | workflow | 2x: 056c0fdf, 3ee927f3 | `intent:feature_modification`, `target:game_logic`, `puzzle_level_redesign` |
+| 6 | `gene_nf_ui_event_triggered_hint` | UI Tutorial Hint with Event-Triggered Fade — Explore Rendering First | workflow | 1x: 056c0fdf | `intent:new_feature`, `target:ui_layout`, `hint_text_mentioned` |
+| 7 | `gene_nf_existing_impl_reuse_audit` | New Feature Existing Implementation Audit — Semantic Module Discovery Before Reimplementing | workflow | 2x: 07f56b0e, 36749904 | `intent:new_feature`, `target:game_logic`, `no_attached_doc` |
+| 8 | `gene_fm_conditional_element_visibility` | Conditional UI Element Visibility — Game State Driven Show/Hide | workflow | 1x: 056c0fdf | `intent:feature_modification`, `target:ui_layout`, `conditional_visibility` |
+| 9 | `gene_fm_planmode_crosscutting_refactor` | Plan-Mode-Driven Cross-Cutting Architectural Refactor | workflow | 1x: 08e306a0 | `intent:feature_modification`, `cross_cutting_system_change`, `multiple_files_estimated_gt_5` |
+| 10 | `gene_fm_layout_floor_guard` | Layout Edge Overflow Fix — Shared Constant Floor Guard | workflow | 1x: 08e306a0 | `intent:feature_modification`, `target:ui_layout`, `layout_overflow_reported` |
+| 11 | `gene_fm_bulk_visual_param_adjustment` | Bulk Proportional Visual Parameter Adjustment Across Multiple Screens | workflow | 1x: 08e306a0 | `intent:feature_modification`, `target:visual_style`, `relative_value_change` |
+| 12 | `gene_pd_design_doc_generation_workflow` | Pre-Implementation Design Doc Generation — Read Code First, Then Write | workflow | 1x: 0997e370 | `intent:planning_design`, `target:documentation`, `pre_implementation_doc_creation` |
+| 13 | `gene_cc_image_gen_sequential_fallback` | Character Reference Image Generation — Batch-First with Sequential Timeout Fallback | workflow | 1x: 0997e370 | `intent:content_creation`, `target:asset_resource`, `mcp_image_generation` |
+| 14 | `gene_br_audit_priority_tier_batch_fix` | Post-Audit Priority-Tier Batch Fix — Reconstruct, Label, and Execute | workflow | 1x: 0ea2a577, 4463c53b | `intent:bug_report`, `follows_inspection_review`, `priority_tier_referenced` |
+| 15 | `gene_fm_doc_review_fix_sweep` | Post-Review Doc Content Fix Sweep — Reconstruct Issue List and Apply Edits | workflow | 5x: 11e7ed86, 4807e6ed, 4cfa39d0 +2 | `intent:feature_modification`, `target:documentation`, `terse_prompt_follows_review` |
+| 16 | `gene_inq_arch_choice_doc_update` | Architecture Choice Terse-Confirm to Design Doc Update — Infer-Then-Apply | workflow | 1x: 11e7ed86 | `intent:inquiry`, `follows_architecture_comparison`, `ultra_terse_confirmation` |
+| 17 | `gene_pd_design_doc_content_fill` | Design Doc Content Fill — Skeleton Elaboration with Simultaneous Implementation File Creation | workflow | 1x: 18479bb5 | `intent:planning_design`, `intent:documentation`, `has_attached_doc` |
+| 18 | `gene_fm_feature_scope_extension_new_content` | Feature Scope Extension — Extend Existing Feature to Cover Newly Added Content | workflow | 2x: 18479bb5, e7d71628 | `intent:feature_modification`, `target:game_logic`, `feature_scope_extension` |
+| 19 | `gene_nf_planmode_parallel_bulk_level_expansion` | Plan-Mode-Driven Bulk Level Expansion — Parallel Content Creation Subagents for Large-Scale Level Design | workflow | 2x: 18479bb5, 5dbc4646 | `intent:new_feature`, `target:game_logic`, `large_scale_content_expansion` |
+| 20 | `gene_pd_design_only_planmode_defer` | Explicit Design-First Defer — Plan-Mode Research + Design Without Implementing | workflow | 1x: 1cd7c1eb | `intent:planning_design`, `explicit_design_first_request`, `no_implementation_requested` |
+| 21 | `gene_pd_terse_approval_batch_rewrite` | Terse Approval — Batch Read-Then-Write Full File Rewrite Implementation | workflow | 1x: 1cd7c1eb, 374e4eb7 | `approval_or_feedback`, `follows_design_only_planmode`, `terse_approval_word` |
+| 22 | `gene_fm_emoji_to_nanovg_migration` | Emoji-to-NanoVG Rendering Migration — Audit Existing Patterns, Rewrite Components, Fix API Names | workflow | 1x: 1cd7c1eb | `intent:feature_modification`, `emoji_replacement_requested`, `nanovg_rendering_specified` |
+| 23 | `gene_fm_shared_component_zorder_override` | Shared Component Z-Order Conflict — Render Order Resequence + Per-Game Margin Override | workflow | 2x: 212062a8, 76b0acb1 | `intent:feature_modification`, `target:ui_layout`, `overlap_reported` |
+| 24 | `gene_fm_shared_component_extraction` | Shared Component Extraction -- Read Per-Game Duplicates, Write Shared Module, Update All Callers | workflow | 2x: 24a716d1, f14c92eb | `intent:feature_modification`, `refactor_to_shared_module`, `duplicate_code_across_games` |
+| 25 | `gene_nf_multi_game_level_generation` | Multi-Game Level Batch Generation -- Per-Game Structure Read, Append Levels, Inline Doc Sync | workflow | 1x: 24a716d1 | `intent:new_feature`, `target:game_logic`, `multi_game_level_expansion` |
+| 26 | `gene_nf_cross_game_symmetric_feature_rollout` | Cross-Game Symmetric Feature Rollout -- PlanMode Research, Per-Game Symmetric Edit, Unified Build | workflow | 1x: 24a716d1 | `intent:new_feature`, `target:game_logic`, `cross_game_feature` |
+| 27 | `gene_fm_level_difficulty_curve_retune` | Level Difficulty Curve Retune -- Bulk starScore Sweep with Flattened Growth Rate | workflow | 2x: 24a716d1, dcc74462 | `intent:feature_modification`, `target:game_logic`, `difficulty_rebalance` |
+| 28 | `gene_nf_special_obstacle_block_introduction` | Match-3 Special Obstacle Block Layered Introduction Workflow | workflow | 1x: 2c4b3363 | `intent:new_feature`, `target:game_logic`, `match3_game` |
+| 29 | `gene_pd_audio_system_design_deferred_assets` | Audio System Design — Code Scaffold + Requirements Spec with Deferred Asset Generation | workflow | 1x: 2c4b3363 | `intent:planning_design`, `target:audio`, `explicit_design_first_request` |
+| 30 | `gene_fm_cross_game_effect_style_port` | Cross-Game Effect Style Port — Reference Previously Modified Renderer, Apply to Target Game | workflow | 2x: 2c4b3363, 9bbd20cc | `intent:feature_modification`, `target:visual_style`, `cross_game_effect_port` |
+| 31 | `gene_fm_multi_game_visual_effects_upgrade` | Multi-Game Bright Effects Upgrade — Audience-Targeted Particle and Animation Enhancement Across Multiple Games | workflow | 1x: 2c4b3363 | `intent:feature_modification`, `target:visual_style`, `multi_game_simultaneous_target` |
+| 32 | `gene_fm_visual_polish_cascade` | Visual Polish Cascade — Consecutive Parameter Tweaking Chain | workflow | 6x: 374e4eb7, 9dc56f96, bc3f2ce9 +3 | `intent:feature_modification`, `target:visual_style`, `consecutive_same_intent_ge_4` |
+| 33 | `gene_pd_direct_design_doc_write_wait` | Direct Design Doc Write and Wait — No-PlanMode Variant of Design-First Defer | workflow | 3x: 374e4eb7, 76b0acb1, e2076a78 | `intent:planning_design`, `explicit_design_first_request`, `explicit_wait_for_approval` |
+| 34 | `gene_fm_cross_game_ui_reference_layout` | Cross-Game UI Layout Reference — Reposition UI Elements by Referencing Working Game Pattern | workflow | 4x: 3ee927f3, 9bbd20cc, bc3f2ce9 +1 | `intent:feature_modification`, `target:ui_layout`, `user_cites_other_games_as_reference` |
+| 35 | `gene_fm_game_grid_orientation_rewrite` | Game Grid Portrait Reorientation — Rows/Cols Swap for Vertical Screen, Full Level Data Rewrite | workflow | 1x: 3ee927f3 | `intent:feature_modification`, `target:game_logic`, `grid_orientation_mismatch` |
+| 36 | `gene_fm_single_file_adaptive_sizing` | Single-Component Adaptive Sizing — Introduce Scale Function, Systematically Replace Hardcoded Sizes | workflow | 1x: 44926b0f | `intent:feature_modification`, `target:ui_layout`, `single_component_responsive` |
+| 37 | `gene_nf_terse_start_reference_guided_scaffolding` | Terse Start Command — Reference-Guided Full New Game Module Scaffolding | workflow | 3x: 4d80bab3, 5c2aeaee, 9bbd20cc | `intent:new_feature`, `terse_start_command`, `follows_preflight_inquiry_turn` |
+| 38 | `gene_nf_mechanic_with_editor_integration` | New Game Mechanic + Level Editor Co-Implementation — Single Turn Dual-Target | workflow | 1x: 4f916c20 | `intent:new_feature`, `target:game_logic`, `editor_integration_requested` |
+| 39 | `gene_fm_editor_output_apply_to_level` | Editor Output Paste-and-Apply to Level File — Strip Log Noise, Precise Replace | workflow | 2x: 4f916c20, 9dc56f96 | `intent:feature_modification`, `user_pastes_structured_lua_data`, `target:game_logic` |
+| 40 | `gene_nf_empty_project_scaffold_template` | Empty Project Scaffold from Template — Read Template, Write Minimal Entry, Build | workflow | 1x: 5634a485 | `intent:new_feature`, `empty_project_request`, `no_existing_scripts` |
+| 41 | `gene_mw_fragment_trigger_context_inferred_doc_update` | Fragment/Ambiguous Input — Context-Inferred Comprehensive Multi-Doc Update | workflow | 1x: 5634a485 | `intent:other`, `ambiguous_fragment_input`, `ultra_terse_or_malformed_prompt` |
+| 42 | `gene_cc_sfx_batch_genre_aware` | Direct SFX Batch Generation — Genre-Aware English Prompt Crafting | workflow | 2x: 5af4f5ad, 9dc56f96 | `intent:content_creation`, `target:audio`, `no_attached_doc` |
+| 43 | `gene_fm_narrative_gameplay_misalignment_fix` | Narrative-Gameplay Misalignment Fix — Replace Irrelevant Dialogue with Gameplay-Accurate Content | workflow | 2x: 5beefcbb, 6b8566ea | `intent:feature_modification`, `target:narrative`, `character_name_in_prompt` |
+| 44 | `gene_ir_followup_similarity_sweep` | Follow-Up Similarity Sweep — Systematic Narrative Audit and Batch Fix After Single-Instance Repair | workflow | 1x: 5beefcbb | `intent:inspection_review`, `follows_single_fix_turn`, `user_asks_for_similar_cases` |
+| 45 | `gene_doc_named_single_doc_source_sync` | Named Single-Doc Source Sync — Read Source Config and Patch Specific Named Doc to Match Code | workflow | 1x: 5beefcbb | `intent:documentation`, `mentions_specific_file`, `has_attached_doc` |
+| 46 | `gene_doc_new_game_devlog_creation` | New Game Dev Log Creation — Template-Guided Initial Log with Code Stats and ADR Append | workflow | 2x: 5c2aeaee, 6b8bf0cd | `intent:documentation`, `new_game_module_just_scaffolded`, `devlog_creation_requested` |
+| 47 | `gene_fm_cross_game_graphic_lib_import` | Cross-Game Tile Drawing Library Import — Copy Rendering Functions from Source Game into Target Game Shape Pool | workflow | 1x: 5dbc4646 | `intent:feature_modification`, `target:visual_style`, `cross_game_graphic_import` |
+| 48 | `gene_nf_mouse_swipe_input_extension` | Mouse Swipe Input Extension — Pair MouseButtonDown/Up to Mirror Touch Swipe Logic | workflow | 1x: 61467d20 | `intent:new_feature`, `intent:bug_report`, `target:game_logic` |
+| 49 | `gene_fm_invalid_move_shake_feedback` | Invalid Move Shake Feedback — Replace Swap-Revert Flash with Nudge-Toward-Target Bounce Animation | workflow | 1x: 61467d20 | `intent:feature_modification`, `target:game_logic`, `invalid_move_feedback_change` |
+| 50 | `gene_nf_match3_particle_effect_system` | Match-3 Particle Effect System — Elimination Particles Flying to Score UI + Special Block Type-Specific Effects | workflow | 1x: 61467d20 | `intent:new_feature`, `intent:feature_modification`, `target:visual_style` |
+| 51 | `gene_nf_obstacle_blocks_named_storylevel_addition` | Match-3 Named Story Level Obstacle Addition — Locate story-N.lua, Add Obstacle Coords, Sync Doc | workflow | 1x: 6b8566ea | `intent:feature_modification`, `target:game_logic`, `match3_game` |
+| 52 | `gene_nf_fresh_project_planmode_split_scaffold` | Fresh Project Lobby Scaffold — Self-Initiated PlanMode Research + Two-Turn Split Build | workflow | 1x: 6b8bf0cd | `intent:new_feature`, `terse_start_command`, `follows_preflight_inquiry_turn` |
+| 53 | `gene_aoc_issue_id_fix_report_inline_update` | Issue-ID-Targeted Code Fix with Inline Report Status Update | workflow | 1x: 762afe73 | `intent:ai_output_correction`, `has_attached_doc`, `issue_report_referenced` |
+| 54 | `gene_doc_level_content_compilation` | Main-Level Content Batch Extraction and Overview Doc Generation | workflow | 1x: 762afe73 | `intent:inspection_review`, `intent:content_creation`, `target:documentation` |
+| 55 | `gene_doc_audit_checklist_synthesis` | Audit Experience Synthesis — Cross-Game Reusable Inspection Checklist Generation | workflow | 1x: 762afe73 | `intent:documentation`, `intent:planning_design`, `target:documentation` |
+| 56 | `gene_nf_combined_design_implement_single_turn` | Combined Design-Then-Implement Single Turn — PlanMode Research Into Immediate Implementation | workflow | 2x: 76b0acb1, bc3f2ce9 | `intent:new_feature`, `plan_mode_triggered`, `immediate_implementation_after_plan` |
+| 57 | `gene_fm_shared_component_post_impl_layout_cascade` | Post-Implementation Shared Component Layout Cascade — Consecutive Position/Size/Z-Order Tweaks Across Pages | workflow | 1x: 76b0acb1 | `intent:feature_modification`, `target:ui_layout`, `shared_component_recently_implemented` |
+| 58 | `gene_nf_settings_admin_with_save_debugging` | Settings Admin Feature — Clear Save + Unlock All With Save-System Debug Cycle | workflow | 1x: 76b0acb1 | `intent:new_feature`, `target:settings_ui`, `admin_debug_feature` |
+| 59 | `gene_cc_source_doc_to_summary_distillation` | Source Doc to New Summary — Generate, Filter, Augment, Condense Distillation Workflow | workflow | 1x: 870a5123 | `intent:content_creation`, `intent:feature_modification`, `target:documentation` |
+| 60 | `gene_ir_sfx_test_panel_coverage_audit_and_fill` | SFX Test Panel Coverage Audit and Gap Fill Workflow | workflow | 1x: 8a77e633 | `用户要求检查某类资产（音效/图片/动画）是否在测试/预览面板中完整覆盖`, `下一条用户消息极短（不超过4字），如加上/加进去/都加上，语义为将上轮发现的缺口一并加入`, `项目存在独立的资产注册文件（sounds.lua 或 assets.lua 等）和共用预览面板（sound-test-panel.lua 等）` |
+| 61 | `gene_fm_cross_game_sfx_button_integration` | Cross-Game UI Button SFX Integration Workflow (Shared Utility First) | workflow | 1x: 8a77e633 | `用户要求将某个音效/交互效果统一应用到多个游戏的特定类型 UI 按钮上`, `所涉及游戏数量不少于 3 个，且每个游戏有各自的 adapter.lua 或 gameplay.lua 等文件`, `该音效需要独立的初始化逻辑（如创建场景、挂载 SFX 节点、销毁），若不封装则会在每个文件中重复` |
+| 62 | `gene_fm_sfx_namespace_deletion_with_cleanup` | SFX Namespace Deletion with In-Game Reference Cleanup Workflow | workflow | 2x: 8a77e633, 9dc56f96 | `用户要求删除某个游戏模块/命名空间下的所有音效，并同时清除游戏代码中的相关引用`, `删除范围具有明确命名空间边界（如消消乐下属的所有音效、p3 模块的 SFX）`, `涉及两类文件：音效注册/测试文件（定义哪些 SFX 存在）加游戏逻辑文件（调用 SoundManager.play）` |
+| 63 | `gene_fm_save_backend_migration` | Save Backend Migration — Plan-First Cross-Game Symmetric Cloud Save Upgrade | workflow | 1x: 9bbd20cc | `intent:feature_modification`, `target:game_logic`, `save_system_change` |
+| 64 | `gene_fm_lobby_game_deactivation` | Lobby Game Deactivation — Registry Remove + Config File Deletion Dual-Mechanism Cleanup | workflow | 1x: 9bbd20cc | `intent:feature_modification`, `target:ui_layout`, `lobby_game_removal` |
+| 65 | `gene_nf_sfx_event_type_wiring_chain` | Cross-Game SFX Event-Type Wiring Chain — One Event per Turn, Progressive | workflow | 1x: 9dc56f96 | `intent:feature_modification`, `target:audio`, `cross_game_sfx_wiring` |
+| 66 | `gene_fm_match3_special_block_tier_balance` | Match-3 Special Block Win-Requirement Tier Balance — Bulk Level Sweep | workflow | 1x: 9dc56f96 | `intent:feature_modification`, `target:game_logic`, `match3_game` |
+| 67 | `gene_fm_cross_game_sequential_tweak` | Cross-Game Sequential Same-Change Rollout — One Game Per Turn Style or Element Removal | workflow | 1x: 9df66fd4 | `intent:feature_modification`, `cross_game_same_change`, `one_game_per_turn` |
+| 68 | `gene_fm_hint_mechanic_progressive_redesign` | Hint Mechanic Progressive Redesign — Four-Phase Evolution from Simple Timer to Accumulating Counter | workflow | 1x: 9df66fd4 | `intent:feature_modification`, `game_hint_system`, `idle_timer_mechanic` |
+| 69 | `gene_fm_optimization_backlog_doc_sequential_consume` | Optimization Backlog Doc Sequential Consumption — @Doc + PriorityN → Batch Edit → Build | workflow | 2x: a09c411b, f14c92eb | `intent:feature_modification`, `has_attached_doc`, `target:optimization` |
+| 70 | `gene_inq_verify_then_serial_level_tweak` | Parameter-Audit-First Then Serial Level Tweak — Consecutive Inquiry Turns Gate Serial Modifications | workflow | 3x: a7d1b207, bc3f2ce9, f4dd8c16 | `intent:inquiry`, `consecutive_inquiry_turns_same_game`, `task_sa_resolved_no_edits` |
+| 71 | `gene_fm_discovery_end_condition_type_switch` | Discovery-Triggered End-Condition Type Switch — Plan-Mode Cross-Layer Core Mechanic Rewrite | workflow | 1x: a7d1b207 | `intent:feature_modification`, `but_currently_behavior_discovery`, `end_condition_type_change` |
+| 72 | `gene_doc_pinpoint_section_condense` | Pinpoint Dated-Section Condense — Single Surgical Edit to Simplify a Specific Log Entry | workflow | 6x: a7d1b207, bdf118ee, be94308f +3 | `intent:feature_modification`, `intent:documentation`, `user_opened_doc_via_mention` |
+| 73 | `gene_doc_abbreviation_clarify_then_replace` | Abbreviation Clarify Then Global Replace — Two-Turn Workflow from Placeholder Inquiry to Bulk In-Doc Rename | workflow | 1x: a7d1b207 | `intent:inquiry`, `intent:feature_modification`, `user_opened_doc_via_mention` |
+| 74 | `gene_nf_shared_nav_tab_bar_introduction` | Shared Bottom Tab Bar Introduction — Replace Per-Page Nav Buttons with Unified Tab Component | workflow | 1x: bc3f2ce9 | `intent:new_feature`, `target:ui_layout`, `shared_component_introduction` |
+| 75 | `gene_fm_mode_bifurcated_win_condition` | Mode-Bifurcated Win Condition — Main Story Auto-Win vs Free Mode Manual Completion | workflow | 1x: bc3f2ce9 | `intent:feature_modification`, `target:game_logic`, `mode_differentiation` |
+| 76 | `gene_cc_narrative_doc_scaffold_then_fill` | Narrative Doc Scaffold-Then-Fill — Planning Doc Skeleton Followed by Per-Level Content Creation Turn | workflow | 1x: bc3f2ce9 | `intent:planning_design`, `intent:content_creation`, `two_turn_doc_scaffold_fill_sequence` |
+| 77 | `gene_pd_devlog_guided_impl_start` | Dev-Log-Guided Implementation Start — @Doc Reference Triggers Full Spec Parse, Parallel Project Exploration, and Step-by-Step Implementation | workflow | 1x: bdf118ee | `intent:planning_design`, `user_opened_doc_via_mention`, `start_development_command` |
+| 78 | `gene_aoc_wrong_target_page_revert_reapply` | Wrong-Target-Page Correction — Revert Mistakenly Modified Page, Then Re-Apply Changes to the Correct Page | workflow | 1x: bdf118ee | `intent:ai_output_correction`, `agent_modified_wrong_page`, `two_structurally_similar_pages` |
+| 79 | `gene_doc_dated_section_augment` | Dated-Section or Doc-End Augment — Single Edit to Append New Content to a Specific Section | workflow | 1x: c44d6be2 | `intent:documentation`, `intent:content_creation`, `user_opened_doc_via_mention` |
+| 80 | `gene_fm_cross_page_ui_inconsistency_unify` | User Discovers Cross-Page UI Inconsistency → Consolidation to Single Implementation | workflow | 1x: c68e9e21 | `intent:feature_modification`, `target:ui_layout`, `cross_page_inconsistency_discovered` |
+| 81 | `gene_fm_emoji_ban_policy_with_rule_doc` | Emoji Ban Policy — Code Removal + Rule Codification in Dev Guidelines | workflow | 1x: cc1dd130 | `intent:feature_modification`, `intent:documentation`, `emoji_removal_no_replacement` |
+| 82 | `gene_doc_progress_tracking_scaffold` | Progress Tracking Doc Scaffold — Synthesize from Code, Scope Correct, Split to Sub-Doc, Fill Gaps | workflow | 1x: cc1dd130 | `intent:documentation`, `intent:content_creation`, `new_progress_doc_from_scratch` |
+| 83 | `gene_nf_game_event_animation_chain` | Consecutive Game-Event Animation Feature Chain (Failure/Collision/Success/Reset/Particle Effects) | workflow | 1x: d8f96672 | `intent:new_feature`, `consecutive_animation_feature_prompts`, `game_event_triggered_animation` |
+| 84 | `gene_cc_dialogue_voice_chattering` | Dialogue Voice Chattering Generation — Real-Game Style Reference Animal Chattering SFX Batch | workflow | 1x: dcc74462 | `intent:content_creation`, `target:audio`, `dialogue_voice_sounds` |
+| 85 | `gene_nf_shared_component_reference_guided_integration` | Reference-Guided Shared Component Cross-Page Integration + Event Trigger Wiring — Two-Turn Chain | workflow | 1x: dcc74462 | `intent:new_feature`, `target:game_logic`, `extend_existing_shared_component` |
+| 86 | `gene_fm_cross_game_config_centralization` | Cross-Game UI Parameter Centralization — Extract Config Table from Reference Game, Apply Symmetrically, Then Tune | workflow | 1x: dcc74462 | `intent:feature_modification`, `intent:configuration`, `target:game_logic` |
+| 87 | `gene_cc_costume_expansion_dedup` | Costume Content Expansion with Dedup — Enumerate Existing, Generate New Images Sequentially, Append as Unpurchased | workflow | 1x: dcc74462 | `intent:new_feature`, `target:game_logic`, `costume_or_outfit_expansion` |
+| 88 | `gene_fm_cross_game_rating_system_unify` | Cross-Game Rating System Unification — Letter Grades Aligned to Star Ratings to Match Existing Games | workflow | 1x: e2076a78 | `intent:feature_modification`, `target:multi_game_rating_display`, `cn_keywords:tongguandengji,xingji,tongbu,lianliankan,fanpai,tuixiangzi,xiaoxiaole` |
+| 89 | `gene_fm_web_viewport_aspect_ratio_cap` | Web Viewport Max Aspect Ratio Cap for Adaptive Resolution — Implementation + Immediate Ratio Tuning Turn | workflow | 1x: e2076a78 | `intent:feature_modification`, `target:adaptive_resolution`, `symptom:web_too_wide_display` |
+| 90 | `gene_fm_en_text_localization_sweep` | Multi-Game English Text Localization Sweep — Level Text and Popup Audit with Inline Chinese Fix | workflow | 2x: e2076a78, fa1daf15 | `intent:inspection_review`, `intent:feature_modification`, `target:multi_game_text_content` |
+| 91 | `gene_fm_multi_game_preimpl_exploration_plan` | Multi-Game Feature Modification — Pre-Implementation Exploration Turn: Task Subagent Scan, Per-Game Reads, TodoWrite Plan, and Report Without Edits | workflow | 1x: e948a3d9 | `intent:feature_modification`, `target:ui_layout`, `multi_game_scope_ge3` |
+| 92 | `gene_cc_multi_ref_parallel_doc_synthesis` | Multi-Reference-Doc Parallel Design Doc Synthesis — Read All Siblings Before Writing | workflow | 1x: fba2ad17 | `intent:content_creation`, `intent:planning_design`, `has_attached_doc` |
+| 93 | `gene_pd_design_discussion_to_impl_trigger` | Design Discussion to Immediate Implementation Trigger — PD to NF Clean Transition | workflow | 1x: 08754637 | `intent:planning_design`, `followed_by_new_feature`, `design_concept_discussion` |
+| 94 | `gene_nf_animation_progressive_detail_chain` | Player Animation Progressive Detail Chain: Broad NF → Specific Sub-Mechanic NF → Parameter FM Tweak | workflow | 1x: 6346da75 | `intent:new_feature`, `target:visual_style`, `consecutive_animation_feature_prompts` |
+| 95 | `gene_inq_capability_check_gates_nf` | Capability Gap Check Gates Immediate NF Implementation: Single Inquiry Confirms Missing Feature → NF | workflow | 1x: 6346da75 | `intent:inquiry`, `target:game_logic`, `capability_support_check` |
+| 96 | `gene_inq_ux_timing_diagnosis_gates_surgical_fm` | UX Timing Diagnosis Inquiry Gates Surgical FM: Quantify Duration Gap → Minimal Non-Blocking Fix | workflow | 1x: 6346da75 | `intent:inquiry`, `target:game_logic`, `ux_timing_complaint` |
+| 97 | `gene_fm_spec_guided_color_scheme_migration` | Spec-Guided Color Scheme Full Migration: Read Palette Spec → Scan All Files → Systematic Replacement | workflow | 1x: 6346da75 | `intent:feature_modification`, `target:visual_style`, `has_attached_doc` |
+| 98 | `gene_ir_doc_freshness_check_sweep` | Inspection-Review-Triggered Doc Freshness Check and Sweep: Breadth-First Scan → Batch Update Stale Docs | workflow | 1x: 6346da75 | `intent:inspection_review`, `target:documentation`, `no_attached_doc` |
+
+---
+
+## `gene_nf_design_doc_system_build`
+
+**设计文档驱动的新系统落地工作流** / Design-Doc-Driven New System Implementation Workflow
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `has_attached_doc`
+- `mentions_specific_file`
+- `large_system_implementation`
+- `design_doc_referenced`
+- `cn_keywords:luodi,xitong,fangan`
+
+**Preconditions:**
+- 用户在提示词中引用了设计方案文档（通过 @文件名 或 file:/// 路径），要求落地某个系统或功能。
+- 这是该功能的首次实现，目标系统尚未存在于代码库。
+- 实现规模较大，涉及多个文件和子系统（音效系统、关卡系统、存档系统等）。
+
+**Evidence:** Turn 1 (145 steps): user referenced 音效系统设计方案.md via @-mention. Agent read design doc + AI开发规范.md → TodoWrite plan → Explore subagent → 34 edits + 3 writes + specialized MCP tools (batch_sound_effects, text_to_sound_effect) → build. Pattern: design doc reference at session open triggers a full read-plan-explore-implement-verify cycle. | 61467d20 T01 (97 steps, 0 edits/13 writes, 1 build): user attached two docs via @-mention (@AI开发规范.md + @P3-消消乐.md) and said '开始制作'. Agent: (1) Read both attached docs. (2) Read 架构决策记录.md + 策划案-大厅.md. (3) Task SA — explore existing project structure (mapped 82 files, identified P1/P2 reference games). (4) Read 10 P2-memory-flip reference files (adapter.lua, init.lua, save.lua, state.lua, all screens/ and view/ files). (5) TodoWrite (14 tasks). (6) Write 12 new P3-match-3 files in dependency order: config → data/levels.lua → logic/state.lua → logic/board.lua → view/board-renderer.lua → view/hud-renderer.lua → view/result-popup.lua → view/pause-overlay.lua → screens/level-select.lua → save.lua → screens/gameplay.lua → adapter.lua → init.lua. (7) Bash mkdir -p for directory structure. (8) Mid-implementation re-reads: reads all 8 newly-written P3 files + P2 view/screen reference files again before writing screens/gameplay.lua and adapter.lua (to verify interfaces match). (9) Build → success. Key variant vs 014354fc: 97 steps vs 145; no specialized MCP tools (audio tools not needed); design doc is game design spec not audio system; reference game P2 is the primary implementation template. Same core pattern: @design_doc + @dev_spec → read docs + read reference game → Write files in dependency order → mid-implementation re-read → build.
+
+---
+
+## `gene_doc_terse_breadth_first`
+
+**简短「更新文档」指令触发的广度优先文档同步** / Terse 'Update Docs' Trigger — Breadth-First Documentation Sync
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `terse_prompt_le_4_tokens`
+- `cn_keywords:gengxin,wendang,tongbu`
+- `follows_feature_completion`
+- `large_file_bash_python_fallback_possible`
+
+**Preconditions:**
+- 用户发送了简短的文档更新指令（如「更新文档」，1-4个词，无具体说明哪些文档或更新什么内容）。
+- 通常发生在完成一个功能实现或修复之后，需要同步文档状态。
+
+**Evidence:** 014354fc T3 (30 steps): user prompt was exactly '更新文档' (2 tokens). First step: Glob 'docs/**/*.md'. Then read 音效系统设计方案.md, 完成记录.md, 总体进度.md, 架构决策记录.md. Then 9 edits across multiple docs. Pattern: a 2-word doc update prompt triggers full discovery + systematic multi-doc editing. | 056c0fdf T4 (50 steps): same '更新文档' prompt. Used 6x Glob to discover all .md paths (scripts/**/*.md, docs/**/*.md, memory/**/*.md, etc.), then read 3 docs (P1-推箱子关卡详细设计.md, 完成记录.md, 总体进度.md). Encountered oversized markdown file — fell back to 5x python3-via-Bash scripts (sed read, python -c, heredoc, base64 encoding) to perform surgical line replacements. Then 9 edits across 3 docs. Confirms pattern + adds large-file bash fallback variant. | 08e306a0 T06 (16 steps): same 更新文档 prompt. New variant: agent first ran 2x Grep searching for session-specific terms (density, PHONE_REF — the shared module introduced in T03) BEFORE doing Glob, using session context to pre-target what needs updating. Then Glob docs/**/*.md, read 4 docs (架构决策记录.md, AI开发规范.md, 完成记录.md, 总体进度.md). Added ADR-010 (UI platform adaptation), new 完成记录 entry, updated 总体进度. 7 edits across 3 docs. Variant: Grep-for-recent-changes before Glob when session context is rich. | 0ea2a577 T05 (45 steps): same '更新文档' prompt after audit+fix session. New variant: agent dispatched a Task subagent specifically to discover project doc files (not Glob directly). Read 文档维护规范.md + 完成记录.md + 总体进度.md + 自查问题报告.md + 主线关卡总览.md (5 docs). 18 edits across 4 docs: 完成记录.md (v8.7→v8.9, added '第五批自查修复' paragraph), 自查问题报告.md (marked P1/P2 issues as resolved, 12 edits), 总体进度.md, 主线关卡总览.md (13 edits updating level status). Variant: Task-subagent-for-discovery + audit-report doc (自查问题报告.md) updated alongside standard progress docs when session was an audit session. | 1cd7c1eb T07 (42 steps): same '更新文档' prompt after visual redesign session (T00-T06). Variant: agent dispatched a Task subagent specifically to discover project doc files (Step 1), then Read 文档维护规范.md + 完成记录.md + 总体进度.md + 架构决策记录.md + 策划案-大厅.md (5 docs). 21 mcp__mkr__Edit calls across 4 docs: 完成记录.md (2 edits, new entry for '游戏合集感重设计'), 总体进度.md (7 edits, updated milestone/completion status), 架构决策记录.md (3 edits, new ADR for UI redesign), 策划案-大厅.md (8 edits, updated UI spec to match new home page design). Same Task-subagent-for-discovery variant as 0ea2a577, with extra: design-spec doc (策划案-大厅.md) updated alongside standard progress docs when session changed the overall UI direction. | 212062a8 T3 (8 steps): same '更新文档' prompt after a bug-verification session (T01 verified feature impl, T02 fixed UI z-order). Minimal variant: agent read only 自查问题报告.md (already in session context from T00/T01), applied 4 edits: updated summary-table severity counts (marked issue 5.1 column as resolved), changed section header [严重]→[已修复] with strikethrough, struck out the issue in the priority summary list, appended a fix entry to the changelog table. Did NOT touch 完成记录.md or 总体进度.md — because T02 was a minor UI bug fix (z-order), no new feature was delivered. Variant: when session activity was bug verification + minor fix only, '更新文档' → read and update only the audit/issue-report doc (自查问题报告.md), skip standard progress docs. | 24a716d1 T05 (33 steps): same '更新文档' prompt after a balance-tuning session (T04 lowered match-3 starScore values). New variant: agent dispatched a Task subagent '查找项目文档文件' for discovery, then Read 3 docs (P3-消消乐.md, 完成记录.md, 总体进度.md). TodoWrite: 3 tasks targeting exactly what T04 changed (update P3 star-score table + examples, update completion record, update overall progress). 17 Edits across 3 docs. No build. Variant: Task-subagent-for-discovery; doc scope limited to design spec that tracks balance parameters (P3-消消乐.md starScore table) + standard progress docs. The game-specific design spec (P3.md) was updated here rather than in T02 because T04 changed numeric parameters rather than adding features. | 2c4b3363 T04 (8 steps): minimal variant '更新文档' after stone/ice block implementation sequence. Agent used Grep to find recently-added block types (石头/冰块) before Glob, then read P3-消消乐.md and applied 3 edits to doc. No build. Session context rich → Grep-first variant. T11 (36 steps): second '更新文档' after longer visual effects session. Used 2x Glob + 2x mcp__mkr__Bash for discovery, read 5 docs (P3-消消乐.md, 完成记录.md, 总体进度.md, 架构决策记录.md, P1.md), 9 edits across 4 docs. Large variant driven by session covering both new mechanics and visual effects. Confirms: session complexity correlates with 更新文档 step count (8 steps for minor feature, 36 for major session). | 374e4eb7 T07 (29 steps, 11 edits, 4 writes): '更新文档' after outfit system design + initial implementation (T00-T06). Agent: 3x Glob → Read design-wardrobe-system.md + 完成记录.md + 总体进度.md → TodoWrite → 11 edits primarily on the newly created design-wardrobe-system.md (4 edits) + 完成记录.md + 总体进度.md (6 edits combined). Variant: when session introduced a new design doc, that doc receives the most edits in the update turn. T11 (27 steps, 7 edits, 5 writes): '更新文档' after adding outfit-based compliment lines (T08) and character click-to-chat feature (T10). Agent: Read design-wardrobe-system.md + 完成记录.md + 总体进度.md directly (no Glob needed, files in session context) → TodoWrite → 7 edits across all 3 docs. Faster variant: session-context-rich, Glob skipped. T26 (27 steps, 10 edits, 3 writes): '更新文档' at session end after bug fixes and visual tweaks. Agent: 3x Glob → Read 完成记录.md + 总体进度.md (design doc omitted — no design changes this turn, only bug fixes) → 2x Bash for large-file operations → 10 edits across 完成记录.md + 总体进度.md. Variant: when session activity was bug fixes only (no new features), design doc is omitted from update scope. | 4463c53b T04 (12 steps, 5 edits, 0 builds): minimal variant confirmed — '更新文档' after: T02 fixed issues 5.3+5.4 (text shadows in result popup + adventure label) AND T03 repositioned+restyled fox chat text (bubble→plain text). Agent: Read 自查问题报告.md directly (in session context, no Glob needed) → 5x Edit on that single file only: (1) mark 5.3/5.4 section headers as [已修复], (2) update summary table severity counts, (3) update priority list status for 5.3/5.4, (4) append fix record entries (including T03 chat text change), (5) bump version v1.7→v1.8. Did NOT touch 完成记录.md or 总体进度.md — because T02-T03 were all issue-report-driven fixes (not new feature additions). Variant rule: when entire session activity was fixing issues already tracked in the issue report, '更新文档' → read+update ONLY the issue report doc (version bump + mark fixed + append changelog), skip 完成记录/总体进度. Note: even T03's UI style change (not a numbered issue) was captured in the issue report's changelog table, confirming the issue report absorbs all session-level changes in this scenario. | 4cfa39d0 T3 (4 steps, 0 edits, 0 builds): '更新文档' at session end after T1 (obstacle/risk analysis of audio design doc) and T2 (optimized and rewrote the audio design doc + updated ADR). Agent: (1) respond_to_user. (2) Read 音效系统设计方案.md. (3) Read 架构决策记录.md. (4) respond_to_user — reported docs already up to date, no changes needed. Zero edits. New variant (no-op): when '更新文档' fires after the prior turn already performed a full doc write/rewrite (T2 did Write on 音效系统设计方案.md + 2x Edit on 架构决策记录.md), the docs are already current — agent reads both docs, confirms no pending updates, and returns without any edits. Rule: '更新文档' is not always a write trigger; when the immediately prior turn already updated the target docs, the result is a read-only verification no-op. | 4f916c20 T23 (66 steps, 21 edits): '更新文档' after big feature session (portal system T01 + editor import button T21). Agent: 5x Glob (searched across scripts/games/p1-puzzle-land/**/*.md, docs/**/*.md, memory/**/*.md, etc.) → Read 4 docs (P1-推箱子关卡详细设计.md, 开发记录-P1推箱子M1.md, 完成记录.md, 总体进度.md) → TodoWrite → 2x Bash wc-l (counted total line counts for all Lua files to update code-stats table in dev log) → 21 edits across 4 docs. New variant: game-specific development log (开发记录-P1推箱子M1.md) with file-size stats table requires Bash wc-l before editing to get accurate line counts. T33 (25 steps, 12 edits): '更新文档、' (with trailing 、) at session end after text-input import feature (T25) + web paste bug fix (T31). Agent: TodoWrite first (docs in session context, Glob skipped) → Read 3 docs (开发记录-P1推箱子M1.md, 完成记录.md, 总体进度.md) → 2x Bash wc-l → 12 edits across 3 docs. Variant rule: when session involved bug fixes + feature iteration (not new game features), game-specific design doc (P1-推箱子关卡详细设计.md) is omitted and only 开发记录 + 完成记录 + 总体进度 are updated. Both variants confirm: when game has dedicated 开发记录 with file-size stat table, '更新文档' triggers Bash wc-l measurement before doc edits. | 5c2aeaee T12 + T14 (indices 9-10): Two sequential doc-check triggers. T12 (index 9, jiancha kaifa jilu, ~18 steps, 7 edits): 3x Glob -> Read kaifa jilu doc -> Bash wc -l (get current line counts) -> TodoWrite -> 7x Edit (update code stats table, add animation feature entries). T14 (index 10, jiancha wendang, ~8 steps, 1 edit): Read dev log -> 2x Bash wc -l -> Grep -> 1x Edit (final stats update). Key variant: jiancha X shifou you xuyao gengxin is functionally equivalent to gengxin wendang; triggers same update-doc workflow. jiancha kaifa jilu always requires Bash wc -l before edits (dev log has code stats table). Two sequential doc-check prompts produce diminishing edits (7 edits then 1 edit) as second pass only catches remaining gaps. | 61467d20 T13 (36 steps, 10 edits): '检查文档，是否有需要更新的的内容' (variant phrasing 'jianchawenjian') after P3 match-3 scaffolding + special block effects session. Agent: (1) Task SA '查找P3相关文档文件'. (2) 3x Glob (scripts/games/p3-match-3/**/*.*, docs/**/*.md, memory/**/*.md). (3) Read 6 docs: 总体进度.md + 完成记录.md + P3-消消乐.md + 文档维护规范.md + 架构决策记录.md + AI开发规范.md. (4) Bash find to get file list and count. (5) TodoWrite (6 tasks). (6) 10 Edits across 3 docs: 总体进度.md (6 edits: P3 status, version), 完成记录.md (1 edit), P3-消消乐.md (3 edits: icon/cover path + chain elim rule + version). 0 builds. Variant: 'jianchawenjian' phrasing triggers same doc-update workflow as '更新文档' — distinguishing signal is inspection_review classification, but agent behavior is identical. Key: P3 game design doc (P3-消消乐.md) updated alongside standard progress docs because P3 was just implemented in this session. T16 (14 steps, 5 edits): '检查文档是否有需要更新的地方' at session end after T14 (Sokoban mouse swipe) and T15 (rainbow bug fix). Agent: (1) TodoWrite (session change recap). (2) Read 完成记录.md + 总体进度.md (ONLY 2 docs — no Task SA, no Glob). (3) 5 Edits across 2 docs: 完成记录.md (2 edits: add P1 mouse swipe entry, add bug fix entry) + 总体进度.md (3 edits: update P1 status, version). No-Glob minimal variant: doc update mid-session (T13 already updated docs) → second doc update at session end → agent skips discovery, reads only the 2 standard progress docs, updates only entries missed in T13 (T14 mouse swipe + T15 rainbow bug). Pattern: when a prior turn in the SAME session already did a comprehensive doc update, the end-of-session doc check uses a minimal 2-doc variant (complete-record + overall-progress) without re-scanning game design docs. | 6b8566ea T11 (6 steps, 1 edit, 0 builds): '更新文档' after obstacle-addition and narrative-fix turns (T03-T10 modified story-N.lua configs + storyline.lua only). Agent: (1) Grep 主线关卡总览.md. (2) Read 主线关卡总览.md. (3) Read 主线关卡总览.md again. (4) Edit 主线关卡总览.md (1 edit). Did NOT touch 完成记录.md or 总体进度.md. Minimal single-doc variant: when session activity was exclusively story-level config changes (obstacle data + narrative text in storyline.lua), '更新文档' → update only 主线关卡总览.md (the level overview tracking per-level obstacle counts and narrative summaries), skipping 完成记录/总体进度/design docs. | 6b8566ea T17 (3 steps, 1 edit, 0 builds): '更新文档' at end of session after more story-level narrative edits (T13-T16 continued storyline.lua + story-N.lua modifications). Ultra-minimal variant: Read 主线关卡总览.md → Edit 主线关卡总览.md → respond (3 steps total). Same single-doc scope. Pattern confirmed: for sessions that only touch story-level configs and narrative text (no new features, no architecture changes), '更新文档' consistently collapses to a single-doc update of 主线关卡总览.md. | 9bbd20cc T10 (42 steps) + T12 (28 steps): T10 '检查文档是否有需要更新的内容' — triggered after T09 cloud-save migration; agent reads docs/ breadth-first across all markdown files, identifies outdated local-save references and architecture notes, updates multiple docs to reflect cloud save backend. T12 '检查文档是否需要更新' — triggered after T11 lobby cleanup (removing 2 game entries); agent reads docs again, updates lobby/game-registry docs to remove references to deactivated games. Both are post-change doc-sync triggers. Two-occurrence session: session contains two doc-check turns (T10 after a major infra change, T12 after a UI/registry change) — pattern repeats within single session. | a7d1b207 T08 (67 steps, 38 edits, 0 builds): '更新文档' after a major match-3 redesign session (T06 changed end-condition step-limit→60s timer across 5 files; T07 added 90s timer + post-time star calc + HUD progress indicator). Agent: 4x Glob (docs/**/*.md, memory/**/*.md, scripts/games/p3-match-3/**/*.md, scripts/**/*.md) + Task SA '查找项目文档' (parallel doc discovery) + Read 5 docs (P3-消消乐.md, 完成记录.md, 总体进度.md, 开发记录.md, 架构决策记录.md) + TodoWrite + 34 Edits across multiple docs. Very large variant: step count driven by the breadth of the preceding session changes (2 turns × 5 files each = 10 code files modified → corresponding doc surface area is wide). Confirms: session complexity (number of prior turns + files changed) is proportional to '更新文档' turn step count and edit count.
+
+bc3f2ce9 T17,T24,T27,T31,T41: 5 terse "更新文档" turns spread across the session. T17 (39 steps, 11 edits): after tab bar introduction (T14-T16); large update covering tab bar design + initial position changes. T24 (13 steps, 7 edits): after tab bar position tweaks (T18-T23); moderate update. T27 (26 steps, 11 edits): after title cross-copy from main story to free mode (T25-T26). T31 (14 steps, 5 edits): after main story popup redesign + star scoring rule change (T30). T41 (50 steps, 17 edits): full session-end comprehensive update after gameplay logic changes (T32-T40) including score formulas, shared popup, mode bifurcation, tile type expansion. Step counts correlate with session activity breadth: T17/T27/T41 (11+ edits) follow multi-file feature turns; T24/T31 (5-7 edits) follow smaller change sets. No build in any doc turn. Confirms: 5 evenly distributed doc checkpoints within a 42-turn session — user syncs docs after each thematic cluster (UI polish cluster → doc, tab bar tweaks → doc, etc.).
+
+be94308f T6 (json index 6, 3 steps, 1 edit, 0 builds): '更新文档' at session end after two consecutive doc-condense turns (T4-T5 condensed a March 19 entry in 完成记录.md). Ultra-minimal context-warm variant: file already in session context → no Glob, no Task SA. Agent: Read 完成记录.md → Edit (single update entry) → respond_to_user. 3 steps total. Variant rule: when '更新文档' fires immediately after a preceding doc-editing sequence that already warmed the target file in context, agent skips Glob discovery and goes straight to Read→Edit→respond on that same file.
+
+c44d6be2 T2 (json idx 2, 7 steps, 2 edits, 0 builds): '更新文档' after T1 integrated a GitHub-cloned font (LongZhuTi-Regular.ttf) into all game adapters. Single-doc variant: AI开发规范.md was already open via file:// in the turn context. Agent: (1) Read AI开发规范.md. (2) respond_to_user (interim note about checking font usage). (3) Grep (search actual font references in code). (4) respond_to_user (identifies missing font-spec section in doc). (5-6) 2x Edit AI开发规范.md (added §3.1 字体规范 — font path convention, nvgCreateFont usage, UI.Init config pattern). (7) respond_to_user. No Glob, no Task SA, no broad multi-doc scan. Variant rule: when '更新文档' fires with a file:// doc pre-attached AND the prior turn just integrated a specific asset into code, agent reads the attached doc → Grep code for the new asset's usage pattern → adds a targeted spec section to that single doc. Distinguishes from full breadth-first: only 1 doc updated, driven by the file:// attachment and session context rather than broad discovery.
+
+cc1dd130 P4 (89 steps, 28 edits, intent: inspection_review+documentation): user prompt '检查文档是否有需要更新的部分'. Context: this turn immediately followed a policy-establishment turn (P3 banned emoji from code + added rule to AI开发规范.md). New behavioral variant: POLICY-ENFORCEMENT CONTINUATION during doc review. Agent did NOT go straight to docs. Instead: (1) TodoWrite. (2) Bash grep emoji in shared scripts. (3) Read main.lua → Edit main.lua (remove emoji). (4) Read game-card.lua → Edit game-card.lua (remove emoji). (5) Grep .emoji pattern. (6) Edit game-card.lua again. (7) Read top-bar.lua → Edit top-bar.lua (remove emoji). (8) Read home/init.lua → 3x Edit home/init.lua. (9) Read profile/init.lua → 3x Edit profile/init.lua. (10) Bash grep-verify all emoji removed from shared scripts. THEN proceeded to standard breadth-first doc update: (11) TodoWrite. (12) Bash get file counts. (13-17) Bash list all Lua files. (18) Read 开发记录-大厅M1.md + 开发记录-P1推箱子M1.md + 策划案-大厅.md + 文档维护规范.md (4 docs). (19) Bash wc -l. (20) Read config file. (21) TodoWrite. (22-39) 18x Edit across 4 docs (开发记录-大厅M1.md 8 edits, 开发记录-P1推箱子M1.md 5 edits, 策划案-大厅.md 4 edits, 文档维护规范.md 2 edits). (40) Build. Key variant rule: when '检查文档' or '检查文档是否有需要更新的部分' follows a POLICY ESTABLISHMENT turn (emoji ban, naming convention change, etc.), agent first completes unfinished policy enforcement in code (grepping for remaining violations + removing them) before switching to standard breadth-first doc update. This EXTENDS the prior turn's scope into the doc-review turn. 89 steps is the largest '检查文档' turn observed, driven by both policy-cleanup (steps 1-10) and full 4-doc update (steps 11-40).
+
+ceed02b2 T2 (39 steps, 13 edits, 1 build): user said '检查文档，是否有需要更新的地方'. Context: immediately follows T1 which deleted the pause button from p3-match-3. Agent: (1) Task SA '查找消消乐相关文档' (topic-scoped to p3/match-3/pause keywords — not generic '查找项目文档'). (2) Read P3-消消乐.md (game design doc). (3) Read 总体进度.md. (4) Read 完成记录.md. (5) Read p3-match-3/adapter.lua (source code — to check for stale pause references in adapter). (6) Read 策划案-大厅.md. (7) TodoWrite (8 tasks). (8) Edit adapter.lua ×1 (removed stale pause button registration from adapter code). (9) Edit P3-消消乐.md ×6 (updated to reflect button layout changes and pause removal). (10) Edit 总体进度.md ×4. (11) Edit 完成记录.md ×2. (12) Build success. New variant rules: (a) Task SA for discovery is topic-scoped to the session's target game (p3/match-3/pause), not a generic '查找项目文档' call — when session was single-game focused, SA query narrows accordingly; (b) agent reads SOURCE CODE (adapter.lua) alongside docs — because T1 deleted a UI element, adapter.lua may still register/reference it, and a code edit is required inside the doc-check turn; (c) BUILD fires at end because adapter.lua (source code) was edited, not just docs — doc-check turns that involve code edits require build verification. The '是否有需要更新的地方' phrasing is functionally equivalent to '是否有需要更新的内容' (61467d20 T13/T16) — both trigger identical breadth-first doc-update workflow. | d8f96672 T2 (28 steps, 9 edits, 0 builds): '检查文档是否有需要更新的地方' after two consecutive animation feature turns (T0: character game-event animations, T1: reset animation + particles). Task SA for doc discovery + Read ×3 + Bash ×2 (wc-l) + Edit ×9 across multiple docs. Full breadth-first update. T4 (5 steps, 0 edits): '检查文档，是否有需要更新的内容' after T3 (minor UI layout change — pause button repositioned). Read ×4 → respond_to_user. No-op variant: preceding turn was a minor UI-only change (no new features, no new files) → agent reads docs, finds nothing to update, returns with no edits. T6 (12 steps, 5 edits): '检查文档有什么需要更新的内容' after T5 (deleted a left-arrow UI button). Grep ×1 → Read ×2 → Bash ×1 → Edit ×5. Minimal targeted update: deleting a UI element triggers doc update only for the relevant design section. T18 (55 steps, 24 edits, 0 builds): '检查文档，是否有需要更新的地方' at end of session after transition overlay implementation + subsequent bug fixes + layout changes (T9-T17). Task SA + Read ×6 + Bash ×5 (file stats) + Edit ×20 across multiple docs. Large end-of-session comprehensive update: proportional to session breadth (9 preceding turns, multiple files changed). Pattern: 4 doc-check prompts in single session — step counts correlate with session activity prior to each checkpoint (large after feature burst, no-op after minor UI tweak, minimal after single button deletion, large at session end). All use '检查文档' phrasing variants.
+
+dcc74462 T6 (18 steps, 7 edits, 0 builds): '更新文档' after game-logic win-condition change (T5: always 3-star for main story). Agent: read key docs → 7 edits across design + completion record docs. Standard moderate variant.
+
+dcc74462 T11 (17 steps, 6 edits, 3 Glob): '更新文档' after chat integration + bug fix sequence (T7-T10). 3x Glob for doc discovery + read + 6 edits across multiple docs. Standard with Glob discovery.
+
+dcc74462 T16+T17 consecutive-identical-prompt variant: two back-to-back '更新文档' prompts after costume generation + difficulty discussion turns. T16 (42 steps, 12 edits, 5 mcp__mkr__Bash): heavy update — agent used 5x Bash commands (likely for large-file operations or wc-l type measurements) alongside 12 edits across multiple docs. T17 (4 steps, 2 edits): immediately following T16 with the exact same '更新文档' prompt — ultra-minimal pass (2 edits only) that catches any remaining gaps missed by T16. Pattern rule: when two consecutive identical '更新文档' prompts appear in sequence, the first performs the bulk of the work (step count proportional to session activity) and the second is a diminishing-return verification pass (typically 2-6 edits). Both should be executed — the second is not a no-op but a final cleanup sweep. | e2076a78 T8 (26 steps, 7 edits, 4 reads): follows T7 anti-addiction design doc write; agent glob-scans docs, reads design+progress docs, updates design doc and completed-features log. T16 (9 steps, 1 edit, 2 greps): session-closing doc update after T15 image size fix; agent grep-searches for any English text remnants then syncs docs. Confirms: terse 更新文档 at session close triggers breadth-first sweep regardless of how minor the preceding change was. | e7d71628 T05 (intent: documentation, prompt_index 5): '更新文档' after a session implementing skin purchase flow (T00) + fixing 2 Lua runtime errors (T01-T02) + visual fix (T03) + save-state extension (T04). File:// attachment of 完成记录.md present. Standard post-session doc update pattern — confirms gene applies to purchase/skin-system implementation sessions. | ef2c887b T6 (16 steps, Glob x2, Grep x1, Read x4, Edit x3, 0 builds) + T8 (7 steps, Grep x2, Read x1, Edit x2, 0 builds): user sent [gengxin wendang] TWICE consecutively in the same session (T6 and T8), following a 3-turn config change sequence (T0-T4). T6: comprehensive first pass -- Grep x1 (stale refs scan), Glob x2 (find all .md), Read x4, Edit x3. T8: lighter second pass -- Grep x2 (check remaining stale refs), Read x1, Edit x2 -- targeting only missed items. DIMINISHING COMPLEXITY: consecutive identical doc-update prompts follow heavy->light pattern within same session. Second prompt behaves as a consistency sweep, not a full rediscovery. | f14c92eb T04 (6 steps, 3 edits): '更新文档' with optimization-suggestions.md open — after 2 component extraction turns (T02+T03), user updated checklist status. T08 (3 steps, 1 edit): '更新文档' with 完成记录.md open — session-ending summary update. Pattern: terse doc update turns punctuate longer feature sequences.
+
+fa1daf15 T1 (30 steps, 9 edits, 0 builds): '更新文档' after skin-acquisition popup feature (T0, 42 steps, complex new UI feature with animation). Agent: 9x mcp__mkr__Edit + 5x respond_to_user + 5x mcp__mkr__Read + 4x TodoWrite + 2x mcp__mkr__Bash. Large update proportional to prior complex new-feature turn — confirms correlation between preceding turn complexity and doc-update step count. T3 (8 steps, 3 edits): '更新文档' after English identifier localization sweep (T2, 55 steps, Grep-heavy). Minimal variant: 3x mcp__mkr__Edit + 3x respond_to_user + 1x mcp__mkr__Read + 1x Grep. Smaller scope because T2 was a targeted text-deletion sweep (not a new feature), so only level-overview doc and completion log need updating. T6 (17 steps, 4 edits): '更新文档' after ai_output_correction session (T5, 54 steps, numerical mismatch fix). Medium variant: 6x mcp__mkr__Read + 4x mcp__mkr__Edit + 3x TodoWrite + 2x Grep + 2x respond_to_user. Three-doc sweep (level overview + completion log + progress doc) after a correction turn that itself already made many edits — confirming doc-update turn re-sweeps for remaining consistency gaps.
+
+---
+
+## `gene_nf_test_feature_explore_first`
+
+**测试/Debug 功能新增：先探索现有基础设施再实现** / New Test/Debug Feature — Explore-First Infrastructure Integration
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:test_ui`
+- `debug_panel_mentioned`
+- `test_switch_mentioned`
+- `cn_keywords:ceshi,debug,tiaoshi,kaiguan`
+
+**Preconditions:**
+- 用户要求新增测试或调试功能（测试UI、debug面板、测试开关开启后的新功能等）。
+- 目标功能需要与已有的测试/debug框架集成，而非完全新建。
+- 提示词中提到了条件触发（如「测试开关开启时」）。
+
+**Evidence:** Turn 2 (45 steps): user asked to add sound effect test UI accessible via test toggle. First step: Task/Explore subagent to map test toggle and debug UI structure. Then read debug-panel.lua, feature-flags.lua, sound-manager.lua. Implemented by extending existing debug panel, not creating a new entry point. Pattern: test feature requests → Explore existing infra → extend, don't create from scratch.
+
+---
+
+## `gene_nf_global_test_flag_creation`
+
+**全局测试开关从零创建：先探索代码库约定，再添加布尔 flag 并挂钩 UI 入口** / Global Test Flag Creation from Scratch — Explore Conventions, Define Boolean, Hook UI Entry
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `test_toggle_creation_from_scratch`
+- `no_existing_test_infra`
+- `default_enabled_mentioned`
+- `no_build_needed`
+- `heavy_codebase_exploration_first`
+- `cn_keywords:zong_kaiguan,ceshi_zong_kaiguan,moren_kaiqia,kongzhi_gongneng_kaiguan,ceshi_kaiguan`
+- `specific_feature_scope_flag`
+
+**Preconditions:**
+- 用户要求「制作」或「添加」一个测试/调试开关，可以是全局总开关，也可以是针对单一功能模块的专项开关（如「仅测试非可游玩时间」），而非在已有 debug 基础设施上新增功能。
+- 当前项目中不存在测试/debug flag 系统（或已有系统无法覆盖用户描述的控制范围）。
+- 用户明确要求默认开启（方便开发阶段直接生效）。
+- 通常是会话中的第一条指令，或新一批开发功能的起始指令。
+- 后续往往紧跟多个新功能请求，这些功能均通过该测试开关来控制可见性/激活状态。
+
+**Evidence:** be94308f T0 (json index 0, 46 steps, 0 builds): user sent '制作一个测试的总开关，让我控制一些功能的开关。测试开关默认开启'. Agent: tools = respond_to_user×13, mcp__mkr__Read×12, Grep×8, TodoWrite×5, mcp__mkr__Bash×2, mcp__mkr__Write×2. Phases: editing (35 steps), localization/exploration (11 steps). 2 minor errors. No build. Pattern: agent spent 11 exploration steps (Grep+Read) scanning codebase for existing flag patterns and entry points before writing. Then 35 editing steps to define the flag, hook it into UI conditional logic, and Write the new files. No build needed — Lua config change takes effect immediately at runtime. This gene is complementary to gene_nf_test_feature_explore_first: gene_nf_test_feature_explore_first covers ADDING A FEATURE to existing test infrastructure; this gene covers CREATING the test infrastructure from scratch. Characteristic signal: user says '制作一个总开关' (create a master switch) rather than '在测试模式下新增X功能' (add X to test mode). The session T1-T3 all add features that are gated by this flag, confirming the flag-first → feature-chain pattern. | ef2c887b T0 (33 steps, 9 reads, 2 edits, 1 build, 0 errors): user sent [zai peizhi zhong zengjia ceshi kaiguan, ceshi kaiguan kaiqishí, shiwei zai fei keyouwanjiéduan, kaiguan moren kaiqia]. Agent: (1) respond_to_user. (2) Glob x3 (scan config dirs). (3) Grep x4 (search existing flag/testMode patterns). (4) Read x9 (config files + game logic). (5) TodoWrite x4 (plan flag location and integration). (6) Edit x2 (add forcePlayTimeRestrict to config, wire conditional logic). (7) build x1. Phases: editing(26), localization(7). KEY VARIANTS vs be94308f: (a) scope is NARROWER -- not global testMode but focused play-time restriction toggle; (b) flag in build_config not game_logic; (c) build IS present (flag wires into game logic not just UI); (d) immediately followed by T2 scope-narrowing rename then T4 set-to-false. Confirms: heavy exploration-first pattern holds regardless of scope width.
+
+---
+
+## `gene_fm_puzzle_level_redesign_with_simulation`
+
+**益智关卡重新设计：先模拟验证再落地** / Puzzle Level Redesign with Simulation-First Solvability Verification
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `puzzle_level_redesign`
+- `custom_game_mechanic`
+- `solvability_verification_needed`
+- `cn_keywords:chongsheji,guanka,bingkuai,yanzheng,tuidao,huaxing`
+
+**Preconditions:**
+- 用户要求重新设计益智游戏的某一关卡（推箱子、方块消除等），并要求强化特定机制（冰块、传送门等需要特殊物理规则的元素）。
+- 关卡有确定性解法约束——错误设计可能导致无解关卡（用户会直接遭遇卡关）。
+- 目标关卡已存在于数据文件中（如 levels.lua），需用新设计替换某一关的数据。
+
+**Evidence:** 056c0fdf T1 (20 main steps + 3 substantive subagents): user asked to redesign Sokoban level 6 with more ice mechanics and bigger field. Agent dispatched: (1) SA a2e60d5 — Explore subagent read levels.lua, board.lua, level-loader.lua to map tile types and ice sliding rules. (2) A design subagent (Task step 8) constructed the new level layout. (3) SA af06861 — Verification subagent wrote a Python simulator (31 steps, multiple compile-fix iterations via base64 encoding workaround) to simulate ice sliding and confirm the level is solvable. After verification passed, main agent edited levels.lua and built. Pattern: explore mechanics → design → simulate-verify → apply → build. | 3ee927f3 T16 (47 steps, 12 edits, 3 writes, 1 build): user asked '重新设计推箱子第七关之后的，设计为高难度高难关卡'. Agent: (1) Task SA1 'explore p1-puzzle-land level files' → read levels.lua + board.lua to understand tile types and movement rules. (2) Task SA2 'design and verify high-difficulty levels' → SA wrote 3 iterative Python simulation scripts (verify_levels.py → v2 → v3), ran via Bash until all levels verified solvable. (3) TodoWrite + 9 edits to levels.lua + 3 Writes for new level data. (4) Build success. Key variant: two separate subagents (explore vs. design+verify split), and the simulation script itself required 3 iterations to fix simulation logic bugs before verification passed.
+
+---
+
+## `gene_nf_ui_event_triggered_hint`
+
+**游戏操作提示文字：首次事件触发渐隐消失** / UI Tutorial Hint with Event-Triggered Fade — Explore Rendering First
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:ui_layout`
+- `hint_text_mentioned`
+- `fade_or_disappear_mentioned`
+- `event_triggered_state_change`
+- `cn_keywords:tishi,jianyin,xiaoshi,huadong,chenggong,caozuo`
+
+**Preconditions:**
+- 用户要求在游戏屏幕中添加引导/提示文字，该文字需要在特定游戏事件后（首次成功操作、首次点击等）自动淡出或消失。
+- 提示文字需嵌入现有游戏屏幕的 UI 层，需了解当前渲染方式和事件系统才能正确实现。
+
+**Evidence:** 056c0fdf T2 (32 steps): user asked to add '滑动屏幕进行移动' hint at bottom of Sokoban screen that fades after first successful move. Agent: (1) SA a9ee6a4 — Explore subagent used Bash ls + Read to map rendering code (board-renderer.lua, screens/gameplay.lua, adapter.lua, animations.lua). (2) Main agent read 6 view files. (3) 5 edits: view/gameplay-view.lua (hint node + fade animation), screens/gameplay.lua x3 (event callback + reset), screens/gameplay-init.lua (init state). Build success. Pattern: explore rendering code → read view structure → add text node + fade animation + event-callback trigger → multi-file edit → build.
+
+---
+
+## `gene_nf_existing_impl_reuse_audit`
+
+**新功能请求前检查现有实现：语义命名预测 + 集成状态审计** / New Feature Existing Implementation Audit — Semantic Module Discovery Before Reimplementing
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `no_attached_doc`
+- `compliance_or_access_restriction`
+- `time_or_condition_gate`
+- `cn_keywords:xianzhi,baohu,weichangnian,shijian,kewanshijian,feikewanshijian`
+
+**Preconditions:**
+- 用户要求新增一项访问控制或合规限制功能（如未成年人保护、时段门控、条件限制），未附加任何设计文档。
+- 代码库中可能已存在同语义的实用模块（如 play-time-guard、time-restriction 等命名的工具文件）。
+- 用户的提示词描述的是期望的行为效果（「非可游玩时间无法点击」「显示遮罩提示」），而非指定实现文件。
+
+**Evidence:** 07f56b0e T01 (22 steps, 0 edits): user asked to add minor protection (未成年人游戏限制) — time-check, level-click block, and overlay display. Explore subagent failed (API 404). Agent: Glob scripts/**/*.lua → Glob .project/*.json → read router/storyline/sfx modules → Glob 'scripts/shared/utils/play-time-guard*' → found existing play-time-guard.lua → Read it (already implements isRestricted() 22:00-08:00 check + renderOverlay() NanoVG overlay) → Glob home/adventure pages → Read home-init/adventure-map → TodoWrite integration checklist → Grep PlayTimeGuard in scripts → final agent thought: feature already fully implemented and integrated in both entry pages (adventure/init.lua, home/init.lua), no edits needed. Pattern: semantic name prediction (功能描述 → 模块名猜测) → targeted Glob → existing module found → integration audit via Grep → no-edit report. | 36749904 T02 (27 steps, 6 edits, NO BUILD — API 404 at session end): user asked to add minor protection time restriction (增加未成年人游戏限制) — time check, block level clicks, show overlay. Explore subagent failed (API 404). Agent fell back to Glob + Read to discover entry points. Glob scripts/**/*.lua → Glob for play-time-guard → NOT FOUND. Agent identified two entry points: home/init.lua (关卡格 tile click handler) and adventure/init.lua (关卡节点 node click handler). TodoWrite: 5 tasks. Write scripts/shared/utils/play-time-guard.lua (new shared module: isRestricted() weekday time-check + renderOverlay() NanoVG center-screen overlay). 3 edits home/init.lua: (1) require play-time-guard, (2) renderOverlay call after renderAll, (3) isRestricted guard in tile click handler. 3 edits adventure/init.lua: (1) require play-time-guard, (2) renderOverlay call after Dialogue/FunFact renders, (3) isRestricted guard in node click handler. Session terminated with API 404 before build step. Pattern (module-not-found branch): semantic prediction → Glob confirms not found → Glob+Read to enumerate all entry points → Write shared module → integrate into each entry (require + renderOverlay + isRestricted guard) → build (intended, not executed due to session termination).
+
+---
+
+## `gene_fm_conditional_element_visibility`
+
+**条件性 UI 元素可见性：基于游戏状态的按钮显隐** / Conditional UI Element Visibility — Game State Driven Show/Hide
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `conditional_visibility`
+- `hide_when_condition_not_met`
+- `game_state_dependent_ui`
+- `cn_keywords:yincang,xianshi,tiaojian,anniu,meiyou,xiayiguan,shengli`
+
+**Preconditions:**
+- 用户要求在特定条件下（如「没有下一关」「已是最后一关」）隐藏某个 UI 元素（按钮、文字等）。
+- 该 UI 元素位于已有的胜利/结算弹窗或类似状态弹窗中，当前无条件显示。
+- 需要在数据层（关卡状态/数量）和视图层（元素显示）之间建立条件判断链。
+
+**Evidence:** 056c0fdf T3 (34 steps): user asked to hide 'Next Level' button in victory screen when no next level exists. Agent: (1) Grep for drawWinDialog → read view.lua, view-layout.lua, view-dialog.lua. (2) Grep for onRequestNextLevel event → read adapter.lua to find lastLevel flag. (3) TodoWrite 4-step plan. (4) 5 edits: view/view-dialog.lua (conditional button render), screens/gameplay.lua x3 (pass hasNextLevel param through event chain), adapter.lua (expose lastLevel data). Build success. Pattern: grep function → read view files → grep event handler → read adapter → multi-file conditional edit propagating state from data layer to view → build.
+
+---
+
+## `gene_fm_planmode_crosscutting_refactor`
+
+**计划模式驱动的跨文件架构级改造** / Plan-Mode-Driven Cross-Cutting Architectural Refactor
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `cross_cutting_system_change`
+- `multiple_files_estimated_gt_5`
+- `shared_utility_needed`
+- `architectural_scope`
+- `cn_keywords:shipei,pingban,duoping,ziduying,zidongsuofang,duowen`
+
+**Preconditions:**
+- 用户要求对已有功能进行横跨多个文件/子系统的架构级改造（如 UI 响应式适配、全局字体缩放、跨模块参数统一化等）。
+- 改造目标不是单点修改，而是需要在多个文件中统一引入一套新逻辑（如统一缩放因子模块），预计改动文件数 ≥ 5。
+- 用户未提供具体实现方案，期望 AI 自行设计并落地。
+
+**Evidence:** 08e306a0 T03 (128 steps): user asked to make UI adapt to tablets (from phone-only). Agent: (1) EnterPlanMode — declared need to research first. (2) Dispatched 3 parallel Task subagents: SA acc083b scanned all NanoVG rendering patterns; SA ac78410 read engine UI docs and examples; SA a425e54 synthesized design plan from both. (3) Main agent read adapter.lua x4 + 3x init.lua, ran Grep for /dpr pattern across all files to confirm uniform pattern (7 files, 3 input/4 render usages). (4) Wrote plan to .claude/plans/*.md. (5) ExitPlanMode. (6) TodoWrite 9 tasks. (7) Write new density.lua shared module. (8) 3 edit rounds: Round 1 (add require to 7 files), Round 2 (replace nvgBeginFrame dpr block), Round 3 (replace input coord transforms). (9) Grep / dpr to verify zero residual. (10) Build success. Pattern: EnterPlanMode → parallel research subagents → write plan → ExitPlanMode → shared module first → batch round edits → grep verify → build.
+
+---
+
+## `gene_fm_layout_floor_guard`
+
+**布局边缘溢出修复：共享常量下限保护** / Layout Edge Overflow Fix — Shared Constant Floor Guard
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `layout_overflow_reported`
+- `min_value_constraint_specified`
+- `shared_constant_likely`
+- `cn_keywords:bianju,dingbian,bianyuan,dingtoubian,zuixiao,zuidashao,shuchubianyuan,jisuanbianju`
+
+**Preconditions:**
+- 用户描述了布局越界/溢出的边缘情况：游戏主体或 UI 内容在特定屏幕尺寸下「顶到边缘」「被截断」「贴边」，并明确提出最小间距要求（如「上下边距至少 50」）。
+- 该边距/间距当前是动态计算的（如按比例分配剩余空间），没有设置最小值下限。
+- 项目中存在统一的布局常量文件（如 layout.lua、constants/sizes.lua），多个游戏/页面共享这些常量。
+
+**Evidence:** 08e306a0 T07 (12 steps): user reported that game content touches screen edge when game body is tall, requested top/bottom margin of at least 50. Agent: (1) Read layout.lua to find BOARD_TOP_PADDING and BOARD_BOTTOM_PADDING (both=10). (2) 2x Grep to trace all calcLayout usages across 4 games (BOARD_Y_TOP_WEIGHT, BOARD_Y_BOTTOM_WEIGHT, topSpace, availH patterns). (3) Read board-renderer.lua and card-renderer.lua to confirm constants propagate correctly. (4) Single Edit: layout.lua, changed BOARD_TOP_PADDING 10→50, BOARD_BOTTOM_PADDING 10→50. (5) Build success. Pattern: user gives minimum floor constraint → Grep constant name → Read layout calcs to verify single-file coverage → change constant to floor value → build.
+
+---
+
+## `gene_fm_bulk_visual_param_adjustment`
+
+**多页面视觉参数批量比例调整** / Bulk Proportional Visual Parameter Adjustment Across Multiple Screens
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:visual_style`
+- `relative_value_change`
+- `multiple_screens_mentioned`
+- `background_decoration_elements`
+- `cn_keywords:shenyidian,qiandiyidian,mingxian,touming,alpha,zhuangshi,beijing,donghua`
+
+**Preconditions:**
+- 用户要求对多个页面/屏幕的同类型视觉元素（背景装饰物、动画粒子、浮动图形等）统一做相对调整（「颜色深一点」「更明显」「稍微淡一些」），而非指定具体数值。
+- 这些元素分散在多个文件中，用户未指定修改哪些文件。
+- 当前参数值分散、不统一，直接套用固定数值可能导致部分元素过深/过浅。
+
+**Evidence:** 08e306a0 T02 (21 steps): user asked to darken background dynamic decoration items across main story mode, free mode, and game selection pages (颜色稍微深一点，看起来更明显一些). Agent: (1) Task subagent SA a66e28a searched for float/particle/bg/decor patterns across /workspace/scripts. (2) TodoWrite 4-task plan. (3) Read 3 files (home/init.lua, free-mode/init.lua, level-select-ui.lua) and audited current alpha values (range 20-36). (4) Calculated 1.8x multiplier as proportional adjustment. (5) 4 edits across 3 files, applying uniform 1.8x to all decoration alphas. (6) Build success. Pattern: explore-all-instances → read-and-audit-values → calculate-proportional-multiplier → batch-edit → build.
+
+---
+
+## `gene_pd_design_doc_generation_workflow`
+
+**实施前规划文档生成：先读代码和现有文档再写** / Pre-Implementation Design Doc Generation — Read Code First, Then Write
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `target:documentation`
+- `pre_implementation_doc_creation`
+- `no_attached_doc`
+- `read_code_before_write`
+- `new_system_planned`
+- `cn_keywords:shengcheng,wenzhang,wendang,jihua,fangan,jilu,xianjishengcheng,genjujihua`
+
+**Preconditions:**
+- 用户要求在开始实现前先生成文档（如「先根据计划生成文档」「先生成一个修改计划的文档」），目的是为后续开发提供参考。
+- 当前尚无对应的设计或计划文档，或现有文档需要大幅更新以反映新的系统架构。
+- 这是一个前置步骤，明确的下一步是基于该文档进行实现，而非把生成文档本身视为最终交付。
+
+**Evidence:** 0997e370 T02 (29 steps): user said '先根据计划生成文档'. Agent: (1) Bash ls to check docs/ dir. (2) Read 4 game config files (p1-p4). (3) Read 总体进度.md, 策划案-大厅.md, 架构决策记录.md. (4) Read home/init.lua + game-registry + router.lua (to align technical content). (5) Read 文档维护规范.md for doc style. (6) TodoWrite. (7) Write 策划案-主线系统.md. (8) Read+Edit 架构决策记录.md (append ADR-009). (9) Edit 文档维护规范.md (register new doc). Pattern: terse 'generate docs from plan' → read game configs + existing docs + code → TodoWrite → write main design doc → append ADR → register in doc index. | T09 (14 steps): user said '先生成一个修改计划的文档' (after design revision). Agent: (1) TodoWrite. (2) Task subagent — audit engine entry points for all 4 games. (3) Read 文档维护规范.md. (4) Write 开发记录-主线系统M1.md. (5) Read+Edit 文档维护规范.md (register new doc). Same pattern applied to implementation plan doc creation.
+
+---
+
+## `gene_cc_image_gen_sequential_fallback`
+
+**角色参考图生成：批量优先，超时降级为逐个生成** / Character Reference Image Generation — Batch-First with Sequential Timeout Fallback
+
+Category: `workflow`
+
+**Signals:**
+- `intent:content_creation`
+- `target:asset_resource`
+- `mcp_image_generation`
+- `character_reference_image`
+- `batch_tool_available`
+- `cn_keywords:shengcheng,cankaoту,jiaose,litu,tupian,shenghuo,wangjia`
+
+**Preconditions:**
+- 用户要求为已有角色设定文档中的角色生成参考图或立绘图（如「为这些角色生成参考图」）。
+- 平台提供了批量图片生成 MCP 工具（如 batch_generate_images）和单张生成工具（如 generate_image）。
+- 角色 Prompt 已存在于设计文档中，无需 AI 即兴撰写（但需要读取文档获取）。
+
+**Evidence:** 0997e370 T05 (26 steps): user asked '为我生成这些角色的参考图' after character design doc was created in T04. Agent: (1) respond_to_user — declared intent to batch generate all 5 characters. (2) batch_generate_images — 5 characters in one call → MCP timeout error. (3) respond_to_user — 'batch timed out, switching to individual generation'. (4) generate_image (fox) → timeout again. (5) respond_to_user — 'retrying'. (6) Read 角色形象设计.md to get prompts. (7) TodoWrite (5 characters pending). (8) generate_image (fox) → success. (9) TodoWrite (fox done). (10-15) generate_image × 4 for owl/cat/bunny/raccoon, each with TodoWrite update. (16) Bash mv images to assets/Textures/character/. (17) TodoWrite (all done). (18) respond_to_user — summary table with paths + preview URLs. Pattern: batch → timeout → read doc for prompts → sequential generate_image with per-character TodoWrite → Bash move → summary table.
+
+---
+
+## `gene_br_audit_priority_tier_batch_fix`
+
+**审计报告后的优先级分层批量修复** / Post-Audit Priority-Tier Batch Fix — Reconstruct, Label, and Execute
+
+Category: `workflow`
+
+**Signals:**
+- `intent:bug_report`
+- `follows_inspection_review`
+- `priority_tier_referenced`
+- `terse_prompt_references_previous_audit`
+- `multi_file_text_normalization`
+- `cn_keywords:xiufu,wenti,P1,P2,jiejue,pijie`
+- `specific_issue_id_reference`
+
+**Preconditions:**
+- 上一个 turn 或 session 已完成了一次系统性审计，输出了按优先级分层的问题列表（P0/P1/P2 等编号）。
+- 用户的提示词简短引用了该优先级层级（如「修复P1、P2问题」），未附加新信息，依赖 AI 从对话历史中重建具体问题清单。
+- 待修复问题涉及多个文件中的同类型问题（如大量 ASCII 标点替换为全角、配置字段统一更新），以及少数逻辑修复。
+
+**Evidence:** 0ea2a577 T03 (170 steps): user said '修复P1、p2问题' (5 chars) after T01 audit produced 5P0+3P1+14P2+4P3 issues. Agent: (1) respond_to_user — 'fixing all P1+P2 systematically'. (2) TodoWrite — 14 items: 3x [P1] (story-13 title inconsistency, p4-link-match status=dev→online, pushbox undo/reset sounds unregistered) + 10x [P2] (84 ASCII '!' → full-width '！' across 10 files, 24 six-dot ellipsis → Chinese '……' across 4 files, 7 ASCII ':' → '：' across 3 files, 'locked' fallback text, difficulty wording gradient, subtitle duplicates, comment-title mismatches, health advisory duration 3s→5s, page destroy global event unsubscribe) + 1 build task. (3) Parallel mcp__mkr__Read of 5+ files. (4) 52 mcp__mkr__Edit calls across 17+ files. (5) 1 mcp__sce-urhox__build → success. (6) Summary table P1×3 + P2×10 + total file counts. Pattern: terse priority-tier reference → TodoWrite with [P1]/[P2] labels reconstructed from audit → parallel reads → massive edit sweep (52 edits, ~17 files) → single final build → structured summary. | 4463c53b T02 (14 steps, 3 edits, 1 build): small-scale variant — user said '修复5.3,5.4' (6 chars) immediately after T01 audit triage established that 5.3 and 5.4 are code-fixable. Agent: (1) TodoWrite — 2 tasks ([5.3] add title text-shadow in result-popup.lua, [5.4] add type-label text-shadow in adventure/init.lua). (2) Edit result-popup.lua ×2 (win popup title + fail popup title, added drop-shadow NanoVG call). (3) Edit adventure/init.lua ×1 (game type label, added text-shadow). (4) Build → success. Small-scale variant: 2 specific issue IDs (not priority tiers) + 3 targeted edits (not 52) + no parallel reads (context already established in T01). Key distinction: user references specific issue IDs (5.3, 5.4) instead of priority tier labels (P1/P2), and the fix is simple enough to skip the parallel-read phase.
+
+---
+
+## `gene_fm_doc_review_fix_sweep`
+
+**审阅发现问题后的文档内容修改工作流** / Post-Review Doc Content Fix Sweep — Reconstruct Issue List and Apply Edits
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:documentation`
+- `terse_prompt_follows_review`
+- `review_findings_referenced`
+- `doc_content_modification`
+- `intent:bug_report`
+- `cn_keywords:xiugai,zhexie,wenti,chuli`
+- `cn_keywords:youhua,weiwodeyouhua,neirong`
+- `optimization_recommendations_requested`
+- `dual_output_fix_and_suggest`
+- `cn_keywords:xiufu,zhexie,wenti`
+
+**Preconditions:**
+- 上一 turn 完成了对设计文档的全面审阅，输出了结构化的修改建议列表（修改点、模糊项、缺失内容等）。
+- 用户的提示词极短（如「修改这些问题」），未附加新信息，依赖 AI 从上一 turn 的分析结果中重建待修改的问题列表。
+- 修改目标主要是文档内容本身（设计文档、配置文件、规范文档等），不需要 build 验证。
+- （变体）用户在要求修复问题的同时，附加了「也为我生成推荐的方案」等优化建议请求——此时 AI 在执行所有修复后，额外输出优化建议清单（而非立即实现优化）。
+- （变体）前一 turn 是对设计文档的跨文档交叉审查（inspection_review，用户要求「根据其他文档检查」），AI 产出了不一致点列表；此时用户发送「修复这些问题」（intent 被标注为 bug_report）——触发相同的还原问题列表 + 逐条修复工作流。
+
+**Evidence:** 11e7ed86 T02 (36 steps): after T01 reviewed P2-记忆翻牌.md and identified ~8 modification points, user sent '修改这些问题' (4 chars). Agent: (1) TodoWrite — 5 tasks reconstructed from T01 findings (config file rename, game-registry update, timer start rule, interrupt/resume lifecycle, save format spec). (2) Read p2-memory-flip.lua (config) → Write renamed config. (3) Read game-registry/init.lua → Edit to update config reference. (4) Read P2-记忆翻牌.md → Edit (timer start rule). (5) Edit (interrupt/resume lifecycle). (6) Edit (save format section). (7) Encountered encoding mismatch on large Markdown doc → fell back to Write (full file rewrite of P2-记忆翻牌.md with all changes included). (8) Read 架构决策记录.md → Edit to append ADR-005 for NanoVG rendering decision. Pattern: terse 'fix these issues' after review → TodoWrite reconstructed list → sequential read-then-edit → Write-fallback on encoding failure for large Markdown doc → ADR append. | 4807e6ed T02 (32 steps, 10 edits, 0 builds): user sent '修改文档' (2 chars) after T01 identified 5 problems with proposed fixes in 主线关卡一致性问题报告.md — including one reversed fix direction. Agent: (1) TodoWrite — 6 tasks: 修复方案方向修正, combo/bonus分析补充, 关卡35对话分数引用, 关卡18文案保留, 关卡24建议精简, 关卡32改动缩小. (2) Read 主线关卡一致性问题报告.md. (3) Sequential respond_to_user + Edit cycles — 10 edits all targeting same document. TodoWrite updated after each task. (4) Final respond_to_user with 修改汇总（共6处修正）. 0 builds (doc only, no code change). Key variant: doc being corrected is a FIX PROPOSAL REPORT (not a feature design doc), and corrections target logical soundness of fix strategies rather than completeness of design content. No ADR appended (fix report correction does not constitute architectural decision). Pattern: terse '修改文档' after fix-proposal audit → TodoWrite reconstruct correction list from T01 audit findings → sequential read+edit on single doc → no build → structured 修改汇总 output. | 4cfa39d0 T2 (11 steps, 3 edits/writes, 0 builds): user sent '为我优化这些内容' (5 chars) with 音效系统设计方案.md attached, after T1 produced a structured obstacles/risks analysis. Agent: (1) respond_to_user. (2) Read 音效系统设计方案.md. (3) TodoWrite — 2 tasks (optimize design doc + update ADR). (4) Write 音效系统设计方案.md (full file rewrite — optimization applied in one shot rather than targeted edits). (5) TodoWrite update. (6) respond_to_user. (7) Read 架构决策记录.md. (8) Edit 架构决策记录.md (ADR-008 content update — enhanced section body). (9) Edit 架构决策记录.md (version metadata bump *文档版本：v1.7*). (10) TodoWrite complete. (11) respond_to_user. Key differences from the base pattern: (a) terse trigger is '为我优化' not '修改这些问题' — user asks for optimization, not explicit issue-list fix; (b) agent used Write (full file rewrite) for the design doc rather than targeted Edits — appropriate when optimization requires restructuring/rewording throughout; (c) ADR was also updated (2 edits) to reflect the enhanced design — distinct from pure doc-fix sessions where ADR is skipped. Pattern: terse optimization request after doc review → TodoWrite → full-rewrite design doc (Write not Edit) → Read+Edit ADR → no build. | 5634a485 T04-T05 (14 steps, 6 edits, 0 builds): after T03 reviewed AI开发规范.md and identified issues, user sent "修复。几个优化也为我生成推荐的方案" — terse fix trigger + optimization request. Agent: (1) TodoWrite (all 6 fix tasks, one per issue found in T03). (2-12) Alternating TodoWrite + mcp__mkr__Edit cycles — 6 edits to AI开发规范.md in strict sequential order, each edit followed by a TodoWrite status update, covering: §2 startup procedure step numbering, §6.1 file/function size limits clarity, §6.1 test directory reference, §6.1 config directory spec, §7 eventData access syntax, and version bump v1.4→v1.5. (13) respond_to_user — reported all 6 fixes applied, then output "几个优化推荐方案" (structured optimization recommendations: 1. 分层架构规范 2. 错误处理模板 3. 配置热加载方案 4. 测试自动化建议). (14) TodoWrite (all done). Key variant: user requests BOTH fixes and optimization recommendations in one terse prompt. Agent strategy: execute all fixes first (sequential Todo+Edit cycles), THEN output optimization recommendations in a final respond_to_user — treating them as separate phases (fix now, suggest for later). No ADR update (unlike 11e7ed86 variant). No build needed. The "几个优化" request does NOT trigger immediate implementation of suggestions — agent outputs them as a numbered recommendation list only. | d02df5f6 T01 (17 steps, 8 edits, 0 builds): after T00 reviewed P3-消消乐.md by cross-referencing other project docs (inspection_review), user sent '修复这些问题' (3 chars, classified as intent:bug_report — note '修复' vs '修改' in prior sessions). Agent: (1) TodoWrite — reconstructed issue list from T00 review findings. (2) respond_to_user. (3-onwards) Sequential mcp__mkr__Edit cycles (4 Edits) + mcp__mkr__Write (1 Write) targeting P3-消消乐.md. 8 total edit/write operations, 0 builds. Key variant: '修复' (fix/repair, bug connotation) rather than '修改' (modify/change, feature connotation) — both trigger the same reconstruct-and-fix sweep. Also: preceding review was inspection_review + cross-doc-referencing, not feature_modification review.
+
+---
+
+## `gene_inq_arch_choice_doc_update`
+
+**架构方案确认后的设计文档同步更新** / Architecture Choice Terse-Confirm to Design Doc Update — Infer-Then-Apply
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inquiry`
+- `follows_architecture_comparison`
+- `ultra_terse_confirmation`
+- `design_doc_pending_update`
+- `cn_keywords:yao,xuanze,fangan,zidehui,zihuishixian`
+
+**Preconditions:**
+- 上一 turn AI 对比解释了两种实现方案（如「NanoVG 全自绘」vs「UI 混用」），并输出了各方案的技术优劣对比。
+- 用户通过极短的确认词（「要」「好」「用这个」等单字/单词）选择其中一种方案，未附加任何新的说明。
+- 当前有一份设计文档待根据选定方案进行更新，所选方案会影响文档中的多个章节（目录、渲染方案、接口说明等）。
+
+**Evidence:** 11e7ed86 T04 (1 step): user asked '自绘重新实现，和UI混用有什么区别'. Agent: pure respond_to_user — explained NanoVG full-custom-draw (all UI elements drawn via NanoVG including pause menu, transitions) vs UI-mixing (NanoVG for game canvas, UIKit for pause menus/overlays) tradeoffs; no file reads. T05 (25 steps): user sent '要' (1 char). Agent inferred user chose full-NanoVG approach: (1) Read P2-记忆翻牌.md. (2) TodoWrite — 7 section-level tasks: update §0.2 dir structure (add view/pause-overlay.lua), update §0.3 rendering plan (add NanoVG for transitions + pause menu), update §7.1 pause menu (NanoVG self-draw not UIKit), add §3.1 level unlock mechanism, add §3.5 artPool registration pseudocode, add §0.2 event naming prefix convention, update version v1.2→v1.3. (3) 7 × Edit on P2-记忆翻牌.md. (4) Summary table. Pattern: architecture comparison explanation (1 step, pure text) → ultra-terse user confirmation ('要') → read design doc → TodoWrite 7 section-level tasks → 7 systematic edits → version bump + summary table.
+
+---
+
+## `gene_pd_design_doc_content_fill`
+
+**设计文档内容填充与实现文件同步创建工作流** / Design Doc Content Fill — Skeleton Elaboration with Simultaneous Implementation File Creation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `intent:documentation`
+- `has_attached_doc`
+- `doc_has_skeleton_needs_content`
+- `level_content_and_dialogue_needed`
+- `pre_implementation_phase`
+- `cn_keywords:buchong,wenzhang,guanka,duihua,kaifa,zhunbei,neirong`
+
+**Preconditions:**
+- 用户通过 @文件名 或 file:/// 附加了一份已有骨架的设计文档（章节结构已存在，但关卡内容、对话台词、配置参数等具体内容为空或占位符）。
+- 用户要求补全文档内容（先补充文档、完善关卡设计），并注明这是后续开发的准备步骤。
+- 文档内容与代码库中已有的数据文件（关卡文件、配置 lua、剧情对话）需要同步协调——补充文档同时意味着创建或初始化对应的实现文件。
+
+**Evidence:** T01 (94 steps): user opened 策划案-主线系统.md (existing skeleton doc) via file:// and asked to fill level content, dialogue, and supplement docs for development. Agent: (1) respond_to_user announce intent. (2) Read doc → Task (Explore project structure). (3) Read 策划案-主线剧情对话.md + storyline.lua + ls storyline-levels/. (4) Task (read existing story-N.lua format). (5) TodoWrite plan. (6) 13 Edit calls on 策划案-主线系统.md + 策划案-主线剧情对话.md (filling chapters by section). (7) 2 Edit calls on storyline.lua (add nodes for levels 17-20). (8) 4 Write calls creating story-17.lua through story-20.lua. (9) Bash cleanup (rm stub files). (10) Final doc Edit (version bump). 0 builds — pure doc/data phase. Total 21 edits/writes, 2 subagents.
+
+---
+
+## `gene_fm_feature_scope_extension_new_content`
+
+**现有功能范围扩展到新增内容** / Feature Scope Extension — Extend Existing Feature to Cover Newly Added Content
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `feature_scope_extension`
+- `new_content_added_recently`
+- `no_attached_doc`
+- `search_first_no_file_path_given`
+- `cn_keywords:shengxiao,youxiao,xinzengguanka,xinzengneorong,baohan,rang_X_dui_Y_youxiao`
+
+**Preconditions:**
+- 用户要求将某个已有功能（如解锁所有关卡、无敌模式、调试开关）扩展到最近新增的内容（新关卡、新游戏、新数据类型）上。
+- 该功能已存在且正常工作，仅因为新增了内容导致覆盖范围不全（如 unlock 只覆盖前 20 关，但刚添加了 21-35 关）。
+- 用户的表述为让 X 对 Y 有效、X 也要支持 Y、新增的 Y 没有 X，而非报告功能本身出错。
+- 用户未指定具体文件路径，需要搜索才能找到功能实现。
+- 变体：用户要求将某个管理/调试操作（如清空存档、重置进度、初始化数据）扩展到最近新功能引入的新持久化状态（如皮肤购买记录、新道具库存）上，而非扩展到新关卡或新游戏内容。核心模式相同：现有操作未覆盖新增的数据类型，需要同步扩展。
+
+**Evidence:** T02 (11 steps): user asked to make the existing unlock-all-levels setting also cover newly added main storyline levels 17-20. Agent: (1) Task SA — search for unlock-all-levels code (keywords: unlock, 解锁). (2) respond_to_user explain found location (settings-save.lua). (3) Read settings-save.lua. (4) respond_to_user plan. (5) Edit (extend unlock count/list). (6) respond_to_user. (7) Read (verify edit). (8) Edit (fix second reference). (9) respond_to_user. (10) Build → success. (11) respond_to_user. Pattern: search-first subagent → read → extend scope → verify-re-read → fix edge case → build.
+
+e7d71628 T04 (intent: feature_modification, target: game_logic): user said '修改清空存档，也清空测试的皮肤购买状态'. Context: T00 implemented a new skin purchase system with persistent purchase state (stored separately from main save data). The user wants the existing 'clear save' debug/admin operation extended to also wipe the new purchase state. Pattern matches gene: existing operation (clear save) needs to cover newly added persistent state (skin purchase data). The '新数据类型' variant of this gene — T04 is not extending feature coverage to new levels/games, but to a new category of persistent state introduced alongside the new feature in T00.
+
+---
+
+## `gene_nf_planmode_parallel_bulk_level_expansion`
+
+**计划模式驱动的大规模关卡内容并行扩展** / Plan-Mode-Driven Bulk Level Expansion — Parallel Content Creation Subagents for Large-Scale Level Design
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `large_scale_content_expansion`
+- `plan_mode_triggered`
+- `parallel_subagent_content_creation`
+- `level_count_target_specified`
+- `no_attached_doc`
+- `multiple_content_types_affected`
+- `cn_keywords:shejiguanka,kuozhan,xinzeng,guandao,zhangshu,dao_X_guan`
+- `no_planmode_sequential_variant`
+
+**Preconditions:**
+- 用户要求将主线关卡（或类似分级内容）扩展到指定数量（如设计到35关），新增量为当前数量的 50% 以上。
+- 扩展涉及多种内容类型：关卡数据文件（story-N.lua）、节点配置（storyline.lua）、剧情对话文档，以及系统策划文档——不是单一文件的修改。
+- 用户未附加任何设计文档，直接下达内容扩展指令（设计到X关）。
+- 代码中存在依赖当前关卡总数的地方（如 unlock 上限、进度计算常量），需要同步更新。
+
+**Evidence:** T03 (83 steps): user asked to design main storyline levels up to 35 (from 20, adding 15 new levels = 3 new chapters Ch6-8). Agent: (1) EnterPlanMode. (2) 3 parallel Task subagents: explore level structure + design 35-level extension plan + check code dependencies on level count. (3) Write plan to .claude/plans/twinkling-prancing-deer.md. (4) ExitPlanMode + TodoWrite. (5) Read 策划案-主线系统.md x6 + storyline.lua + story-16-20.lua x5 + 策划案-主线剧情对话.md + settings-save.lua. (6) Task subagent: update design doc. (7) 3 parallel Task subagents: update storyline.lua (15 new nodes) + create 15 level data files + update dialogue doc Ch6-9. (8) 10x TaskOutput + 4x Bash monitoring. (9) 2x Edit settings-save.lua (extend unlock limit to 35). (10) Build success. Total: 7 subagents, 4 direct edits, 15 new level files created. | 5dbc4646 T3 (55 steps, 12 writes, 2 edits, 1 build): user said '设计主线关卡，到28关' — extend from 16 to 28 (+12 new levels). NO PlanMode. NO parallel subagents. Agent: (1) respond_to_user. (2) Read storyline-levels/story-2.lua, story-7.lua, story-10.lua, story-14.lua (sample memory-flip levels for format). (3) Task SA1 '探索记忆翻牌故事模式结构' → understood storylineMode + levelData structure. (4) Task SA2 '探索主线模式关卡调用方式' → confirmed external injection mechanism via storylineOpts. (5) Read /workspace/scripts/config/storyline.lua. (6) Glob storyline-levels/*.lua. (7) Read all 16 existing story files (4 per game: easy/medium/hard/expert tier per game type) to map difficulty progression per game. (8) 2x Grep to check adventure page NODES_PER_PAGE constant (=7) — pagination awareness check. (9) TodoWrite. (10) Write story-17.lua through story-28.lua (12 sequential Writes: cycle p1/p2/p3/p4 maintaining difficulty tier escalation). (11) 2x Edit storyline.lua: header comment update + append 12 new node metadata entries. (12) Build success. Key variant: no-planmode sequential variant — agent reads all existing level files individually (1 by 1) rather than using subagents, then writes new levels without parallelism. Reads are heavier (16 file reads) compared to 5 in the PlanMode variant where subagents handled this. Pagination check (NODES_PER_PAGE) is a unique pre-write step absent from PlanMode variant.
+
+---
+
+## `gene_pd_design_only_planmode_defer`
+
+**用户主动推迟实现的设计方案模式：PlanMode 纯设计，等待批准** / Explicit Design-First Defer — Plan-Mode Research + Design Without Implementing
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `explicit_design_first_request`
+- `no_implementation_requested`
+- `plan_mode_triggered`
+- `no_code_change_expected`
+- `cn_keywords:xian_sheji,rang_wo_cankao,xian_gei_fangan,sheji_yi_xia`
+
+**Preconditions:**
+- 用户明确表示「先设计/先给方案/先看一下」，并未要求立即实现——典型措辞为「先设计一下让我参考」「先给我一个方案」「设计一下，看看效果」。
+- 请求涉及整体 UI/功能/架构的重新设计（而非局部微调），需要研究现有代码结构才能给出有依据的方案。
+- 方案结果供用户参考/审核，用户批准后才实现，代理不应在未得到批准前自行开始实现。
+
+**Evidence:** 1cd7c1eb T00 (14 steps): user said '..., 先设计一下让我参考' (explicit design-only). Agent: (1) respond_to_user. (2) Task SA1 Explore code structure. (3) respond_to_user. (4) EnterPlanMode. (5) respond_to_user. (6) Task SA2 deep analysis of home UI (3-layer layout, platform-feel elements). (7) Task SA3 game-container + lifecycle analysis. (8) respond_to_user presented design summary. (9-12) Write plan file to .claude/plans/ via Task subagent. (13) respond_to_user showed plan. (14) ExitPlanMode. ZERO edits/writes to workspace code in T00. Implementation came only in T01 after user said 符合预期. Pattern: 先设计让我参考 → EnterPlanMode → 2-3 research subagents → write plan file → present design → ExitPlanMode → wait for approval.
+
+---
+
+## `gene_pd_terse_approval_batch_rewrite`
+
+**简短批准触发大规模批量文件重写实现** / Terse Approval — Batch Read-Then-Write Full File Rewrite Implementation
+
+Category: `workflow`
+
+**Signals:**
+- `approval_or_feedback`
+- `follows_design_only_planmode`
+- `terse_approval_word`
+- `batch_structural_rewrite_needed`
+- `multi_file_implementation_triggered`
+- `cn_keywords:fuhe_yuqi,hao_kaishi,keyi,tongyi,zhixing_fangan`
+- `follows_design_doc_write_turn`
+
+**Preconditions:**
+- 上一个 turn 完成了「纯设计」阶段（EnterPlanMode 研究 + 方案呈现 + ExitPlanMode），方案已获用户审阅。
+- 用户的回复极短（1-5个字），明确表示方案符合预期（「符合预期」「好的」「开始吧」「可以」「执行」），没有附加新的约束或修改要求。
+- 方案涉及多个文件的全量结构重构（如重写整个 home 页面、重写 game-card 组件），预计改动幅度大，需用 Write（全量重写）而非 Edit（局部修改）。
+- （变体）上一个 turn 可以是「直接写设计文档 + 等待审阅」（无 PlanMode），而非必须经过 EnterPlanMode/ExitPlanMode 流程——只要用户已审阅了设计方案并给出简短批准指令即可触发。
+
+**Evidence:** 1cd7c1eb T01 (37 steps): user sent '符合预期' (3 chars) after T00 presented UI redesign plan (platform to game-collection feel). Agent: (1) respond_to_user starting implementation. (2) TodoWrite 5 tasks: read files, rewrite constants, rewrite game-card, rewrite home page, build. (3-12) Read 8 files (main.lua, colors.lua, layout.lua, router.lua, home/init.lua, game-card.lua, top-bar.lua, bottom-nav.lua, screen-transition.lua, profile/init.lua). (13) respond_to_user read complete. (16) Write colors.lua (warm color palette). (17) Write layout.lua (new constants). (20) Write game-card.lua (square tile style, removed list style). (23) Write home/init.lua (game main menu, removed top-bar/bottom-nav). (26) Write main.lua (updated initialization). (34) build → success. Total: 5 full file Writes, 0 Edits. Pattern: terse approval → batch Read all affected files first → systematic Write (not Edit) for structural rewrite → Build. | 374e4eb7 T01 (56 steps, 11 edits, 9 writes, 1 build): user sent '开始制作' (2 tokens) after T00 directly wrote a design doc (24 steps, 4 writes, no PlanMode). Agent: respond_to_user announcing start → TodoWrite → Read 9 files (home/adventure/init.lua x4, tab-bar.lua, fox-mascot.lua, settings-save.lua, colors.lua, layout.lua) → Write outfit-manager.lua (new shared module) → Edit settings-save.lua + tab-bar.lua + fox-mascot.lua (3 edits) + Edit fox-mascot.lua x2 more (refreshSkin method) → Write profile/init.lua (new outfit page) → Edit main.lua x3 (route registration, initialization, navigate callback) → Edit adventure/init.lua x3 (dynamic outfit texture) → Build success. Non-PlanMode variant: terse trigger ('开始制作') after direct doc write (gene_pd_direct_design_doc_write_wait) produces same batch-read-then-implement behavior as the PlanMode variant.
+
+---
+
+## `gene_fm_emoji_to_nanovg_migration`
+
+**Emoji 转 NanoVG 自绘迁移工作流：先审查再迁移，API 名称对照验证** / Emoji-to-NanoVG Rendering Migration — Audit Existing Patterns, Rewrite Components, Fix API Names
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `emoji_replacement_requested`
+- `nanovg_rendering_specified`
+- `rendering_tech_migration`
+- `inquiry_confirms_emoji_present`
+- `cn_keywords:shanchu_emoji,shiyong_nanovg_huizhi,emoji,nanovg_zihui`
+
+**Preconditions:**
+- 用户询问当前 UI 是否使用了 emoji，或在上一个 turn 的 Grep 结果中已确认 emoji 存在（如 text = 某 emoji 字符，或 isActive and 某符号 or 另一符号）。
+- 随后用户要求「删除这些 emoji，使用 NanoVG 绘制」——明确指定替换技术（NanoVG 自绘），而非默认使用 UIKit 文字组件。
+- 项目中已有其他游戏模块（game adapter.lua）使用 NanoVG 绘制图形，可作为 API 用法参考（nvgBeginFrame、nvgCreateFont、nvgDelete 等）。
+
+**Evidence:** 1cd7c1eb T04 (3 steps): user asked if home page uses emoji. Agent: Grep emoji chars in home/init.lua → found emoji at line 43. Grep game-card.lua → found GAME_ICONS table with 4 emoji entries + star rendering. respond_to_user confirmed emoji in 2 files. | T05 (39 steps): user said delete emoji, use nanovg. Agent: TodoWrite tasks: rewrite game-card.lua as NanoVG, update home/init.lua, update main.lua lifecycle. Read game-card.lua + home/init.lua + main.lua + colors.lua + layout.lua + game-registry/init.lua. Grep nvgBeginFrame → found NanoVG pattern in games/p1-puzzle-land/adapter.lua. Read adapter.lua NanoVG render loop. Write game-card.lua (NanoVG draw, geometric shapes). Write home/init.lua (NanoVG render). 3x Edit main.lua (add NanoVGRender event + nvgCreate + nvgDelete). build → Lua error: nvgDestroy undefined (should be nvgDelete). Read lua_errors.log. Grep nvgDestroy|nvgDelete → confirmed correct API is nvgDelete. Edit fix. build → success. Pattern: emoji inquiry → grep confirm → study NanoVG from adapters → Write components + Edit lifecycle hooks → build fail (API name) → read log → grep correct → fix → build success.
+
+---
+
+## `gene_fm_shared_component_zorder_override`
+
+**共享组件层级冲突修复：渲染顺序调整 + 游戏专属参数覆盖** / Shared Component Z-Order Conflict — Render Order Resequence + Per-Game Margin Override
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `overlap_reported`
+- `z_order_wrong`
+- `search_fails_in_game_folder`
+- `shared_component_discovered`
+- `render_order_fix_needed`
+- `per_game_param_override`
+- `cn_keywords:chongdie,cengji,shijianTiao,zhebie,xiafang,weizhi`
+
+**Preconditions:**
+- 用户报告某个 UI 元素与另一 UI 元素重叠，且层级顺序错误（出现在某个元素的下方或被遮挡）。
+- 在该游戏目录内直接搜索相关元素名称或中文文字标签，找不到对应实现（SA 搜索结果为 NOT FOUND 或 No matches）。
+- 该视觉元素实际上来自 scripts/shared/ 目录中的共享组件（如 fox-mascot、achievement-popup），通过 adapter.lua 的回调函数集成到游戏渲染循环中。
+
+**Evidence:** 212062a8 T2 (57 steps): user reported 连连看 (p4-link-match) encouragement text overlaps with time bar and appears below it. Agent: (1) Task SA searched for encouragement text in p4-link-match → NOT FOUND. (2) Grep 鼓励|encourage|combo patterns across all scripts → found in p3-match-3 and shared/outfit-manager, not in p4. (3) Grep fox-mascot in p4-link-match → found FoxMascot.render call in logic/board.lua + adapter.lua. (4) Read adapter.lua + gameplay.lua → identified fox-mascot is rendered via afterBg callback, which fires BEFORE hudRenderer.drawTimeBar — hence appears underneath. (5) Fix 1: Edit gameplay.lua to move afterBg call to AFTER hudRenderer.drawTimeBar call (z-order fix). (6) Attempted Fix 2: Edit fox-mascot.lua FOX_MARGIN_B 4→38 (then reverted — would affect all games). (7) Correct Fix 2: Edit adapter.lua to call FoxMascot.render(nvgCtx_, logW, logH, 34) — pass per-game bottom_margin override instead of changing shared constant. (8) Build success. Key insight: when shared component lacks per-game layout accommodation, add param to render() call in adapter rather than modifying shared constant. | 76b0acb1 T31+T32: T31 (30 steps, 8 edits, 1 build): in-game portrait rendering above game content in link-match and memory-flip, check other 2 games. Agent: Grep render order → Read 4 adapters → TodoWrite → Edit 4 adapter.lua files (resequence render calls to put fox portrait below game content) → Build. T32 (22 steps, 8 edits, 1 build): in-game portrait now not showing at all — regression from T31. Agent: Grep → Read 4 adapters + fox-mascot.lua → diagnose z-order change caused portrait to render behind game canvas entirely → Edit 4 adapters + fox-mascot.lua → Build. Pattern: z-order fix causes visibility regression; second-pass fix requires reading the rendering pipeline more carefully to find correct layer insertion point.
+
+---
+
+## `gene_fm_shared_component_extraction`
+
+**重复实现抄取为共享组件：读取各游戏实现后写入共享模块** / Shared Component Extraction -- Read Per-Game Duplicates, Write Shared Module, Update All Callers
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `refactor_to_shared_module`
+- `duplicate_code_across_games`
+- `generic_code_requested`
+- `shared_component_write`
+- `cn_keywords:gaiweitongyang,tongyong,gongxiang,gongyong,mozu,baocheng,choutixiang,fugai`
+
+**Preconditions:**
+- 用户要求将多个游戏中重复实现的某个功能（如庆祝特效、结算动画、成就弹窗等）抄取为一个可复用的共享模块（「改为通用代码」「封装成公共组件」「抄取出来」）。
+- 该功能在至少两个游戏的相同类型文件（如 view/result-popup.lua）中各自有独立实现，彼此功能相似但代码不共享。
+- 此抄取请求通常与其他任务一起出现在同一个 prompt 中（如「加暂停 + 改为通用代码 + 修复 status」），需先用 TodoWrite 拆分任务再逐项执行。
+
+**Evidence:** 24a716d1 T01 (83 steps, 32 edits, 1 build): prompt contained 3 tasks including 'refactor celebration effects as shared module'. TodoWrite decomposed into 3 tracks. For the shared-component task: (1) Read p3-match-3/view/result-popup.lua + p2-memory-flip/view/result-popup.lua to understand duplication. (2) Write /workspace/scripts/shared/components/celebration-effects.lua -- new shared module. (3) Edit p3-match-3/view/result-popup.lua -- replaced inline celebration with require+call. (4) Edit p2-memory-flip/view/result-popup.lua -- same. (5) Build success. Pattern: multi-task prompt with refactor task -> TodoWrite split -> read all duplicates -> Write shared module -> Edit each caller -> Build. | f14c92eb T02,T03,T05 (P2,P3,P5): three sequential shared UI component extractions consumed from optimization backlog. T02 P2 (36 steps, 9 edits, 1 build): background decoration component (item 9 of optimization-suggestions.md). T03 P3 (69 steps, 21 edits, 2 builds): settings modal component (item 10). T05 P5 (31 steps, 8 edits+1 write, 1 build): page header component (item 11). Pattern: all 3 consumed @optimization-suggestions.md via attached doc.
+
+---
+
+## `gene_nf_multi_game_level_generation`
+
+**多游戏关卡批量生成：逐游戏读取结构后扩充，同步更新文档** / Multi-Game Level Batch Generation -- Per-Game Structure Read, Append Levels, Inline Doc Sync
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `multi_game_level_expansion`
+- `inline_doc_sync_requested`
+- `no_planmode_needed`
+- `three_or_more_games_targeted`
+- `cn_keywords:shengcheng,gengduoguanka,sange,liangge,tongbu,gengxin,wendang,P1,P2,P3`
+
+**Preconditions:**
+- 用户要求为当前项目中的多个游戏（2-3 个）同时生成更多关卡，并要求同步更新文档（「并且同步更新文档」）。
+- 各游戏均有独立的关卡数据文件（如 data/levels.lua），以及对应的设计文档（如 P1.md、P2.md、P3.md）。
+- 扩充规模属于小到中等（每个游戏增加 5-15 关），不需要 plan mode，可直接按游戏分批处理。
+
+**Evidence:** 24a716d1 T02 (74 steps, 27 edits, 1 build): user said 'generate more levels for all 3 games and sync update docs'. Agent: (1) Task SA1 scan levels/docs paths. (2) Task SA2 check P1 level-select logic. (3) TodoWrite: P1 lv-07~12, P2 L16~25, P3 L16~25, doc sync, build. (4) Read 3 levels.lua (P1/P2/P3). (5) 20 Edits across 3 levels.lua files -- appended new level entries. (6) Read+Edit P1.md, P2.md, P3.md design docs. (7) Read+Edit P1 level-select-detail doc when needed. (8) Read+Edit complete-record.md + overall-progress.md. (9) Build success. No PlanMode, no parallel content subagents -- direct sequential read-then-edit per game. Bash 'find .md' used 3x when doc dir was ambiguous. Distinct from gene_nf_planmode_parallel_bulk_level_expansion: no plan mode, 3 games simultaneously, smaller per-game addition, inline doc sync.
+
+---
+
+## `gene_nf_cross_game_symmetric_feature_rollout`
+
+**跨游戏对称功能落地：PlanMode 研究设计，按游戏逐一对称实现** / Cross-Game Symmetric Feature Rollout -- PlanMode Research, Per-Game Symmetric Edit, Unified Build
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `cross_game_feature`
+- `same_feature_all_games`
+- `plan_mode_triggered`
+- `symmetric_implementation`
+- `future_scalability_mentioned`
+- `cn_keywords:zengjia,fengye,suoyougame,sange,zuzhun,sicheng,weibeihou,kuozhan`
+
+**Preconditions:**
+- 用户要求为所有游戏（N 个）添加同一个 UI 功能或交互机制（如关卡分页、进度指示、难度标签），而非只针对某一个游戏。
+- 该功能需要同时修改每个游戏的 level-select.lua（或等价的选关界面文件）和 adapter.lua（或等价的适配器文件）。
+- 用户的理由是为未来扩展做准备（「为了后续增加更多……」），说明需要设计方案而非快速实现。
+
+**Evidence:** 24a716d1 T03 (108 steps, 47 edits, 1 build): user asked 'add level pagination for all games, to prepare for future expansion'. All 3 games targeted, no attached doc. (1) EnterPlanMode step 0. (2) Task SA1 'explore level-select screens for all 3 games'. (3) Task SA2 'design unified pagination approach'. (4) Task SA3 'write plan file' -> .claude/plans/squishy-sauteeing-whistle.md. (5) ExitPlanMode step 19. (6) TodoWrite: P1 level-select, P2 level-select, P3 level-select, P1 adapter, P2 adapter (with input refactor), P3 adapter (with input refactor), build -- 7 tasks. (7) Read 6 files (3 level-select.lua + 3 adapter.lua). (8) 36 Edits across 6 files applying same pagination logic symmetrically. (9) Build success. Pattern: cross-game feature -> EnterPlanMode -> 3 SAs (explore/design/write-plan) -> ExitPlanMode -> TodoWrite Nx2+build -> read all target files -> symmetric edits -> build.
+
+---
+
+## `gene_fm_level_difficulty_curve_retune`
+
+**关卡难度曲线重校：整体降低三星门槛并拉平每关递增幅度** / Level Difficulty Curve Retune -- Bulk starScore Sweep with Flattened Growth Rate
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `difficulty_rebalance`
+- `per_level_parameter_sweep`
+- `star_score_threshold`
+- `growth_rate_reduction`
+- `single_file_bulk_edit`
+- `cn_keywords:jiangdi,sanxing,xuyao,meiguan,tisheng,shuliang,zhengti,jiangdi,quanbu`
+- `vague_scope_no_parameters`
+- `story_per_level_file_structure`
+- `massive_multi_file_sweep`
+
+**Preconditions:**
+- 用户要求对某个游戏的整体难度曲线进行调整（「整体降低三星需求」「整体提高难度」），并且同时要求减缓每关之间的参数递增幅度（「降低每关提升的数量」）。
+- 目标游戏的所有关卡难度参数都集中在单一数据文件中（如 data/levels.lua），每关一个 starScore/threshold 字段。
+- 此调整不涉及逻辑代码修改，只需批量修改关卡数据文件中的数值参数。
+- 【变体·模糊范围】用户只说「整体降低主线关卡的难度」，不指定任何具体参数（三星门槛、递增幅度等）；代理需自主决定调整方向和幅度。
+- 【变体·多文件结构】主线关卡参数分散在多个文件（story-1.lua…story-N.lua，每关一个文件），而非集中在单一 levels.lua；调整规模显著更大（60+ 次编辑）。
+
+**Evidence:** 24a716d1 T04 (39 steps, 28 edits, 1 build): user asked to globally lower match-3 three-star requirements and reduce per-level score increment. Agent: (1) Read /workspace/scripts/games/p3-match-3/data/levels.lua (1 read only). (2) TodoWrite: adjust all 25 levels starScore (lower threshold + flatten growth) + build. (3) 25 Edit calls -- each targeting one level's goal+starScore block anchored via old_string. New values show front-loaded small reduction (early levels barely changed) and back-loaded large reduction (L23+ had ~40-50% cut, e.g. two-star 22000->12600 for late levels). (4) Build success. Pattern: balance retune prompt -> read data file -> TodoWrite 2 tasks -> per-level edits with flattened growth -> build. No architecture change, pure data-layer parameter adjustment. Distinct from gene_fm_bulk_visual_param_adjustment (visual elements, multiple screens, uniform proportional multiplier).
+
+dcc74462 T18 (169 steps, 64 edits, 51 reads, 0 builds): user sent '整体降低主线关卡的难度' — highly vague, zero parameter specifications. Agent: (1) Glob all story-N.lua files (multiple glob calls to build full file list). (2) Read 51 story-level files to understand current difficulty parameters (obstacle counts, target values, timing). (3) TodoWrite — batch tasks by game/level group. (4) 64 Edit calls across all story level files. No Build. This is the most extreme scale of difficulty retune observed: 169 steps vs 39 steps for the single-file variant (24a716d1:T04). Key differences from existing pattern: (a) vague scope — no mention of starScore/三星/增长幅度, just '整体降低'; (b) multi-file structure — each story level is a separate .lua file (story-1.lua to story-N.lua), not a single levels.lua; (c) autonomous parameter determination — agent decided adjustment scale without user input; (d) no Build in this turn (pure data file edits, syntax verified via file structure). Confirms: when prompt is maximally terse and multi-file, step count and edit count scale proportionally with level count.
+
+---
+
+## `gene_nf_special_obstacle_block_introduction`
+
+**消消乐特殊障碍方块逐步引入工作流** / Match-3 Special Obstacle Block Layered Introduction Workflow
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `match3_game`
+- `obstacle_block_mechanic`
+- `special_block_type`
+- `no_attached_doc`
+- `cn_keywords:shitou,bingkuai,zhang_ai_wu,zhan_yong_gezi,shengming_zhi`
+
+**Preconditions:**
+- 用户要求在消消乐（或类似 match-3 游戏）中新增一种特殊方块（障碍物/具有特殊交互的格子占用物）。
+- 该方块类型在代码库中尚不存在，属于首次实现，用户无附加设计文档。
+- 通常包含 3-4 个子需求：方块行为逻辑（如不参与消除）、视觉渲染（独特外观）、关卡触发（从第X关开始出现）、文档同步。
+- 可能在同一 session 的后续 turn 中继续添加第二种特殊方块，第二次无需重新探索项目结构。
+
+**Evidence:** 2c4b3363 T00 (72 steps, 22 edits): first special block — 石头 (stone obstacle, no elimination, gravity-pass-through). Agent: Task SA (explore project) + Glob lua/md → Read P3-消消乐.md + board.lua + board-renderer.lua + levels.lua → TodoWrite 5 tasks → 17x Edit board.lua (type constant, elimination bypass, gravity) + Edit board-renderer.lua + Edit levels.lua (insert stones in L6+) + Edit doc → build success. T01 (21 steps, 9 edits): '在第六关开始，出现石头' — pure level-data turn. Read levels.lua → TodoWrite 4 tasks → 9x Edit levels.lua (stone positions added to L6-L25) → build success. No project re-exploration. T02 (92 steps, 38 edits): second special block — 冰块 (ice, 3 HP, adjacency damage, cracking visuals, appears L4). No re-exploration (T00 context reused) → immediate TodoWrite 5 tasks → Read board.lua + board-renderer.lua + levels.lua → 38x Edit (ice type constant, HP field, iceDamage(), 3-state renderer branch, L4 level data) → build success. Pattern: first block = explore+read+TodoWrite+edit 4-file set+build; second block = TodoWrite+read+edit same 4-file set+build. HP-based blocks require state-machine in board.lua + renderer branching by health level.
+
+---
+
+## `gene_pd_audio_system_design_deferred_assets`
+
+**音效系统设计：代码骨架 + 需求文档，资源生成延后** / Audio System Design — Code Scaffold + Requirements Spec with Deferred Asset Generation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `target:audio`
+- `explicit_design_first_request`
+- `explicit_deferred_asset_generation`
+- `plan_mode_triggered`
+- `multi_game_event_mapping`
+- `cn_keywords:sheji_yinxiao,yinxiao_xitong,hou_xu_shengcheng,tongyi_shengcheng,yinxiao_xuyao`
+
+**Preconditions:**
+- 用户要求设计音效系统：哪些操作/行为需要音效，并设计好代码框架（「先设计好代码，和需要什么音效的需求」）。
+- 用户明确表示音效资源将在后续统一生成，当前 turn 只需输出代码框架和需求文档，不需要真实音效文件（「后续我统一生成音效」）。
+- 项目包含多个游戏，音效系统需覆盖所有游戏的所有交互事件（而非单一游戏）。
+- 当前代码库中尚无音效管理器，需要从零设计 SoundManager 模块 + 各游戏适配器挂钩。
+
+**Evidence:** 2c4b3363 T06 (24 steps, 2 writes, 0 builds): user said '设计一套音效系统，设计哪些操作和行为需要音效。先设计好代码，和需要什么音效的需求。用于制作代码，后续我统一生成音效'. Agent: (1) EnterPlanMode. (2) 3 parallel Tasks — explore 消消乐 code, explore 推箱子 code, explore engine audio API. (3) Read urhox-libs/Effects/Effects.lua ×2 + engine-docs/api/audio.md. (4) Task (Design sound effect system). (5) Read adapter.lua ×2 (消消乐 and 推箱子) + Glob scripts/shared/**/*.lua. (6) Task (Find adapter onEnter/onExit lines). (7) 2x Write to .claude/plans/ (sound manager plan file — written twice due to size). (8) ExitPlanMode. Zero edits to /workspace code; zero builds. Explicit design-then-generate separation. T12 (14 steps, 4 edits): user attached 架构决策记录.md and said '之前设计了一个音效相关的文档，保存docs下'. Agent: read plans/ audio design doc → Write/Edit docs/ to register the audio design doc + update ADR → no build. Pattern: design audio system → write to plans/ → exit plan mode → later user triggers doc migration from plans/ to docs/.
+
+---
+
+## `gene_fm_cross_game_effect_style_port`
+
+**跨游戏特效风格移植：参考已修改游戏，迁移到目标游戏** / Cross-Game Effect Style Port — Reference Previously Modified Renderer, Apply to Target Game
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:visual_style`
+- `cross_game_effect_port`
+- `references_previous_modification`
+- `particle_animation_effects`
+- `cn_keywords:cankao_shangmian_xiugai_tezhong,xiugai_X_de_tezhong,fengge_yizhi`
+
+**Preconditions:**
+- 用户要求对某个游戏的视觉特效进行修改，且提示词中明确引用了本 session 早期对另一游戏的特效改动（典型措辞：「参考上面的修改特效，修改X的特效」）。
+- 被引用的「上面的修改」已在本 session 的前几个 turn 中完成（如已对消消乐/推箱子增强了粒子特效、发光效果等）。
+- 目标游戏的特效系统与已修改游戏类似（同样使用 NanoVG 自绘粒子/动画），可直接移植风格参数。
+- 不需要 PlanMode——特效移植目标明确，直接探索+实现。
+
+**Evidence:** 2c4b3363 T08 (31 steps, 7 edits): user said '参考上面的修改特效，修改连连看的特效' — explicit cross-reference to T05 effects. Agent: (1) TodoWrite 3 tasks (explore + enhance + build). (2) Task SA (explore 连连看 effects code). (3) Read p4-link-match/view/board-renderer.lua. (4) Read shared/components/celebration-effects.lua (shared component check). (5) Read p4-link-match/view/result-popup.lua. (6) TodoWrite 8 tasks (particle, link-line, disappear, result-popup, score text). (7) 6x Edit board-renderer.lua + 1x Edit result-popup.lua (brighter colors, more particles, glow halos, thicker link lines). (8) build → success. Key: agent read celebration-effects.lua to check shared component integration BEFORE editing renderer. T09 (39 steps, 10 edits): user said '优化记忆翻牌的特效' — same cross-reference pattern implied (no explicit '参考' this time). Agent: Task SA (explore 记忆翻牌). Read card-renderer.lua + result-popup.lua + hud-renderer.lua. TodoWrite 7 tasks (flip anim glow, match particle/halo, card backlight, front-face match glow). 10x Edit card-renderer.lua + 1x Read+Edit gameplay.lua (event hook for flash effect) → build success. Pattern across T08-T09: explore target game → read shared components → read result popup → TodoWrite per-effect-dimension → edit renderer per dimension → build. T08 had explicit '参考上面的' cross-reference; T09 implied same style from session context. | 9bbd20cc T04 (27 steps, 6 edits + 1 write, 1 build): user says '为翻牌通关时制作动画效果。参考推箱子'. Agent: (1) TodoWrite. (2) Task SA — searched P1-推箱子 for victory/clear animation implementation (found view/animations.lua). (3-4) TodoWrite + respond_to_user. (5) Read p1-puzzle-land/view/animations.lua (P1 win animation code). (6) Read p2-memory-flip/view/result-popup.lua (current P2 state). (7) respond_to_user. (8) Edit card-renderer.lua (add card-flip animation frames). (9) respond_to_user. (10) Write result-popup.lua (full rewrite with win animation sequence ported from P1 style). (11) respond_to_user. (12-22) Read gameplay.lua + 5x Edit gameplay.lua (integrate animation triggers into win-condition flow, timing control, non-blocking guard). (23-26) TodoWrite + build success + TodoWrite + respond. SA-first discovery variant: Task SA locates P1 animation file → agent reads it → ports to P2 via card-renderer edit + result-popup rewrite + gameplay integration.
+
+---
+
+## `gene_fm_multi_game_visual_effects_upgrade`
+
+**多游戏明亮特效升级：受众感知驱动的全游戏粒子动画增强** / Multi-Game Bright Effects Upgrade — Audience-Targeted Particle and Animation Enhancement Across Multiple Games
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:visual_style`
+- `multi_game_simultaneous_target`
+- `audience_targeted_design`
+- `bright_particle_effects`
+- `child_audience_context`
+- `no_plan_mode`
+- `cn_keywords:gengmingxian_tezhong,mingliangfengge,ertong,xiaohaizi,duogame,xiugai_X_he_Y`
+
+**Preconditions:**
+- 用户要求为多个游戏（2个或以上，如「消消乐、推箱子」）同时增强或新增视觉特效（粒子、发光、动画等），而非调整单一参数值。
+- 提示词中包含受众定位信息（「目标用户是小孩子」），说明特效风格需偏向鲜艳、夸张、明亮，而非精细写实。
+- 各游戏的特效代码分布在各自独立的 renderer 文件中（如 p3-match-3/view/board-renderer.lua, p1-puzzle-land/view/animations.lua），需分别探索和修改。
+- 不需要 PlanMode——特效增强方向明确（更多粒子、更亮颜色、更大动画），直接探索+修改。
+
+**Evidence:** 2c4b3363 T05 (96 steps, 23 edits): user said '为消消乐，推箱子，增加更明显的特效，目标用户的小孩子，使用更明显的，明亮风格的特效'. Agent: (1) respond_to_user. (2) Task SA1 (探索消消乐特效代码). (3) Task SA2 (探索推箱子特效代码). (4) TodoWrite 8 tasks covering both games: 消消乐-消除粒子增强, 消消乐-特殊方块特效, 消消乐-Combo特效, 消消乐-消除动画, 推箱子-推动特效, 推箱子-胜利特效. (5) Heavy read phase: p3-match-3/view/board-renderer.lua read 7x + p1-puzzle-land/view/animations.lua read 4x. (6) Edit match-3 board-renderer.lua 10x (particle count 2-3x, colors to orange/yellow/pink, glow halos, combo text scale up). (7) Edit sokoban animations.lua 8x (push effect particles, victory rainbow burst). (8) Single build → success. Total 23 edits, 2 Task SAs, 11 Reads, 96 steps. Post-pattern: T08 user then said '参考上面的修改特效，修改连连看的特效' — confirming T05 output serves as reference for subsequent ports. Key insight: heavy read phase (14 reads of board-renderer.lua alone) before editing is necessary because NanoVG particle functions are large and interleaved; agent must read whole file sections multiple times to understand function boundaries.
+
+---
+
+## `gene_fm_visual_polish_cascade`
+
+**视觉打磨连续微调链** / Visual Polish Cascade — Consecutive Parameter Tweaking Chain
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:visual_style`
+- `consecutive_same_intent_ge_4`
+- `parameter_tweak_chain`
+- `size_color_position_adjustment`
+- `cn_visual_decoration_keywords`
+- `element_removal_sub_turns_in_cascade`
+- `cascade_compression_late_turns_shrink`
+
+**Preconditions:**
+- 用户已有一个基本可用的视觉元素（游戏图形、装饰物、UI控件），正在进行迭代打磨。
+- 连续4+次 feature_modification 指向 visual_style 或 ui_layout，每次只调整1-2个参数（形状、大小、颜色、粗细）。
+- 用户的反馈模式为：观察结果→提出微调→观察→再微调，典型的视觉打磨循环。
+
+**Evidence:** 374e4eb7: T05-T06: preview area height 180→260 in 2 consecutive turns (7 and 3 steps each, 1 edit + 1 build each). T14: 修改蓝色五角星→四角星 (4 steps, 1 edit, 1 build — direct shape constant change). T15: 修改三角形为正三角形居中 (21 steps, 4 edits, 4 builds — NanoVG geometry calculation required 4 build iterations to get triangle centered correctly in tile). T17: 加大连连看鱼/桃心/绿色箭头/闪电图形 (10 steps, 4 edits, 1 build). T18: 加大螺旋加粗 (5 steps, 1 edit, 1 build). All T14-T18 edits targeted tile-renderer.lua in p4-link-match. Distinctive: geometry shape adjustments (T15) consistently require multiple build cycles; size increases (T17-T18) succeed in 1 build.
+
+9dc56f96 T05-T12: 8-turn visual polish cascade on level-select background decorations. T05 (6 steps, E:1, B:1): change scattered dots→stars. T06 (4 steps, E:1, B:1): '太小了大幅度增大' — large size boost. T07 (15 steps, E:1, B:1): add colorful + slow-movement animation effect (Grep×3 to locate update hooks). T08 (15 steps, E:2, B:1): ai_output_correction — '没有浮动效果' → agent rewrote animation velocity logic. T09 (17 steps, E:2, B:1): bug_report — '还是没有移动效果' → agent investigated, found animation update function was not registered in game loop's update callback. Fixed by hooking into correct update event. T10 (12 steps, E:2, B:1): extend same floating effect to main menu. T11 (4 steps, E:2, B:1): '再增大一些尺寸'. T12 (7 steps, E:1, B:1): '主菜单布局向上对齐'. New observation: a visual polish cascade can absorb 2 correction-type turns (ai_output_correction + bug_report) mid-chain without interrupting the user's iterative refinement — the overall intent trajectory remains feature_modification:visual_style.
+
+bc3f2ce9 T00-T16: 14-turn consecutive visual polish cascade targeting the adventure (main story) page, the longest single-game cascade observed so far. T00 (18 steps, 2 edits, 2 builds): button repositioned from top-left to bottom-right. T01 (19 steps, 5 edits, 1 build): level grid reshaped to S-form stagger (1-per-row staggered). T02 (4 steps, 1 edit, 1 build): vertical spacing −40%. T03 (8 steps, 2 edits, 1 build): background circle enlarged + color lightened + title moved up. T04 (5 steps, 2 edits, 1 build): title moved up 5px + background color reverted. T05 (12 steps, 1 edit, 1 build): level button background circle color lightened. T06 (12 steps, 2 edits, 1 build): pagination UI repositioned upward. T07 (7 steps, 1 edit, 1 build): cross-page sync of free-mode toggle button position. T08 (5 steps, 1 edit, 1 build): vertical spacing +20% + grid shifted up. T09 (5 steps, 1 edit, 1 build): circle color lightened again. T10 (6 steps, 1 edit, 1 build): circle color further lightened. T11 (4 steps, 1 edit, 1 build): pagination UI moved up 20px. T12 (8 steps, 3 edits, 1 build): pagination +20px up, level grid +40px up, title −20px. T13 (12 steps, 4 edits, 1 build): mode-switch buttons 2× size + 2× text size. T14 breaks the cascade with a new_feature (shared tab bar, 81 steps). T15 (11 steps, 1 edit, 1 build): background circle size +20%. T16 (12 steps, 2 edits, 1 build): animal avatar size +20%. Pattern: cascade can be interrupted mid-chain by a structural new_feature turn then resume; the structural turn (T14) had 3× more steps and subagents than any polish turn. Each polish turn: 1 edit + 1 build; edits grow when multi-element turns appear (T01=5 edits, T12=3 edits, T13=4 edits).
+
+c68e9e21 T01-T08 (8-turn settings page visual polish cascade): T01 (28 steps, 6 edits, 1 build): broad 'optimize settings page' — agent reads structure, applies warm color scheme + layout improvements. T03 (30 steps, 9 edits, 1 build): 'change buttons to bright warm cute style' — multiple button redraws. T04 (11 steps, 1 write, 1 build): 'too flat and monotonous' — agent rewrites full layout with rounded panels + shadows. T05 (14 steps, 5 edits, 1 build): 'bold the audio slider and buttons'. T06 (8 steps, 4 edits, 1 build): 'delete white circle and text left of sound labels' — surgical removal. T07 (3 steps, 1 edit, 1 build): 'delete set from title' — single-line removal. T08 (47 steps, 5 edits, Grep×10, Read×12, 1 build): 'change slider/button colors to orange-red warm tones' — even a single-page color change required extensive Grep+Read to locate all hard-coded color values across multiple functions. New observations: (1) cascade compression — turns become progressively smaller as specific artifacts are cleaned up (30→11→14→8→3 steps), ending in micro-edits; (2) 'remove unwanted element' sub-turns (T06, T07) are natural members of a visual polish cascade, not a separate bug_report; (3) a warm-color-scheme color change within one complex NanoVG component can require 40+ steps of exploration (Grep×10, Read×12) to locate all color constants; (4) T02 (31 steps, cross-page unification) interrupts T01→T08 cascade — a cross-page inconsistency-discovery turn can appear mid-cascade without breaking the overall polish rhythm. | e2076a78 T12-T15: health advisory compliance UI relocation cascade. T12 (25 steps, 8 edits): user moves health advisory display from free-mode page left-corner to game-start screen; agent reads init files, TodoWrite, edits health-advisory.lua to fire on game-start event, build. T13 (5 steps, 1 edit): immediately reports aspect ratio distortion of the game-rating image; agent runs mkr__Bash to check image resolution, then edits aspect ratio constraint, build. T14 (11 steps, 5 greps, 1 edit): new error log paste — nil value error in health advisory after the move; agent Greps for the nil reference location, reads the file, identifies missing nil check, edits fix, build. T15 (12 steps, 4 edits, 2 builds): user requests 100% size increase on the health advisory image; agent edits size params across multiple sections, two build attempts. Pattern: relocation of a UI component to a new context triggers a cascade of visual artifacts + runtime errors + size adjustment micro-turns.
+
+08754637 (zzj): Two major visual polish cascades observed. T71-T86: 16-turn HUD/UI polish cascade — consecutive FM turns targeting HUD display elements: weapon text label, mode display text with breathing animation, flicker frequency, transform progress bar, text backgrounds, border for overlay mask, score removal and repositioning, digital-style font for speed/distance, 1.5x UI scale, digital font for corner numbers, removal of tunnel name display, horizontal offset support, fine-tuning offset values, font weight increase, final offset adjustment, percentage text scaling. This 16-turn cascade is the longest single-target UI polish run in the dataset — all turns target the same HUD module with single-parameter adjustments per turn. T430-T444: 15-turn 3D model appearance cascade targeting player character armor/arm visual design: material non-reflective, divider line weight, arm material to armor with rune decoration, arm 2x scale, shoulder armor 1x scale, element 1.5x scale, remove shoulder spikes, remove small spikes above main spike, reorder armor layers (spike pauldron to lower position), rotate lower plate vertical onto upper arm exterior, add texture/decoration to upper pauldron, remove gold layer/add texture+gold trim, arm scale to 1.5, shoulder scale 1.5->1.25, head scale to 0.8. Pattern: 3D game-object visual polish cascades follow the same single-parameter-per-turn rhythm as 2D UI cascades; geometry/hierarchy changes (reorder layers, rotate elements) cost more steps than color/scale tweaks.
+
+---
+
+## `gene_pd_direct_design_doc_write_wait`
+
+**直接写设计文档并等待审批（无计划模式变体）** / Direct Design Doc Write and Wait — No-PlanMode Variant of Design-First Defer
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `explicit_design_first_request`
+- `explicit_wait_for_approval`
+- `no_plan_mode`
+- `new_system_being_designed`
+- `cn_keywords:xian_sheji,xie_wendang,jiancha_meiwenti,dengwo,kaishi_zhizuo`
+- `cn_keywords:xian_bu_yao_kaishi_zhizuo,xian_bu_yao_zhizuo`
+
+**Preconditions:**
+- 用户明确要求先设计系统并输出文档（「先设计这个系统，写一个文档」），并附加等待条件（「等我检查没问题后开始制作」）。
+- 这是一个新系统的首次设计，代码库中该系统尚不存在，需先探索现有代码架构再写文档。
+- 用户未要求立即实现，期望审阅文档后再给出「开始制作」等简短指令。
+- 提示词中没有附带设计文档（由 AI 生成文档，而非用户提供文档），且未使用 EnterPlanMode。
+
+**Evidence:** 374e4eb7 T00 (24 steps, 0 edits, 4 writes, 0 builds): user said '先设计这个系统，写一个文档，等我检查没问题后开始制作'. Agent: (1) Task SA — explore project structure (tabs, routes, components). (2) Read 6 existing related components: tab-bar.lua, fox-mascot.lua, settings-save.lua, home/init.lua, main.lua, router.lua. (3) 4x Grep (TabBar.render, fox.png usage, FoxMascot integration). (4) TodoWrite. (5) Write design-wardrobe-system.md. (6) respond_to_user presenting design summary and waiting. Then T01 '开始制作' (2 tokens) triggered full implementation (56 steps, 11 edits, 9 writes, 1 build). Distinction from gene_pd_design_only_planmode_defer: no EnterPlanMode/ExitPlanMode cycles — agent directly reads code and writes the design doc without formal plan-mode research subagents. | 76b0acb1 T13 (58 steps, 15 edits, 5 writes, 0 builds): user said doc update for 20 levels of main story, explicit 先不要开始制作 prohibition. Agent: respond_to_user → Task SA (research existing design docs) → TodoWrite → Read design docs x many → Edit storyline configs + design docs x15 → respond_to_user. No builds throughout. Pattern confirms: 先不要开始制作 as an explicit prohibition phrase triggers doc-only update; agent reads existing design docs as reference then writes new levels design content into game design spec files. | e2076a78 T7 (17 steps, 6 reads, 2 globs): user prompt "设计防沉迷系统，先写文档，不要直接开始制作。在配置中增加开关，【测试开关-是成年人】。" Explicit "先写文档" phrase. Agent: Glob+Read existing docs and code (6 steps), then writes design document for anti-addiction system covering config switch, adult/minor behavioral branches, future integration point. No edits to game code, no build. Confirms: 先写文档/不要直接开始制作 is a reliable trigger phrase — agent writes a complete spec doc with config design, behavioral spec, and deferred implementation notes, then stops without touching game code.
+
+---
+
+## `gene_fm_cross_game_ui_reference_layout`
+
+**跨游戏 UI 布局参考移植：参考已有游戏实现，移动目标游戏 UI 元素** / Cross-Game UI Layout Reference — Reposition UI Elements by Referencing Working Game Pattern
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `user_cites_other_games_as_reference`
+- `ui_element_repositioning`
+- `cross_game_layout_pattern`
+- `cn_keywords:cankao_qita_youxi,yidong,an_niu,zuoshang,budong,weizhimeibiao`
+
+**Preconditions:**
+- 用户要求修改某个游戏的 UI 元素位置（如将按钮从底部移到左上角），并在提示词中明确引用其他游戏作为参考（「参考其他游戏」）。
+- 用户描述的是目标位置（「移到左上角」），而非具体实现方式（不指定代码文件）。
+- 项目中确实存在其他游戏已实现了用户期望的 UI 布局模式，可作为可靠的参考实现。
+
+**Evidence:** 3ee927f3 T10 (14 steps, 3 edits, 1 build): user said '参考其他游戏，将连连看游戏局内，下方的按钮，移动到左上角'. Agent: (1) Read p4-link-match/view/hud-renderer.lua (current HUD layout). (2) Read p4-link-match/screens/gameplay.lua (click event binding). (3) Task SA '查看其他游戏的 HUD 布局' → SA returned comparison: p1-puzzle-land has control buttons at top-left, p2/p3 have similar patterns. (4) Edit hud-renderer.lua ×2 (moved button drawing coordinates from bottom to top-left position). (5) Edit gameplay.lua ×1 (updated click area detection to match new button position). (6) Build success. Distinctive: user's '参考其他游戏' phrasing triggers Task subagent specifically to survey HUD layouts across all games before implementing, rather than directly guessing the target position. The cross-game survey step prevents coordinate mismatches between render position and click area. | 9bbd20cc T06 (16 steps, 2 edits, 1 build): user says '参考推箱子关卡胜利的UI，修改翻牌游戏胜利的UI，将三个按钮改为纵向排列'. Agent: (1) respond_to_user. (2) TodoWrite. (3) Task SA — searched p1-puzzle-land/ for win popup UI file (keyword: result, victory, popup, button). (4) Read p2-memory-flip/view/result-popup.lua (current P2 state). (5) TodoWrite. (6) respond_to_user. (7) Read p1-puzzle-land/view/board-renderer.lua (P1 result UI — contains win dialog button layout). (8) TodoWrite. (9) respond_to_user. (10-11) 2x Edit p2-memory-flip/view/result-popup.lua — restructure button container from horizontal to vertical layout (direction change). (12) respond_to_user. (13) build success. (14-15) TodoWrite + respond. Specific layout-directive variant: user names the target axis explicitly ('纵向排列'). SA locates P1 UI file → agent reads P1 layout code → applies vertical-stack layout to P2 result popup buttons.
+
+bc3f2ce9 T26 (11 steps, 2 edits, 1 build): "参考主线的标题，修改自由模式页面的标题". User cited the main story (adventure) page title as the reference for updating the free mode page title. Agent: (1) Read adventure/init.lua (main story title rendering). (2) Read home/init.lua or free mode page (current free mode title). (3) 2x Edit: applied main story title style (font, size, color, position) to the free mode page. (4) Build success. Variant: both pages are within the same project (intra-project reference, not cross-project). "参考主线的标题" phrasing names the reference page explicitly — no Task subagent survey needed since both pages are already known from session context. Confirms: cross-page UI style reference pattern does not always require Task subagent if reference page is already in session context.
+
+ceed02b2 T1 (38 steps, 15 edits, 1 build): user said '参考推箱子，修改消消乐的游戏页面，将返回和重开按钮移动到左上角，删除暂停'. Agent: (1) Glob scripts/**/*.lua. (2) Read p3-match-3/view/hud-renderer.lua (current HUD layout). (3) Read p3-match-3/screens/gameplay.lua (click event binding). (4) Read p3-match-3/view/pause-overlay.lua (pause UI — to plan removal). (5) Task SA '查找推箱子HUD布局' → SA returned p1-puzzle-land/view/board-renderer.lua + p1-puzzle-land/screens/gameplay.lua showing back/restart buttons at top-left implementation. (6) TodoWrite (3 tasks). (7) Edit hud-renderer.lua ×2 (repositioned return/restart button drawing coordinates to top-left, removed pause button rendering). (8) Edit gameplay.lua ×12 (updated click detection areas to new top-left positions + removed pause button event handlers). (9) Read gameplay.lua (re-read mid-editing for context). (10) Edit gameplay.lua ×1 (final cleanup). (11) Build success. New variant vs prior instances: (a) combined repositioning + deletion in one prompt ('移动到左上角，删除暂停') — agent reads pause-overlay.lua BEFORE Task SA survey, specifically to understand the pause UI structure it needs to remove; (b) gameplay.lua required 12 edits (vs. 1-3 in 3ee927f3/9bbd20cc) because removing pause event handlers + repositioning two buttons' click areas required rewriting multiple handler sections; (c) reference game (推箱子 = p1-puzzle-land) is named explicitly in the prompt, so Task SA has a specific search target rather than surveying all games generically.
+
+---
+
+## `gene_fm_game_grid_orientation_rewrite`
+
+**游戏网格方向重排：行列互换以匹配竖屏设计，全量重写关卡数据文件** / Game Grid Portrait Reorientation — Rows/Cols Swap for Vertical Screen, Full Level Data Rewrite
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `grid_orientation_mismatch`
+- `portrait_screen_landscape_grid`
+- `rows_cols_swap`
+- `level_data_bulk_rewrite`
+- `cn_keywords:hengbi_zong_duo,zongbi_heng_duo,shupingmu,xiugai_weizhu,fangkuai,zhu,zong,heng`
+
+**Preconditions:**
+- 用户指出游戏网格（棋盘）的行列比例与屏幕方向不匹配：当前网格横向方块多于纵向（横比纵多），但游戏是竖屏，用户要求改为纵向更多（纵比横多）。
+- 游戏所有关卡的网格尺寸（rows/cols）集中定义在单一数据文件中（如 data/levels.lua），每关一个配置项。
+- 棋盘逻辑代码（board.lua）中 rows/cols 字段有明确语义（rows=行数/y方向，cols=列数/x方向），需要确认坐标约定后再修改。
+
+**Evidence:** 3ee927f3 T14 (10 steps, 1 write, 1 build): user said '修改连连看的关卡，现在连连看的方块横比纵多，但是游戏是竖屏的，修改为纵比横多'. Agent: (1) Read p4-link-match/data/levels.lua → confirmed all 25 levels have cols > rows (e.g. rows=4, cols=6 → more horizontal than vertical). (2) Read p4-link-match/logic/board.lua → confirmed coordinate convention: rows=行数(y方向), cols=列数(x方向). (3) TodoWrite: swap rows/cols for all 25 levels while keeping total tile count reasonable. (4) Write p4-link-match/data/levels.lua (full file rewrite — all 25 levels updated with new rows > cols values). (5) Build success. Key insight: agent chose Write (full file rewrite) over 25× Edit because all levels needed the same type of change — Write produces a cleaner, verifiable result in one shot. The coordinate convention check (board.lua read) was essential: without it, agent might have swapped in the wrong direction.
+
+---
+
+## `gene_fm_single_file_adaptive_sizing`
+
+**单组件自适应尺寸改造：引入缩放函数后系统替换全文件硬编码尺寸** / Single-Component Adaptive Sizing — Introduce Scale Function, Systematically Replace Hardcoded Sizes
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `single_component_responsive`
+- `pc_vs_mobile_size_mismatch`
+- `hardcoded_pixel_values`
+- `no_plan_mode`
+- `no_cross_file_scope`
+- `cn_keywords:zishiying,daxiao,wenzidaxiao,shouji_heshi,pc_tai_xiao,dan_zu_jian,tanchu,mianban`
+
+**Preconditions:**
+- 用户报告某个 UI 组件（弹窗、设置面板、覆盖层等）在手机上尺寸合适，在 PC 或平板上文字/布局太小。
+- 目标组件是独立的单文件组件（如 settings-popup.lua），所有尺寸均以硬编码像素值分散在文件各处（对话框宽高、字体大小、padding、卡片高度等）。
+- 需要引入基于屏幕尺寸的缩放机制，但改动仅限于该单一文件——不需要新建共享模块，不需要修改其他游戏或页面文件。
+- 通常发生在已完成了跨文件的平台适配（如 density.lua）之后，用户再针对某个遗漏组件补充适配。
+
+**Evidence:** 44926b0f T03 (27 steps, 8 edits, 1 build): user asked '让设置页面也自适应大小，文字大小，现在在手机页面是合适的，在PC页面就太小了'. Agent: (1) Read settings-popup.lua — surveyed all hardcoded pixel values (fixed dialog size, font sizes, padding, card heights). (2) respond_to_user — explained all sizes are fixed, described scale plan. (3) TodoWrite — listed subsections to update: scale function, showConfirm dialog, makeVolumeCard, M.open opener (value labels), anti-addiction status card, button area, close button, panel container. (4) Edit #1 — added refreshUIScale() function computing uiScale = min(max(logW/340, 1.0), 2.5) at top of file. (5) 7 more Edit calls — one per subsection, replacing hardcoded values with math.floor(value * uiScale). (6) TodoWrite — mark all done. (7) Build → success. Total: 8 edits, all in settings-popup.lua, 0 other files changed. Distinct from gene_fm_planmode_crosscutting_refactor (7+ files, PlanMode, shared utility module): this pattern is single-file, no PlanMode, introduces inline scale function rather than imported module. Typical session context: a cross-file adaptive system (like density.lua) was implemented earlier in the project; this turn patches a single overlooked component.
+
+---
+
+## `gene_nf_terse_start_reference_guided_scaffolding`
+
+**简短启动指令触发的参考游戏引导式全游戏脚手架搭建** / Terse Start Command — Reference-Guided Full New Game Module Scaffolding
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `terse_start_command`
+- `follows_preflight_inquiry_turn`
+- `no_attached_doc`
+- `full_new_game_module_creation`
+- `layer_by_layer_implementation`
+- `reference_game_as_template`
+- `game_registry_edit_needed`
+- `cn_keywords:kaishi_kaifa,kaishi_zhizuo,kaifa`
+- `follows_architecture_planning_turn`
+- `task_subagent_reference_reading`
+
+**Preconditions:**
+- 上一 turn 对一款新游戏的设计文档进行了阻碍点/补充内容分析（预实施审查），已确认无硬性阻碍。
+- 用户发送极短的开发启动指令（如「开始开发」「开始制作」，≤4字），无附件、无具体说明，隐含「按上一轮分析的方案开始」。
+- 该游戏尚未在代码库中存在，需从零创建完整游戏模块目录结构（config、init.lua、logic/、view/、screens/、adapter.lua）。
+- 项目中已有一个或多个结构完整、测试通过的参考游戏（如 p2-memory-flip、p1-puzzle-land），可作为实现模板。
+- （变体）上一 turn 包含架构规划阶段（渲染方案设计、逻辑/渲染层分离约束、M1范围确认），而非仅为预实施审查——此时触发指令通常为「没有需要修改的，开始开发」而非纯粹的「开始开发」。
+
+**Evidence:** 4d80bab3 T1 (81 steps, 15 Writes + 1 Edit + 1 build): user sent 「开始开发」(2 chars) after T0 preflight review confirmed no hard blockers for P4-连连看. Agent: (1) TodoWrite 15-item ordered task list (all game layers). (2) respond_to_user. (3-8) Read 7 P2 reference files: adapter.lua, init.lua, save.lua, logic/state.lua, screens/level-select.lua, screens/gameplay.lua, view/card-renderer.lua. (9) respond_to_user (declared architecture understood). (10) TodoWrite (mark references read, start impl). (11) Bash mkdir -p for game directory structure. (12-29) Writes in dependency order: init.lua → config/p4-link-match.lua → data/levels.lua → logic/pathfinder.lua → logic/state.lua → logic/board.lua → save.lua → view/tile-renderer.lua → view/board-renderer.lua. (30-36) Mid-session: 2 parallel Tasks to read P2 view files (hud-renderer, result-popup, pause-overlay, gameplay) AND read already-written P4 logic files (board.lua, state.lua, pathfinder.lua) to verify interfaces. (37-58) Direct reads of P2 view/screen files + P4 design doc re-read + Read already-written P4 board-renderer, board, state. (54-62) Write remaining view/screen files: hud-renderer.lua → result-popup.lua → pause-overlay.lua → screens/gameplay.lua → screens/level-select.lua. (63-72) Read P2 adapter + game-registry → Write adapter.lua → Edit game-registry/init.lua (register p4-link-match). (73-76) Build → success. Total: 15 Writes + 1 Edit + 1 build, 0 errors. Key behaviors: (a) pre-reads ALL reference game files before writing ANY new files; (b) mid-implementation re-reads reference view files + already-written logic files before writing view layer; (c) re-reads design doc mid-implementation to verify UI specifics (level-select.lua required checking P4.md level count and grid size). Session note: only 2 prompts total (T0 preflight + T1 start) — this gene is valid due to distinctive 81-step scaffolding behavior despite low prompt count. | 5c2aeaee T3 (turns 2-3 combined, ~50 steps + context continuation, 8+ Writes, 1 Edit, 2 builds): user sequence — T1: preflight review (3 docs attached), T2: architecture planning ('渲染方案，使用nanovg，但是确保逻辑层和渲染层剥离，以便后续如果有需要改变。M1制作基础+冰面'), T3: '没有需要修改的，开始开发' (7 chars). Pre-sequence has TWO turns (preflight + architecture planning) instead of one. Agent: (1) TodoWrite. (2) 3 parallel Task subagents (read NanoVG example, read scaffold template, read NanoVG API docs) — uses Task SAs for reference reading instead of direct Reads (distinction from 4d80bab3). (3) Bash mkdir -p for game directory structure. (4) 8x Write: config/p1-puzzle-land.lua, data/levels.lua, logic/level-loader.lua, logic/board.lua, save.lua, view/animations.lua, view/board-renderer.lua, screens/level-select.lua, screens/gameplay.lua. Context continuation adds: Read all 9 written files + reference demo adapter + game-lifecycle SDK + logger → Write adapter.lua → Write init.lua → Edit game-registry (register game) → Build → error → Grep error log → 2x Edit → Build success. Key variant: (a) triggered by '没有需要修改的，开始开发' (not just '开始开发') after architecture planning turn; (b) reference reading done via Task subagents (not direct Reads) — faster but uses subagent slots; (c) game = p1-puzzle-land (Sokoban), first-time creation with logic/render separation enforced by user. | 9bbd20cc T01 (41 steps, 0 direct edits, 12 writes, 1 build): terse '开始开发' follows T00 preflight review of P2-记忆翻牌.md. Agent: (1-2) respond_to_user + TodoWrite. (3-9) 7x Read P1-推箱子 reference files in exact module order: init.lua → adapter.lua → save.lua → screens/level-select.lua → screens/gameplay.lua → logic/board.lua → shared/components/screen-transition.lua. (10-12) respond + TodoWrite + Bash mkdir p2-memory-flip/{logic,view,screens,data}. (13-35) 12x Write new P2 files mirroring P1 structure: init.lua, data/levels.lua, save.lua, logic/state.lua, logic/board.lua, view/card-renderer.lua, view/hud-renderer.lua, view/result-popup.lua, view/pause-overlay.lua, screens/level-select.lua, screens/gameplay.lua, adapter.lua. (36) build success. (37-40) Bash verify + respond. First scaffolding session for P2-记忆翻牌 (card-matching game). Read order follows P1 module architecture exactly (entry → adapter → save → screens → logic → shared) before mirroring each module to P2. 12 files created from scratch in one turn.
+
+---
+
+## `gene_nf_mechanic_with_editor_integration`
+
+**游戏机制与关卡编辑器同步集成：单 Turn 双目标实现** / New Game Mechanic + Level Editor Co-Implementation — Single Turn Dual-Target
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `editor_integration_requested`
+- `no_attached_doc`
+- `mechanic_and_editor_simultaneous_request`
+- `also_add_to_editor_phrase`
+- `cn_keywords:jiaru_bianjiqi,bianjiqi_zhichi,bianjiqi_zhong,bianjiqi_li`
+
+**Preconditions:**
+- 用户要求新增一种游戏机制（如传送门、特殊方块、颜色门控），并在同一条提示词中明确要求「同时加入编辑器支持」或「也加入编辑器中」。
+- 该机制在代码库中尚不存在，需要同时修改游戏逻辑层（board.lua）、渲染层（board-renderer.lua）和关卡数据层（levels.lua）。
+- 项目已有关卡编辑器（level-editor.lua），需要为新机制添加对应的工具按钮和放置逻辑。
+- 用户未附加设计文档，直接描述机制规则（如颜色一一对应、同色只有一对门和目标）。
+
+**Evidence:** 4f916c20 T01-T02 (73 steps, 24 edits, 1 build): user said '为推箱子增加传送门，红绿蓝三个颜色的传送门和传送目标，传送门和目标一一对应。同一个颜色只会存在一个门和一个目标。将3种颜色的传送门和目标也加入编辑器中'. No design doc attached. Agent: (1) Glob project structure. (2) Read 6 core files: board.lua (game logic), board-renderer.lua (NanoVG rendering), level-editor.lua (editor), levels.lua (level data), level-loader.lua (loader), init.lua (game screen). (3) respond_to_user — declared architecture understood. (4) TodoWrite 10 tasks in dependency order: 数据格式扩展→逻辑层门传送规则→渲染层门/目标可视化→关卡加载器适配→编辑器工具按钮→编辑器放置逻辑→编辑器颜色选择→编辑器导出格式→现有关卡数据兼容→Build验证. (5) 24 Edit calls across board.lua (portal teleport logic, color-match state machine), board-renderer.lua (3-color portal + target rendering via NanoVG color map), levels.lua (portals/portalTargets fields added to existing levels as empty tables), level-loader.lua (parse new fields), level-editor.lua (3x portal tool buttons + 3x portal target buttons with color labels, placement/erase logic, export format updated). (6) Build success. Distinctive: user explicitly requested both mechanic AND editor support in one prompt ('也加入编辑器中'); agent implemented both in a single 73-step turn without splitting. Color-coded variant pairs (red portal→red target) implemented via string-key color map in renderer. All 6 game files touched.
+
+---
+
+## `gene_fm_editor_output_apply_to_level`
+
+**编辑器导出数据粘贴覆盖关卡：噪音剥离 + 精准替换** / Editor Output Paste-and-Apply to Level File — Strip Log Noise, Precise Replace
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `user_pastes_structured_lua_data`
+- `target:game_logic`
+- `apply_to_specific_level_number`
+- `editor_exported_data_pasted`
+- `level_number_specified`
+- `raw_data_with_possible_log_noise`
+- `cn_keywords:fugai,yingyong,di_X_guan,bianjiqi_shuchu,zhandiefu`
+
+**Preconditions:**
+- 用户在提示词正文中直接粘贴了结构化的关卡数据（来自关卡编辑器的导出输出，格式为 Lua table `{ width=N, height=M, player={...}, walls={{...}}, ... }`）。
+- 用户指定了要覆盖/应用的目标关卡序号（「第X关」「第八关」等）。
+- 粘贴的数据可能带有 TapTap Maker 日志噪音：前缀如 `[2026-03-20 10:55:52][6773][Script]` 或尾缀如 UUID `33fd2834-69ad-4209-b0ab-78d842749e93:1:143137`——需要提取纯 Lua table 部分。
+- 目标关卡数据文件（levels.lua）已存在且该序号的关卡已有条目，需精准替换。
+
+**Evidence:** 4f916c20: Three instances of the same pattern in one session. T07-T08 (P4, 9 steps, 2 edits, 1 build): user pasted partial level 8 data (missing portals/ice fields) and said '将这个数据，应用到推箱子第八关'. Agent: Read levels.lua (2x, offset to target range), Grep '关卡 08' to locate, 2x Edit (one partial then full replacement), Build success. T11-T12 (P6, 3 steps, 1 edit, 1 build): user pasted complete level 8 data including portals/portalTargets fields with real game values. No noise in this paste. Agent: directly Edit to replace level 8 entry (no reads needed — file still in context), Build success. Fast variant when file is in context. T17-T18 (P9, 4 steps, 1 edit, 1 build): user pasted level 7 data WITH log noise: prefix '[2026-03-20 10_55_52_657][6773][Script] ' and suffix ' 33fd2834-69ad-4209-b0ab-78d842749e93:1:143137'. Agent: Read levels.lua (offset to level 7 range), Edit to replace level 7 entry using extracted Lua table (stripping prefix/suffix), Build success. Key observations: (1) T07 had a partial paste (user forgot portals field) — agent noted the omission and applied what was given; (2) T11 overrode T07 with the complete data including portals; (3) T17 demonstrates the log-noise stripping pattern — real TapTap Maker export includes timestamp prefix and UUID suffix that must be stripped before applying.
+
+9dc56f96 T41-T44: 4 consecutive Sokoban level data paste operations (levels 9-12). Each turn follows the same minimal pattern: T41 (6 steps, E:1, B:1, Grep:1, Read:2): level 9 — Grep level header in levels.lua + Read surrounding context + Edit replace + Build. T42 (5 steps, E:1, B:1, Grep:1, Read:1): level 10 — same Grep+Read+Edit+Build. T43 (5 steps, E:1, B:1, Grep:1, Read:1): level 11. T44 (5 steps, E:1, B:1, Grep:1, Read:1): level 12. Consecutive cluster (4 turns in a row) confirms users often redesign multiple levels in sequence and paste them one-by-one. No log noise in this session — clean editor output, minimal stripping needed. Compared to 4f916c20 where some pastes had missing fields and log noise, this session shows the fast-path variant (clean data, file already in context after first read).
+
+---
+
+## `gene_nf_empty_project_scaffold_template`
+
+**空项目脚手架初始化：读取模板后写入最小入口并构建** / Empty Project Scaffold from Template — Read Template, Write Minimal Entry, Build
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `empty_project_request`
+- `no_existing_scripts`
+- `first_session_of_project`
+- `scaffold_template_available`
+- `initialization_text_mentioned`
+- `cn_keywords:konxiangmu,zhunbei,kongxiangmu,chuangjian,chushihua,kongdemoban`
+
+**Preconditions:**
+- 用户要求为一个新项目准备空的基础工程（「准备一个空项目」「创建基础项目」），通常附带一个初始化验证需求（如屏幕显示「初始化成功」文字）。
+- 这是项目的第一个 session，代码库中尚无任何 scripts 文件，或仅有空目录结构。
+- 项目工作目录中存在脚手架模板文件（如 `/workspace/templates/scaffold-2d.lua`），供 AI 参考如何构建最小可运行入口。
+
+**Evidence:** 5634a485 T00-T01 (8 steps, 1 Write, 1 build): user said "为我准备一个空项目，屏幕中间显示"初始化成功"". Agent: (1) respond_to_user (thinking). (2) mcp__mkr__Read /workspace/templates/scaffold-2d.lua — read the scaffold template to understand 2D project structure. (3) mcp__mkr__Read /workspace/engine-docs/principles.md — read engine principles. (4) respond_to_user (planning). (5) mcp__mkr__Write /workspace/scripts/main.lua — created minimal entry with centered "初始化成功" text using NanoVG. (6) respond_to_user. (7) mcp__sce-urhox__build {scriptsPath: "scripts", entry: "main.lua"} → 🎉 构建成功. (8) respond_to_user. Pattern: scaffold template present → read template + read principles → write minimal main.lua → build. Key insight: agent does NOT write main.lua from memory — it first reads the scaffold template to ensure the structure matches the platform conventions (NanoVG init sequence, global lifecycle hooks, etc.). The build takes exactly 2 reads + 1 write + 1 build = 8 steps total.
+
+---
+
+## `gene_mw_fragment_trigger_context_inferred_doc_update`
+
+**残缺输入上下文推断触发综合文档更新** / Fragment/Ambiguous Input — Context-Inferred Comprehensive Multi-Doc Update
+
+Category: `workflow`
+
+**Signals:**
+- `intent:other`
+- `ambiguous_fragment_input`
+- `ultra_terse_or_malformed_prompt`
+- `follows_readiness_analysis_turn`
+- `target:documentation`
+- `multi_doc_update`
+- `project_config_update`
+- `crlf_normalization_needed`
+- `cn_keywords:xuyao,xu,yao,xu_yao`
+
+**Preconditions:**
+- 上一 turn 已完成了对多个文档的阻碍点/补充内容分析，输出了结构化的「需要补充的内容」清单。
+- 用户发送了一个极短的、字面上不可解析的输入（如『xuyao』『xu』『要』）——该输入是残缺片段、输入法未完成的拼音、或语音输入截断，无法从字面意思判断具体操作。
+- 结合上一 turn 的分析上下文，可以将用户的残缺输入合理推断为「请执行上一轮识别出的需要补充的内容」。
+
+**Evidence:** 5634a485 T08-T09 (70 steps, 19 edits, 0 builds): user sent 'xuyao' (4 Roman characters -- likely garbled/truncated voice input or IME incomplete, intended as 'xu yao' = 'need to'). Context: T07 (prior turn) identified 6 items needed in the docs (schedule restructuring, code standard cross-references, container architecture details, document registry updates, AI dev spec sections 4 and 7 simplification). Agent: (1) TodoWrite (6 tasks inferred from T07). (2) respond_to_user (declared intent). (3-64) Systematic multi-file doc update: Edit project.json (fill in title='yi zhi you xi da ting' and description from template placeholder). Multiple Edits + CRLF fixes on 'zhuang an da ting'.md (restructure implementation schedule week->phase, update code standards section, architecture container details, structure spec). Multiple Edits on AI dev spec.md (simplify section 4 config contract -> cross-reference; simplify section 7 acceptance criteria -> cross-reference). Two rounds of Edits on doc registry.md (add 'kai fa ji lu' pattern). Encountered CRLF issue (\r\n caused Edit string match to fail 3 times) -> Bash `sed -i 's/\r$//'` to normalize line endings -> retry Edit successfully. Total: 19 edits across 4 files + 2 Bash sed CRLF fixes. Key patterns: (a) Agent does NOT ask for clarification on ambiguous input -- uses session context to infer intent and proceeds; (b) CRLF normalization via Bash sed when Edit fails due to \r\n mismatch; (c) Version bumps on all modified docs (AI dev spec v1.4->v1.5, design spec v1.3->v1.4, doc registry v1.1->v1.2).
+
+---
+
+## `gene_cc_sfx_batch_genre_aware`
+
+**直接音效批量生成：受众感知驱动的英文 Prompt 一次性批量创建** / Direct SFX Batch Generation — Genre-Aware English Prompt Crafting
+
+Category: `workflow`
+
+**Signals:**
+- `intent:content_creation`
+- `target:audio`
+- `no_attached_doc`
+- `batch_sound_generation`
+- `genre_context_in_prompt`
+- `audience_context_in_prompt`
+- `cn_keywords:shengcheng,yinxiao,youxi,ertong,xiuxian,yizhi`
+
+**Preconditions:**
+- 用户直接要求为游戏生成音效资源（如「生成游戏音效」「为游戏制作音效」），未附加任何音效设计文档。
+- 提示词中包含游戏类型上下文（如「休闲游戏」「益智游戏」）和/或目标受众（如「小孩」「儿童」），用于推断所需音效风格。
+- 当前未要求先设计音效系统或先写文档，属于直接内容创作请求。
+
+**Evidence:** 5af4f5ad T01 (3 steps, 47s session): user said "为我生成新的游戏音效，需要是休闲游戏的音效，适合益智游戏，小孩游玩的音效" with no design doc. Agent: (1) respond_to_user (thought: will generate a set of child-friendly puzzle game SFX). (2) mcp__sce-urhox__batch_sound_effects with 8 English prompts: ui_tap 0.5s, correct_answer 1.0s, wrong_answer 0.8s, star_collect 0.6s, bubble_pop 0.4s, level_complete 1.5s, combo_chain 0.8s, piece_place 0.4s. All prompts use English despite Chinese-language project — each includes style (soft/bright/playful), timbre (xylophone/bells), audience safety (not scary), and game context. Result: 8/8 success, all saved to workspace/assets/audio/sfx/. (3) respond_to_user — table of file→usage→duration. Pattern: genre+audience context in prompt → agent infers 4 sound categories (UI/feedback/event/tactile) → single batch call with English descriptive prompts → success → summary table. Note: single-session evidence; pattern is distinctive for its specific MCP tool usage and English-prompt-for-Chinese-project strategy.
+
+9dc56f96 T22 (6 steps, E:1, B:1, SFX:1): '为我生成更多的休闲游戏音效，主要目标用户是儿童，生成一些可爱的反馈，气泡音效，按钮点击音效。' Agent: Read sounds.lua (check existing keys) → batch_sound_effects with batch of cute/bubble/button SFX → Edit sounds.lua to register → Build. T28 (7 steps, SFX:1): '参考 bubble_pop_cute，生成更多类似的音效' — reference-guided batch: user names an existing SFX as style reference rather than describing genre/audience. Agent: batch_sound_effects call with style-matching prompts (no edit/build — user wants to hear first, placement deferred to T29). New variant: reference-guided generation (user names an existing SFX as style anchor) vs genre+audience generation (T22, 5af4f5ad:T01). Both trigger single batch_sound_effects call.
+
+---
+
+## `gene_fm_narrative_gameplay_misalignment_fix`
+
+**剧情对话与游戏内容对齐修复** / Narrative-Gameplay Misalignment Fix — Replace Irrelevant Dialogue with Gameplay-Accurate Content
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:narrative`
+- `character_name_in_prompt`
+- `level_name_in_prompt`
+- `gameplay_mechanic_mismatch`
+- `dialogue_irrelevant_to_gameplay`
+- `cn_keywords:genyouxi_wuguan,wuguanneirong,gaiweidui,duihuaneirong,jingtingduihua`
+
+**Preconditions:**
+- 用户在提示词中同时指出了角色名（如「逗逗」）和关卡名称（如「逗逗的锁链迷阵」），说明该关卡剧情对话中出现了与实际游戏内容无关的词汇或道具引用。
+- 问题表现为：角色对话使用了游戏中并不存在的元素（如「宝石被锁链锁住」），而实际游戏内容使用了完全不同的概念（如「锁定方块」「图案配对」）。
+- 用户要求将无关内容「改为其他的聊天内容」，即替换为与实际游戏玩法一致的对话描述，而非简单删除。
+
+**Evidence:** 5beefcbb T02-T03 (20 steps, 2 edits, 1 build): user said '逗逗的锁链迷阵，剧情对话种提到宝石被锁链锁住，但是和游戏内容完全无关，改为其他的聊天内容'. Agent: (1) Task SA to search /workspace/scripts/ for 逗逗-related files + 宝石/锁链 keywords. (2) Grep 'story-24' (found as level 24 = 逗逗的锁链迷阵). (3) Read storyline.lua to locate preDialogue + storyText for story-24. (4) Read story-24.lua to understand actual level mechanics (锁定方块 = locked blocks, not chains/gems). (5) Edit storyline.lua preDialogue: '有些宝石被锁链锁住了......' → '这次的图案比之前多了好多种......'. (6) Edit storyline.lua storyText: '有些方块被锁链锁住了！要先消除旁边的方块才能解锁它们！' → '12×10的大棋盘，16种图案，还有锁定方块，得先解锁再配对！'. (7) Build success. Root cause: game p4-link-match uses 图案 (pattern) tiles and 锁定方块 (locked blocks) mechanic, but dialogue was written using 宝石 (gems) and 锁链 (chains) narrative that never existed in the actual game. | 6b8566ea T03 (18 steps, 2 edits, 1 build): user said '修改 关卡 21：慧慧的单行道 的剧情，并没有箭头，改为注意到地上的传送门了吗，传送门是单向的。修改游戏内文字，和[@主线关卡总览.md]'. Agent: Read 主线关卡总览.md → Glob story-21* → Read story-21.lua → Grep storyline.lua → Read storyline.lua → Edit storyline.lua (storyText/preDialogue: 箭头→传送门) → Edit 主线关卡总览.md (doc sync) → Build. Variant: triple sync (storyText + doc). Agent also reads the level config (story-21.lua) to understand actual game mechanic before editing narrative. | 6b8566ea T06 (8 steps, 3 edits, 1 build): user said '修改 豆豆的迷雾深渊，剧文案，每次成功连线就能驱散周围迷雾，改为通过挑战就能驱散周围迷雾。，火火的回答改为交给我吧！'. Agent: Grep storyline.lua → Edit storyline.lua (storyText fix) → Edit 主线关卡总览.md → Edit storyline.lua (characterReply: 火火's response fix) → Build. Variant: two-field fix (storyText + characterReply) + doc update in one turn. | 6b8566ea T10 (9 steps, 3 edits, 1 build): user said '修改豆豆的锁链迷阵，剧情为，锁链封住了道路，需要通过挑战才能继续前进'. Agent: Grep storyline.lua → Grep 主线关卡总览.md → Edit storyline.lua (x2: preDialogue + storyText) → Edit 主线关卡总览.md → Build. Variant: 2 storyline.lua edits (preDialogue + storyText) + doc sync.
+
+---
+
+## `gene_ir_followup_similarity_sweep`
+
+**单点修复后的全文案相似性扫描与批量修复** / Follow-Up Similarity Sweep — Systematic Narrative Audit and Batch Fix After Single-Instance Repair
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inspection_review`
+- `follows_single_fix_turn`
+- `user_asks_for_similar_cases`
+- `target:narrative`
+- `systematic_audit_requested`
+- `combined_inspect_and_fix`
+- `cn_keywords:leiside,youmei,jianchayoumei,chazhaoleiside,wentian,tongleixing_wenti`
+
+**Preconditions:**
+- 上一个 turn 完成了对单个文案/对话/描述的定向修复（如将一处角色对话中的错误术语替换为准确的游戏术语）。
+- 用户随后发出「检查是否有类似的」或「有没有类似的问题」类提问，期望 AI 将上一次单点修复的模式扩展为全项目文案系统性审计。
+- 审计目标为整个剧情配置（storyline.lua + 所有 story-N.lua 关卡文件），而非单一文件。
+- 用户期望结果不只是列出问题，而是就地修复所有发现的问题（inspect + fix 合并）。
+
+**Evidence:** 5beefcbb T04-T05 (33 steps, 11 edits, 1 build): immediately after T03 fixed the '锁链迷阵' dialogue, user asked '检查是否有类似的，和游戏内容关联较小，但是容易引起误会的文案'. Agent: (1) TodoWrite (audit plan). (2) Read storyline.lua (full file). (3) Task SA to read all story-*.lua files in storyline-levels/. (4) Found 4 categories of similar issues: [A] '宝石' terminology used in 逗逗 (p4-link-match) levels (game actually uses 图案/pattern tiles) — 5 occurrences; [B] '锁链' used in 2 more places (should be 锁定方块 = locked blocks); [C] Step count in dialogue (慧慧：　45步内完成」) doesn't match level config (actual target = 52 steps); [D] '宝石被迷雾笼罩' should be '方块被迷雾笼罩'. (5) 11 sequential Edits across storyline.lua: 宝石→图案/方块 x5, 锁链→锁定 x3, 45步→52步 x1, 迷雾宝石→迷雾方块 x1, legend level copy x1. (6) Build success. Key pattern: '检查是否有类似的' triggers a full-scope audit (entire storyline config + all level files via Task SA) rather than a targeted point check, and results in immediate batch editing of ALL found issues in one turn.
+
+---
+
+## `gene_doc_named_single_doc_source_sync`
+
+**明确指定单一文档的源代码同步更新** / Named Single-Doc Source Sync — Read Source Config and Patch Specific Named Doc to Match Code
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `mentions_specific_file`
+- `has_attached_doc`
+- `single_doc_named_explicitly`
+- `follows_code_change_session`
+- `source_config_driven_update`
+- `fix_history_append`
+- `cn_keywords:gengxin_wenzhang,tongbu_daima,xiugai,wendang,zhibiao,duiying`
+
+**Preconditions:**
+- 用户通过 @文件名 或 file:/// 路径明确指定了需要更新的单一文档（典型措词：「更新[@xxx.md]」），而非泛指「更新文档」。
+- 该文档的内容来源于代码配置文件（如 storyline.lua、levels.lua、config/*.lua），当前 session 中已对这些源代码进行了修改。
+- 文档中存在与源代码的实际内容偏差（如 doc 中写「宝石配对」但源代码已改为「图案配对」），需要通过读取源代码来确认所有差异。
+
+**Evidence:** 5beefcbb T06-T07 (29 steps, 8 edits, 0 builds): user said '更新[@主线关卡总览.md]' — explicitly naming one doc via @-mention after T02-T05 modified storyline.lua. Agent: (1) Read /workspace/docs/主线关卡总览.md (full doc). (2) Read /workspace/scripts/config/storyline.lua (source of truth). (3) TodoWrite — 6 discrepancies: story-4 title 宝石配对→图案配对, story-12 title 宝石迷城→迷城配对, story-20 title 传奇宝库→传奇收藏, story-24 storyText/dialogue (宝石/锁链→锁定方块 + step count 45→52), story-28 storyText (锁链→锁定), story-28 dialogue (宝石被迷雾→方块被迷雾). (4) 7 Edit calls patching each discrepancy in 主线关卡总览.md. (5) 1 Edit call appending 第二批修复（2026-04-03） section to 历史修复记录 table. Total: 8 edits, 0 builds. Distinction from gene_doc_terse_breadth_first: user names ONE specific doc (not 'update docs'), agent reads BOTH the named doc AND the source config to diff them — source config is authoritative reference, not session memory. Fix-history append is a key distinguishing step.
+
+---
+
+## `gene_doc_new_game_devlog_creation`
+
+**新游戏首次开发记录创建：模板参考 + 代码行数统计 + ADR追加** / New Game Dev Log Creation — Template-Guided Initial Log with Code Stats and ADR Append
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `new_game_module_just_scaffolded`
+- `devlog_creation_requested`
+- `mentions_specific_game_name`
+- `no_existing_devlog_for_game`
+- `follows_implementation_turn`
+- `cn_keywords:zengjia_kaifa_jilu,P1_kaifa_jilu,xinzeng_jilu`
+- `at_mention_devlog_named_explicitly`
+- `design_docs_read_before_devlog_write`
+
+**Preconditions:**
+- 用户明确要求为某个游戏新增开发记录（如「增加P1-推箱子的开发记录」），而非「更新文档」——这是首次为该游戏创建开发日志。
+- 该游戏的代码文件已在本 session 或紧上一个 session 中完成初始脚手架搭建，存在 lua 源码文件但尚无对应的 docs/开发记录-*.md。
+- 项目中已有其他游戏的开发记录文件（如 docs/开发记录-大厅M1.md）可用作模板和格式参考。
+
+**Evidence:** 5c2aeaee T4 (index 3, ~18 steps, 1 Write + 4 Edits + 0 builds): user said '增加P1-推箱子的开发记录' after game scaffolding completed in T2-T3. Agent: (1) Task SA '查找开发记录模板和格式' → SA found docs/开发记录-大厅M1.md as template. (2) Read 开发记录-大厅M1.md (template). (3) Read P1-推箱子关卡详细设计.md (game design doc for content). (4) Bash wc -l on all p1-puzzle-land/*.lua files (get line counts for code stats table). (5) Read 架构决策记录.md (to find existing ADR numbers). (6) TodoWrite. (7) Write docs/开发记录-P1推箱子M1.md (new dev log). (8) 4x Edit 架构决策记录.md (add ADR for NanoVG rendering choice + logic/render separation; encoding issue required re-reads + Bash cat-A + full file Write to resolve CRLF problem). Pattern: '增加X的开发记录' → find template → read design doc → Bash wc-l code stats → read ADR → Write new devlog → Edit ADR. Key distinction from gene_doc_terse_breadth_first: this is FIRST-TIME creation (not update), and requires Bash wc-l before writing (not after reading existing doc). CRLF encoding edge case: when Edit fails due to CRLF mismatch in ADR file, agent uses Bash cat-A to inspect encoding then falls back to Write (full file rewrite). | 6b8bf0cd T8 (10 steps, 1 Write, 0 builds): user sent '更新[@开发记录-大厅M1.md]' — explicitly @-mentioning the devlog via the UI's @-mention syntax (triggers <document> context injection). This is the FIRST time this devlog is created (scaffold was just built in T2-T7). Agent: (1) Read /workspace/docs/开发记录-大厅M1.md (the target file — already exists as a template created in an earlier session, OR is blank). (2) respond_to_user (analyzing what to write). (3) Read AI开发规范.md (dev standards doc for formatting guidance). (4) Read 策划案-大厅.md (lobby design spec — to understand what features were implemented). (5) Read 架构决策记录.md (ADR — to capture architectural decisions made during scaffold). (6) respond_to_user (planning content). (7) Bash 'wc -l /workspace/scripts/**/*.lua ...' (count code lines for stats table). (8) respond_to_user (computing stats). (9) Write /workspace/docs/开发记录-大厅M1.md (full file write — new devlog content with code stats). (10) respond_to_user. Key differences from 5c2aeaee variant: (a) trigger is '@-mention of specific devlog file' not '增加X的开发记录' terse command — user explicitly opens and references the file; (b) agent reads DESIGN DOCS (AI开发规范.md + 策划案-大厅.md + 架构决策记录.md) before writing, not just code files — because this is the lobby itself, there are no source config files to diff against, and design docs ARE the source of truth for what was built; (c) no ADR append (unlike 5c2aeaee) — because the lobby's ADR was already updated elsewhere; (d) Bash wc-l step is still present (code stats table). Pattern: @-mention devlog → Read devlog template → Read design docs (not code configs) → Bash wc-l → Write full devlog.
+
+---
+
+## `gene_fm_cross_game_graphic_lib_import`
+
+**跨游戏图案函数库导入：将源游戏绘制函数复制到目标游戏图案池** / Cross-Game Tile Drawing Library Import — Copy Rendering Functions from Source Game into Target Game Shape Pool
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:visual_style`
+- `cross_game_graphic_import`
+- `references_existing_game_renderer`
+- `tile_drawing_functions_ported`
+- `art_pool_update_required`
+- `source_game_named_in_prompt`
+- `cn_keywords:cankao_X_de_fangkuai_tuxing,xiugai_Y_de_tuxing,cankao_X_de_tuxing_yingyong`
+
+**Preconditions:**
+- 用户明确指名了两个游戏：源游戏（如「连连看」）和目标游戏（如「记忆翻牌」），要求将源游戏的 tile/card 图案风格导入到目标游戏中。
+- 提示词使用「参考 [source_game] 的方块/图形」+「修改 [target_game] 的图形」表述，引用的是源游戏已有的图形库，而非当前 session 早期的修改成果。
+- 两个游戏均使用 NanoVG 自绘图案（矢量函数），源游戏的绘制函数（如 tile-renderer.lua 中的 drawStar/drawFish/drawArrow 等）可直接复制到目标游戏的渲染器中。
+- 目标游戏的图案配置（art pool）存储在 board/logic 层的 Lua 文件（如 board.lua 的 ART_POOLS 表）而非渲染器本身，需要在导入绘制函数的同时同步更新图案名称注册。
+
+**Evidence:** 5dbc4646 T2 (21 steps, 2 edits, 1 build): user said 参考连连看的方块图形，修改记忆翻牌的图形. Agent: (1) respond_to_user. (2) Task Explore SA — simultaneously found both games rendering files (p2 card-renderer + p4 tile-renderer) and p2 levels+board config. (3) Read p2-memory-flip/view/card-renderer.lua (target renderer). (4) Read p4-link-match/view/tile-renderer.lua (source renderer — all drawing functions: drawFish, drawHeart, drawArrow, drawLightning, drawSpiral, drawStar4 etc). (5) Read p2-memory-flip/data/levels.lua (to understand art pool usage). (6) Read p2-memory-flip/logic/board.lua (to find ART_POOLS). (7) TodoWrite: (a) copy link-game drawing functions into card-renderer shapes table; (b) update board.lua ART_POOLS to include new shape names. (8) Edit card-renderer.lua — inserted 9 drawing functions from tile-renderer (fish/heart/arrow/lightning/spiral/star4/hexagon/diamond/cross) into the shapes table, adapting function signatures to match p2 convention. (9) Edit board.lua — added new shape names to shapes_easy and shapes_hard pools in ART_POOLS. (10) Build success. Key distinction from gene_fm_cross_game_effect_style_port: (a) user explicitly names SOURCE game (连连看) as the reference, not a same-session prior modification; (b) the import copies entire drawing function bodies (not just style parameters); (c) two target files must be updated: renderer (drawing functions) + board logic (art pool names). The cross-reference is to the OTHER game existing code, not to an earlier-in-session change.
+
+---
+
+## `gene_nf_mouse_swipe_input_extension`
+
+**鼠标滑动输入扩展：MouseButtonDown/Up 配对补充触摸对称逻辑** / Mouse Swipe Input Extension — Pair MouseButtonDown/Up to Mirror Touch Swipe Logic
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `intent:bug_report`
+- `target:game_logic`
+- `mouse_drag_not_working`
+- `touch_already_supported`
+- `mouse_swipe_requested`
+- `MouseButtonUp_missing`
+- `input_event_pair_extension`
+- `cn_keywords:shubiao,huadong,tuodong,anzhushuabiao,yidong,caozuo`
+
+**Preconditions:**
+- 游戏已支持触摸输入（TouchBegin/TouchEnd 配对），但鼠标操作只有 MouseButtonDown（点击），缺少 MouseButtonUp（抬起）事件处理。
+- 用户报告或询问「按住鼠标后滑动无响应」或「鼠标滑动不支持」——表现为点击有效但拖拽无效。
+- 触摸滑动逻辑：TouchBegin 记录起点 → TouchEnd 计算方向 → 触发操作。该逻辑需要对称地移植到鼠标事件对（MouseButtonDown/Up）上。
+
+**Evidence:** 61467d20 T08 (10 steps, 6 edits, 1 build): user said '我用鼠标操作看起来并不支持，我按住鼠标后，视为选中了一个方块，出现框，但是保持按住的状态，移动鼠标并没有反应'. Target: P3 match-3 (adapter.lua). Agent: (1) respond_to_user — identified problem: MouseButtonDown only handles click, no MouseButtonUp for drag end. Touch has TouchBegin/TouchEnd pair; mouse lacks the Up counterpart. (2-8) 6x Edit adapter.lua: [a] add mouseStart_ = nil state variable, [b] rewrite P3M3_HandleMouseButtonDown to only record mouseStart_ (not immediately process click), [c] add new P3M3_HandleMouseButtonUp function (distance threshold check → swipe or click), [d] SubscribeToEvent MouseButtonUp in onEnter, [e] UnsubscribeFromEvent in onExit, [f] clear mouseStart_ in cleanup. (9) Build → success. (10) Summary. T14 (22 steps, 6 edits, 1 build): user said '为推箱子增加鼠标操作，可以滑动屏幕移动角色'. Target: P1 Sokoban (adapter.lua). Agent: (1) Task SA — find Sokoban files. (2) Read adapter.lua (P1). (3) Read gameplay.lua (P1). (4) respond_to_user — TouchBegin/TouchEnd swipe already works; MouseButtonDown is click-only, missing Up counterpart. (5) TodoWrite. (6-12) 6x Edit P1 adapter.lua: same pattern — rewrite MouseButtonDown to record mouseStart_, add P1PL_HandleMouseButtonUp, subscribe/unsubscribe, cleanup. (13) Build → success. Pattern confirmed across 2 games (P3 match-3 and P1 Sokoban): identical pattern in both adapters — TouchBegin/End exists, MouseButtonUp missing → add mouseStart_ variable + Down record + Up swipe/click detection. The agent independently identified the same root cause and applied the same fix pattern to both games in the same session. Session flow for T08: inquiry (T07, 'does P3 support drag?') → agent reads code and says yes → user says 'actually no, mouse drag doesn't work' → bug fix (T08).
+
+---
+
+## `gene_fm_invalid_move_shake_feedback`
+
+**无效操作抖动反馈：以「推不动」演出替代「交换后瞬间弹回」闪烁** / Invalid Move Shake Feedback — Replace Swap-Revert Flash with Nudge-Toward-Target Bounce Animation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `invalid_move_feedback_change`
+- `cross_game_animation_reference`
+- `shake_nudge_animation`
+- `swap_revert_flash_problem`
+- `cn_keywords:wufa_caozuo,kanbuzhu,shunjianhui,yanchu,bunengyi,meiyou_yanchu,cankao_tuixiang`
+
+**Preconditions:**
+- 游戏当前的无效操作反馈表现为「方块直接交换然后瞬间弹回」，在视觉上看起来像闪烁或瞬移，缺乏「推不动」的感觉。
+- 用户要求改为「向目标方向轻微移动一段距离然后弹回」的抖动/震动演出，通常引用其他游戏作为参考（如「参考推箱子」）。
+- 游戏有独立的渲染器文件（如 board-renderer.lua）和屏幕控制器文件（如 gameplay.lua），动画逻辑在渲染器中实现，触发逻辑在屏幕控制器中。
+
+**Evidence:** 61467d20 T09 (23 steps, 7 edits, 1 build): user said '现在消消乐，在无法操作时，会先替换然后瞬间恢复，修改为想要移动的方块向对应方向运动，有一个看起来无法移动的演出，参考推箱子'. Agent: (1) Read gameplay.lua (P3 match-3) to understand current invalid-move flow. (2) Read board-renderer.lua to understand animation system. (3) respond_to_user — identified: invalid swap does full swap + instant revert → looks like a flash. Solution: add shakeAnim that moves only the operated block toward target direction by ~30% tile size, then bounces back. (4) TodoWrite (3 tasks). (5) Edit board-renderer.lua: add shakeAnim_ state table. (6) Edit board-renderer.lua: add startShakeAnim(from, direction) function. (7) Edit board-renderer.lua: update isAnimating() to include shakeAnim check. (8) Edit board-renderer.lua: update clearAnims() to clear shakeAnim. (9) Edit board-renderer.lua: add _drawWithShakeAnim() method in draw() loop for SWAP_BACK state. (10) Edit gameplay.lua: in onSwapResult handling, when result == 'invalid', call startShakeAnim(from, direction_toward_to) instead of startSwapAnim + swapBack. (11) TodoWrite. (12) Build → success. (13) respond_to_user — 'before: both blocks swap and flash back; now: only operated block moves 30% distance toward target then bounces back, giving push-cant-move feel'. Cross-game reference: user said '参考推箱子' to describe the desired feel. Agent didn't read Sokoban code — it used the verbal description to infer the animation style. Key implementation detail: shakeAnim uses only ONE direction (toward target), not a full swap. The block returns to its original position, no state change in board logic.
+
+---
+
+## `gene_nf_match3_particle_effect_system`
+
+**消消乐粒子特效系统：飞向分数 UI 的消除粒子 + 特殊方块差异化演出** / Match-3 Particle Effect System — Elimination Particles Flying to Score UI + Special Block Type-Specific Effects
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `intent:feature_modification`
+- `target:visual_style`
+- `match3_game`
+- `particle_effects_requested`
+- `particles_fly_to_ui_target`
+- `special_block_visual_effects`
+- `score_ui_position_reference`
+- `hud_coordinate_lookup`
+- `cn_keywords:xiaochutezhong,feichuliuzi,fenshuwei,tezhufangkuai,tezhong,yanchu`
+
+**Preconditions:**
+- 游戏是消消乐（match-3）类型，方块消除时当前只有简单的缩放淡出动画，缺乏粒子飞出特效。
+- 用户要求「消除时特效大一些，飞出粒子效果到分数 UI 的位置」，说明粒子飞行目标是 HUD 中的分数控件位置。
+- 游戏有独立的渲染器文件（board-renderer.lua）、HUD 渲染器（hud-renderer.lua）和屏幕控制器（gameplay.lua）。
+- （变体）后续 turn 可能要求为特殊方块（line_h、line_v、bomb、rainbow 等）添加差异化特效（光束、冲击波、闪光等）。
+
+**Evidence:** 61467d20 T10 (26 steps, 8 edits, 1 build): user said '增加消消乐，方块消除时的特效，特效大一些，飞出粒子效果到分数UI的位置。增加演出效果'. Agent: (1) Read hud-renderer.lua to find score widget coordinates → confirmed score is at (screenW - 14, 34). (2) respond_to_user — declared architecture plan: particle system in board-renderer, score target from HUD coords. (3) TodoWrite (4 tasks). (4) Edit board-renderer.lua: add particles_ state table + spawnElimParticles() with velocity toward score position + easing functions. (5) Edit board-renderer.lua: add updateParticles() + drawParticles() methods. (6) Edit board-renderer.lua: update updateAnim() to call updateParticles(). (7) Edit board-renderer.lua: update resetAll() to clear particles. (8) Edit board-renderer.lua: add drawParticles() call in draw() loop after combo text. (9) Edit board-renderer.lua: enhance basic elimination animation (block expands 12% → shrinks + white flash). (10) Edit gameplay.lua: call spawnElimParticles(board_.elim, scoreX, scoreY) when elimination triggers. (11) Edit gameplay.lua: also trigger for chain eliminations in _doChainCheck. (12) Build → success. T11 (28 steps, 7 edits, 1 build): user said '为特殊方块增加特效和演出效果'. Agent: (1) Read board.lua (P3 match-3) to map special block types (LINE_H, LINE_V, BOMB, RAINBOW) and their trigger effects. (2) TodoWrite (5 tasks). (3) Edit board-renderer.lua: extend spawnElimParticles to branch on tile.specialType — LINE_H/V → beam_h/beam_v particles; BOMB → shockwave circle; RAINBOW → flash fullscreen. (4) Edit board-renderer.lua: extend updateParticles to handle new particle types + screen shake for BOMB. (5) Read board-renderer.lua (to verify function order). (6) Edit board-renderer.lua: add drawParticles branching for beam_h/beam_v/shockwave/flash types. (7) Edit board-renderer.lua: fix function definition order — move easeOutQuad/easeOutBounce to before updateParticles (Lua requires forward-definition). (8) Edit board-renderer.lua: remove duplicate easing function definitions that were left at old location. (9) Edit board-renderer.lua: apply screen shake offset in draw() using nvgSave/nvgTranslate/nvgRestore. (10) Build → success. Key pitfall from T11: Lua function definition order matters — if easeOutQuad is defined below updateParticles, it evaluates to nil when updateParticles is first called. Agent caught this after read and moved the definitions up.
+
+---
+
+## `gene_nf_obstacle_blocks_named_storylevel_addition`
+
+**消消乐主线关卡障碍物新增：按关卡名定位 story-N.lua 并更新坐标及文档** / Match-3 Named Story Level Obstacle Addition — Locate story-N.lua, Add Obstacle Coords, Sync Doc
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `match3_game`
+- `level_name_in_prompt`
+- `obstacle_count_mentioned`
+- `cn_keywords:zengjia_bingkuai,zengjia_shikuai,zengjia_shitou,bingkuai_shukuai_peizhitianjia`
+
+**Preconditions:**
+- 用户提示词中包含一个具体关卡名称（如「糖糖的石之花园」）和要新增的障碍物数量（如「增加6个石头」）。
+- 目标关卡是消消乐（match-3）主线关卡，对应 story-N.lua 配置文件。
+- 该关卡的关卡配置文件（story-N.lua）中已存在 stonePositions 或 icePositions 字段（或尚未添加），需要在棋盘坐标中插入新的障碍物坐标。
+
+**Evidence:** 6b8566ea T07 (22 steps, 3 edits, 1 build): user said '糖糖的石之花园关卡，增加6个石头'. Agent: Glob story-31* → Read story-31.lua (understand current layout + board size) → 2x Edit story-31.lua (add stonePositions coords) → Grep/Read/Edit 主线关卡总览.md (update stone count) → Grep storyline.lua (check narrative, no changes needed) → Build. | 6b8566ea T08 (18 steps, 3 edits, 1 build): user said '糖糖的永恒花园，增加4个石块和4个冰块'. Agent: Grep storyline.lua → Read story-35.lua → 2x Edit story-35.lua (add both icePositions + stonePositions coords) → Grep/Read/Edit 主线关卡总览.md (update both ice and stone counts) → Build. Mixed obstacle variant: added both ice and stone in one turn. | 6b8566ea T09 (11 steps, 2 edits, 1 build): user said '在糖糖的冰火花园，增加4个冰块'. Agent: Grep storyline.lua → Read story-27.lua → 1x Edit story-27.lua (add icePositions coords) → Grep/Read/Edit 主线关卡总览.md (update ice count) → Build. Minimal single-obstacle-type variant. Pattern confirmed across 3 turns: level-name-in-prompt → Grep/Glob to find story-N → Read current layout → Edit coords → Sync doc → Build. IMPORTANT: in this session, agents mistakenly used frozenCells/stoneBlocks instead of the canonical icePositions/stonePositions field names — this caused the T12 bug. Always use canonical field names from board.lua.
+
+---
+
+## `gene_nf_fresh_project_planmode_split_scaffold`
+
+**全新项目大厅脚手架：自发 PlanMode 研究 + 分两 Turn 构建** / Fresh Project Lobby Scaffold — Self-Initiated PlanMode Research + Two-Turn Split Build
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `terse_start_command`
+- `follows_preflight_inquiry_turn`
+- `no_reference_game_in_project`
+- `truly_fresh_project_first_scaffold`
+- `plan_mode_triggered`
+- `self_initiated_planmode`
+- `user_repeats_start_command`
+- `split_implementation_two_turns`
+- `jixu_continuation_trigger`
+- `bash_mkdir_directory_creation`
+- `cn_keywords:kaishi_zhizuo,jixu,kaishi_kaifa`
+
+**Preconditions:**
+- 这是项目的第一次脚手架搭建，代码库中不存在任何参考游戏或完整模块——只有基础的 main.lua 入口存在（或完全为空）。
+- 上一 turn 完成了预实施评审（preflight review），确认无硬性阻碍，但用户未明确要求「先设计再实现」。
+- 用户发送极短的开发启动指令（「开始制作」「开始开发」，≤4字），未附加任何设计文档或实现约束。
+- 由于代码库中尚无任何参考实现，代理自行决定进入 PlanMode 进行架构研究（不是用户主动请求的）——导致第一次「开始制作」只产生计划文件，无代码。
+- 用户看到计划但没有代码输出，再次发送「开始制作」，此时代理开始实际实现。
+- 实现规模较大（模块数量多、目录结构复杂），导致第一轮实现 turn 无法完成全部文件，用户需要发送「继续」才能完成剩余部分。
+
+**Evidence:** 6b8bf0cd T2-T7 (first session where lobby scaffold was built). Context: project had only a stub main.lua. T0: preflight review (2 docs attached), T1: agent reviewed docs + confirmed no blockers. T2 (prompt index 1): user sent '开始制作' (2 chars). Agent: EnterPlanMode (self-initiated, user did NOT ask for design-first) → Task SA1 'Explore UI library patterns' (read urhox-libs/UI module structure, widgets gallery) → Task SA2 'Explore templates and router patterns' (read templates/scaffold-2d.lua, engine-docs/principles.md, lua-scripting-guide.md) → Task SA3 'Explore project config and assets' (read .project/project.json, settings.json, assets/, docs/, urhox-libs/ README) → respond_to_user → Task SA4 'Design M1 phase 1 plan' (design detailed plan for 益智游戏大厅 M1) → respond_to_user → Write .claude/plans/quiet-munching-dolphin.md → Bash mkdir plans/ → Write plan again → ExitPlanMode. 14 steps, 0 code files written. T3 (prompt index 2): user sent '开始制作' AGAIN (2 chars, same prompt). Agent: Write (TodoWrite) → respond → Task 'Read UI recipe doc' → respond → Bash 'mkdir -p /workspace/scripts/{app,config/{games,home,schema},pages/{home,profile},...}' → Write colors.lua → Write layout.lua → Write logger.lua → respond → Write feature-flags.lua → Write game-config-schema.lua → respond → Write demo-color-match.lua, demo-number-puzzle.lua, demo-memory-flip.lua, game-registry/init.lua → respond → Write router.lua → respond → Write top-bar.lua, bottom-nav.lua, game-card.lua → respond → Write pages/home/init.lua → respond → Write pages/profile/init.lua → respond → Read game-card.lua (x2 to verify) → Edit game-card.lua (minor fix) → Read main.lua → Write main.lua → respond → Build → success → Write (TodoWrite complete) → respond. 45 steps, ~15 Write calls, 1 Build OK. T4 (prompt index 3): user sent '继续'. Agent: respond → Write (TodoWrite) → respond → Read 策划案-大厅.md → respond → Write game screens (init.lua x3 for different game pages) → Write pause-menu.lua → Write adapter.lua → Write sdk/game-lifecycle/init.lua → Read init.lua → Edit init.lua x2 → Read main.lua → Write main.lua (updated) → Write (TodoWrite) → Build → success → Bash 'find /workspace/scripts -name *.lua | sort' → Write (final summary). 32 steps, 6 Writes + 2 Edits, 1 Build OK. Key pattern: PlanMode self-initiated by agent when no reference implementation exists; user must repeat start command to trigger actual code; scaffold too large for one turn, requiring 'jixu' continuation. No cross-game reference reading (unlike gene_nf_terse_start_reference_guided_scaffolding).
+
+---
+
+## `gene_aoc_issue_id_fix_report_inline_update`
+
+**按问题 ID 修复代码并内联更新问题报告** / Issue-ID-Targeted Code Fix with Inline Report Status Update
+
+Category: `workflow`
+
+**Signals:**
+- `intent:ai_output_correction`
+- `has_attached_doc`
+- `issue_report_referenced`
+- `issue_id_specified`
+- `fix_then_mark_resolved`
+- `report_inline_update`
+- `cn_keywords:xiufu,wentibiaohao,yixiufu,gengxin,baogao`
+
+**Preconditions:**
+- 用户打开了之前由 AI 生成的「自查问题报告.md」或类似结构化问题追踪文档。
+- 用户的指令包含具体的问题编号（如 '修复 1.1 1.2 1.4'、'修复 2.2'），而非泛泛的「修复所有问题」。
+- 问题报告中每条问题均有唯一 ID（如 1.1、2.2），且已记录在 AI 交付的文档中。
+
+**Evidence:** 762afe73 T01 (22 steps): user said '修复 1.1 1.2 1.4'. Agent: TodoWrite 3 tasks. Grep for anti-addiction SDK init (1.1) → Read app.lua/app-full.lua → Edit adding anti-addiction Init call and require. Grep for '！' → Read 6 files → 20 Edits converting all ASCII '!' → '！' across storyline.lua + 5 other files. Read board-renderer.lua → Edit fixing six-dot ellipsis. build → update report 5x Edits: mark 1.1/1.2/1.4 [已修复], update summary table, append changelog row v1.1. | 762afe73 T04 (16 steps): user said '修复 2.2' (English UI text). Agent: Read result-popup.lua/p3/result-popup.lua/game-card.lua/sound-test-panel.lua/level-editor.lua → 9 Edits converting 'NEW BEST!→新纪录！', 'NEW→新', 'HOT→热门', 'BGM→背景音乐', 'W-/W+/H-/H+→宽-/宽+/高-/高+'. build → 5x Edit on report: mark 2.2 [已修复], update table, append changelog row. | 762afe73 T05 (45 steps): user said '修复 2.1' (ellipsis in multiple files). Agent: Grep '...' in 5 files → 42 Edits across storyline.lua (13 occurrences), outfit-manager.lua (20+ occurrences), adventure/init.lua, board-renderer.lua, level-editor.lua. build → update report. | 762afe73 T09 (12 steps): user said '根据自查问题报告修复 四、章节逻辑一致性'. Agent: Read storyline.lua → Grep chapter unlock sequences → 8 Edits fixing chapter boundary conditions and milestone unlock triggers → build → 4x Edit marking Section IV items [已修复] in report.
+
+---
+
+## `gene_doc_level_content_compilation`
+
+**主线关卡内容批量提取与总览文档生成** / Main-Level Content Batch Extraction and Overview Doc Generation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inspection_review`
+- `intent:content_creation`
+- `target:documentation`
+- `level_content_extraction`
+- `user_review_requested`
+- `batch_file_read`
+- `cn_keywords:suoyou,zhuixian,guanka,wenzimiaosu,guankaxinxi,baocun,wenjian,jiancha`
+
+**Preconditions:**
+- 项目中存在大量按关卡编号命名的独立配置文件（如 story-1.lua 至 story-35.lua）和一个主索引文件（如 storyline.lua）。
+- 用户要求将所有主线关卡的文字描述和关卡信息「汇总为一个文档以便检查」，目的是让用户自行审查内容正确性。
+- 当前没有现成的综合关卡总览文档，或现有总览文档内容已过时。
+
+**Evidence:** 762afe73 T11 (14 steps): user said '将所有主线关卡，的文字描述，关卡信息，保存为一个文档。让我检查'. Agent: (1) Read storyline.lua (confirmed 35 main levels, story-N.lua naming). (2) Bash ls scripts/storyline-levels/ → confirmed 35 files. (3) Bash cat scripts/storyline-levels/story-*.lua → read all 35 level configs in one shell call. (4) Write docs/主线关卡总览.md — 35-level structured overview: each level has 旁白对话 text, 目标得分, 棋盘大小, 障碍物列表, 解锁条件. Followed by respond_to_user with file path and summary. Key efficiency: single Bash cat glob read all 35 files instead of 35 separate Read calls.
+
+---
+
+## `gene_doc_audit_checklist_synthesis`
+
+**自查经验沉淀：跨游戏可复用检查指南合成** / Audit Experience Synthesis — Cross-Game Reusable Inspection Checklist Generation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `intent:planning_design`
+- `target:documentation`
+- `cross_project_reusability`
+- `audit_synthesis_requested`
+- `cn_keywords:zonghe,zijianfangxiang,qitagame,jiancha,wenti,wendang`
+
+**Preconditions:**
+- 当前 session 已完成了一轮完整的游戏自查（检查 + 修复 + 报告更新），用户对该流程有了充分认识。
+- 用户要求「根据发现的问题和文档，总结一份用于其他游戏检查的检查方向文档」，目的是将本次经验沉淀为可复用的检查框架。
+- 会话上下文中已有自查问题报告.md 和自查清单.md 等参考文档。
+
+**Evidence:** 762afe73 T12 (30 steps): user said '根据发现的问题和文档，总结一个，需要检查方向的文档，用于其他游戏的检查'. Agent: (1) Write docs/游戏自查方向指南.md immediately — 6-section guide covering: 合规政策检查、文本规范检查、数值文案一致性、关卡内容一致性、章节逻辑一致性、代码质量. Each section: specific Grep patterns, files to read, comparison data sources. Includes P0/P1/P2/P3 priority definitions and report template. (2) While writing, noticed remaining unfixed issues (storyline continuity gaps) — immediately proceeded: Read storyline.lua → 19 Edits fixing 6 remaining story issues. (3) build. (4) 8x Edit on 自查问题报告.md marking newly fixed items [已修复]. (5) respond_to_user — reported guide path + extra fixes performed. Pattern: synthesis task → immediate Write of reusable doc → opportunistic discovery of remaining issues → fix + build + update report within same turn.
+
+---
+
+## `gene_nf_combined_design_implement_single_turn`
+
+**先设计后制作单 Turn 模式：PlanMode 调研 + 立即实现（无需用户批准）** / Combined Design-Then-Implement Single Turn — PlanMode Research Into Immediate Implementation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `plan_mode_triggered`
+- `immediate_implementation_after_plan`
+- `cn_keywords:xian_sheji,ran_kaishi_zhizuo,xian_sheji_ran_kaishi`
+
+**Preconditions:**
+- 用户在同一条消息中明确要求先设计、然后开始制作——先设计（不等待确认）再立即实现，全程在单个 turn 内完成。
+- 功能涉及多个文件（共享组件 + 多个游戏 adapter/页面集成），需要研究现有代码架构才能设计合理的方案。
+- 不同于 gene_pd_design_only_planmode_defer（设计后等待用户批准）和 gene_pd_direct_design_doc_write_wait（无 PlanMode，写文档等待），此模式在同一 turn 内完成设计 + 实现。
+
+**Evidence:** 76b0acb1 T16 (99 steps, 39 edits, 1 build): user said feature request for fox mascot with praise bubbles, ending with 先设计，然后开始制作这个功能. Agent: (1) EnterPlanMode. (2-9) 5 Task subagents — explore lobby page structure, explore 4-game page structures, find single-action success event hooks in each game, explore render structure, design complete fox-mascot implementation plan. (10-13) Write plan file to .claude/plans/ (written twice due to size). (14) Task subagent creates plan file on remote workspace. (16) ExitPlanMode. (17-18) respond_to_user + TodoWrite — transition directly into implementation without pausing for user confirmation. (19-37) Read init.lua x6, adapter.lua x4, Bash ls, Grep x9 — survey integration points. (38) Write /workspace/scripts/shared/components/fox-mascot.lua (new shared component, full implementation). (39-46) Edit adventure/init.lua x4. (47-49) Edit home/init.lua x2. (50-63) Read x5, Grep x4, respond intermediate. (64-69) Edit home/init.lua x2, Edit p1-p4 adapter.lua x4 (one per game). (70-98) More Reads + Greps + Edits for home free-mode page, respond, Build success. Total: 99 steps, new shared component created, 4 game adapters + 2+ home pages integrated. Distinction from gene_pd_design_only_planmode_defer: no waiting for user approval between ExitPlanMode and implementation. Distinction from gene_pd_direct_design_doc_write_wait: uses formal PlanMode + research subagents (not direct doc write), and immediately implements.
+
+bc3f2ce9 T35 (87 steps, 20 edits, 21 reads, 0 tasks, 1 build): "先总结4个游戏游戏通关弹窗需要显示的内容，然后写一个通用的弹窗，包括主线弹窗，和自由模式的弹窗". User asked to first summarize what each of the 4 games' end popups shows, then implement a shared popup component (with main story and free mode variants). Agent: (1-21) 21 direct Reads of all 4 games' popup/result implementations (no Task subagents). (22-41) 20 Edits implementing shared popup component + per-game integration. (42) Build success. No-PlanMode, no-subagent variant: research phase done by direct sequential reads (21 reads) rather than PlanMode + Task subagents. Same high-level pattern (survey existing → design shared component → implement) but without EnterPlanMode. Applicable when user phrasing is "先总结...然后写" (first summarize, then write) rather than "先设计，然后制作" (first design, then make); the former implies direct read-and-synthesize, the latter implies formal planning before implementation.
+
+---
+
+## `gene_fm_shared_component_post_impl_layout_cascade`
+
+**共享 UI 组件实现后的跨页面布局调整级联：连续位置/尺寸/z-order 微调** / Post-Implementation Shared Component Layout Cascade — Consecutive Position/Size/Z-Order Tweaks Across Pages
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `shared_component_recently_implemented`
+- `consecutive_layout_tweaks_ge_5`
+- `cn_keywords:li_hui,jiao_se_li_hui,xiang_shang_yi_dong,jian_ju,z_xu`
+
+**Preconditions:**
+- 当前 session 的前几个 turn 新实现了一个跨游戏共享 UI 组件（如角色立绘/Mascot），在多个大厅/游戏页面中集成。
+- 后续出现 5 次以上连续或近连续的 feature_modification turn，调整同一组件在不同页面下的位置、尺寸、z-order、间距或显示条件，且每个 turn 涉及 1-10 个文件编辑和 1 次 build。
+- 每个 turn 的用户消息极短——通常为向上移动N像素、加大N%、在X页面立绘不显示、在游戏内立绘在内容上方等定向调整指令。
+
+**Evidence:** 76b0acb1 T18-T38 (15+ turns): after T16 implemented fox-mascot.lua shared component across 4 games + 2 lobby pages, subsequent turns are almost entirely ui_layout tweaks for the fox portrait. T18 (37 steps, 6 edits, 1 build): user requested portrait size 100% increase + z-order below tab UI + move up. T20 (6 steps, 1 edit, 1 build): main mode level button vertical spacing -10%. T22 (10 steps, 2 edits, 1 build): free mode portrait not showing after return from game (lifecycle onShow not registered). T23+T25 (5+3 steps, 1 edit each, 1 build each): main mode level buttons up 20px (repeated twice after device preview). T31 (30 steps, 8 edits, 1 build): in-game portrait rendering above game content in 2 games, check other 2 — z-order fix across 4 adapters. T32 (22 steps, 8 edits, 1 build): in-game portrait now not showing at all — regression from T31 z-order fix. T38 (3 steps, 1 edit, 1 build): bottom margin = 2x top margin. Pattern: each turn is a short visual feedback loop — user sees result on device, finds a position/z-order issue, requests targeted adjustment. Distinct from gene_fm_visual_polish_cascade (which targets visual style/color/shape in a single game component) — this cascade is cross-page, cross-game for a shared lobby+in-game component layout properties.
+
+---
+
+## `gene_nf_settings_admin_with_save_debugging`
+
+**设置界面管理功能（清空存档、解锁关卡）含存档系统调试循环** / Settings Admin Feature — Clear Save + Unlock All With Save-System Debug Cycle
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:settings_ui`
+- `admin_debug_feature`
+- `save_system_involved`
+- `cn_keywords:qingkong_cundang,jiesuo_guanka,qingkong_jilu,kaifa_gongneng`
+
+**Preconditions:**
+- 用户请求在设置界面增加开发/管理功能，典型为：清空存档（让玩家重头开始）、解锁所有关卡（测试便利）。
+- 功能涉及存档系统（settings-save.lua 或等效）的直接读写操作。
+- 通常会出现确认弹框（防止误操作）的后续补充，以及「清空后依然有记录」的 bug 报告。
+
+**Evidence:** 76b0acb1 T39-T43. T39 (31 steps, 3 edits, 1 build): add clear save button in settings. Agent: TodoWrite → Grep settings structure → Read settings-save.lua + home/init.lua + adventure/init.lua → Task SA (explore save system keys) → Read x5 + Grep x5 → Edit settings-save.lua (add clearAll function) → Edit home/init.lua + adventure/init.lua (add button UI) → Build. T40 (7 steps, 2 edits, 1 build): add confirmation dialog for clear save. Agent: Read home/init.lua → no confirm dialog found → Edit home/init.lua + adventure/init.lua (add confirmation dialogs) → Build. T42 (22 steps, 1 edit, 1 build): clear save button still shows records after clearing. Agent: respond → Read settings-save.lua → Task SA (explore save key namespace across all save calls) → Read x6 + Grep → discovers clearAll missed certain level-progress keys → Edit settings-save.lua (fix clearAll to cover all keys) → Build. T43 (24 steps, 3 edits, 1 build): add unlock all levels button. Agent: respond → TodoWrite → Read settings-save.lua → Task SA (explore level config data structure) → TodoWrite → Read x2, Grep x2 → Edit settings-save.lua (add unlockAll function) → Edit home/init.lua + adventure/init.lua (UI button) → Build.
+
+---
+
+## `gene_cc_source_doc_to_summary_distillation`
+
+**源文档到新摘要文档生成与迭代精炼工作流** / Source Doc to New Summary — Generate, Filter, Augment, Condense Distillation Workflow
+
+Category: `workflow`
+
+**Signals:**
+- `intent:content_creation`
+- `intent:feature_modification`
+- `target:documentation`
+- `source_doc_opened_via_file_link`
+- `new_summary_doc_requested`
+- `single_target_doc_consecutive_refinement`
+- `filter_augment_condense_sequence`
+- `no_code_changes`
+- `no_build_needed`
+- `no_glob_discovery_needed`
+- `read_then_write_full_rewrite`
+- `cn_keywords:shengcheng,zongjiexing,zongti_jindu,jinglianje,shanchuyijishu,jingjianzongji`
+
+**Preconditions:**
+- 用户通过 file:// 链接打开了一份较大的项目综述或进度文档（如总体进度.md），要求基于该文档生成一份新的精简总结文档（目标为新建文件，不更新原文）。
+- 用户在生成后连续对新文档进行多次迭代修改：过滤内容（删除某类内容）、补充内容（新增计划/展望章节）、压缩精简（整体缩短）。
+- 整个 session 不涉及代码修改或 build 操作——是纯文档的生成与编辑流程。
+- 用户每次 turn 均通过 @-mention 或 file:// 重新打开同一目标文档，代理无需 Glob 文件发现。
+
+**Evidence:** 870a5123 4-turn session entirely focused on 总体进度总结.md. T0 (content_creation, 5 steps, 2 tool calls): user opened 总体进度.md via file://, asked to generate new 总体进度总结.md. Agent: Read source doc → Write new summary (no Glob, no subagents). T1 (feature_modification, 3 steps, 2 tool calls): user opened generated doc via @-mention, asked to remove tech-feature content, keep only game content. Agent: Read → Write full rewrite (tech sections stripped). T2 (planning_design, 3 steps, 2 tool calls): user opened same doc, asked to add future plans section (level optimization, audio, UI polish, initial version launch, expansion). Agent: Read → Edit to append 后续计划 section. T3 (feature_modification, 3 steps, 2 tool calls): user opened same doc, asked to make it more concise. Agent: Read → Write full rewrite (compressed to minimal format: single-line game summaries). Pattern: all turns are Read → Write/Edit → respond, no discovery needed because user always opens the doc via file://. Subagents were initialized (3x Warmup) but never used. Drift marker at step 4: '4 consecutive edits without verification' — expected for pure doc work with no build.
+
+---
+
+## `gene_ir_sfx_test_panel_coverage_audit_and_fill`
+
+**音效测试面板覆盖审查 + 极简指令填入工作流** / SFX Test Panel Coverage Audit and Gap Fill Workflow
+
+Category: `workflow`
+
+**Signals:**
+- `用户要求检查某类资产（音效/图片/动画）是否在测试/预览面板中完整覆盖`
+- `下一条用户消息极短（不超过4字），如加上/加进去/都加上，语义为将上轮发现的缺口一并加入`
+- `项目存在独立的资产注册文件（sounds.lua 或 assets.lua 等）和共用预览面板（sound-test-panel.lua 等）`
+
+**Preconditions:**
+- 存在集中的音效/资产注册文件（每个游戏一份），其中键名与实际文件名可对应
+- 存在共享测试面板文件，维护一份已注册可试听/试看的条目列表
+- 用户首条消息意图为 inspection_review，目标为某类资产的覆盖完整性
+- 用户第二条消息意图为 new_feature，内容极度简短，无额外说明
+
+**Evidence:** 8a77e633 T1 (inspection_review, 16 steps, 0 edits): user asked to check whether all SFX appear in the sound test page. Agent used Task SA → Read sound-test-panel.lua (extracted 25 registered entries) → Bash find assets/ -name '*.ogg' (found 33 total .ogg files) → Read p1/p2/p3/p4 sounds.lua (collected code-referenced keys) → 3x Grep (verified 8 files not in panel had no code references) → reported 25/33 covered, 8 unreferenced (marked as 未使用/预留). T2 (new_feature, 6 steps, 2 edits, 1 build): user sent ultra-terse 加上. Agent: Edit sound-test-panel.lua to append new 未使用/预留 group with 8 SFX + Edit to update COUNT 25→33 → build pass. Pattern: 3-source audit (test panel + disk find + per-game sounds.lua + grep) → gap table → ultra-terse confirm → 2 targeted edits + count update → build.
+
+---
+
+## `gene_fm_cross_game_sfx_button_integration`
+
+**跨多游戏 UI 按钮音效统一集成工作流（共享工具模块优先）** / Cross-Game UI Button SFX Integration Workflow (Shared Utility First)
+
+Category: `workflow`
+
+**Signals:**
+- `用户要求将某个音效/交互效果统一应用到多个游戏的特定类型 UI 按钮上`
+- `所涉及游戏数量不少于 3 个，且每个游戏有各自的 adapter.lua 或 gameplay.lua 等文件`
+- `该音效需要独立的初始化逻辑（如创建场景、挂载 SFX 节点、销毁），若不封装则会在每个文件中重复`
+
+**Preconditions:**
+- 目标音效文件已存在于资产目录中（.ogg 文件已就绪）
+- 各游戏结构对称：每个游戏均有 adapter.lua（大厅/关卡入口按钮）和 gameplay.lua（游戏内按钮）
+- 当前各游戏文件中尚无该音效的初始化或播放代码
+- 用户明确列出了目标按钮类型（返回、选关、撤销、重置等），或可从上下文推断
+
+**Evidence:** 8a77e633 T5 (feature_modification, 65 steps, 31 edits+writes, 16 reads, 1 subagent, 1 build): user asked to apply ui_tap.ogg sound effect to lobby/menu/in-game UI buttons across all 4 games. Agent used Task SA to scan all 4 game dirs (p1-puzzle-land, p2-memory-flip, p3-match-3, p4-link-match), read adapter.lua and gameplay.lua for each → identified 8 target files with click callbacks. Then: Write scripts/shared/utils/ui-tap.lua (new shared utility encapsulating SoundManager init + play() for ui_tap.ogg) → 3-round batch edit: round 1 = add require to all 8 files, round 2 = add uiTap.play() to adapter.lua buttons in all 4 games, round 3 = add uiTap.play() to gameplay.lua buttons in all 4 games → build pass. Key insight: shared utility written BEFORE cross-game sweep to avoid 8x repeated SoundManager initialization boilerplate.
+
+---
+
+## `gene_fm_sfx_namespace_deletion_with_cleanup`
+
+**音效命名空间删除 + 游戏内引用清理工作流** / SFX Namespace Deletion with In-Game Reference Cleanup Workflow
+
+Category: `workflow`
+
+**Signals:**
+- `用户要求删除某个游戏模块/命名空间下的所有音效，并同时清除游戏代码中的相关引用`
+- `删除范围具有明确命名空间边界（如消消乐下属的所有音效、p3 模块的 SFX）`
+- `涉及两类文件：音效注册/测试文件（定义哪些 SFX 存在）加游戏逻辑文件（调用 SoundManager.play）`
+
+**Preconditions:**
+- 目标命名空间的音效在注册文件（sounds.lua）和测试面板（sound-test-panel.lua）中均有条目
+- 游戏逻辑文件（gameplay.lua、board-renderer.lua 等）通过 SoundManager.play(sfx_key) 调用这些音效
+- 同一逻辑文件中可能混有待删除的专属 SFX 和需要保留的跨游戏共享 SFX
+- 用户明确指定命名空间（游戏名/模块名），无歧义
+
+**Evidence:** 8a77e633 T6 (feature_modification, 71 steps, 17 edits, 17 reads, 7 greps, 1 subagent, 1 build): user asked to delete all SFX under the match-3 game module from the sound test panel and remove all in-game references. Agent: TodoWrite → Task SA → Read sound-test-panel.lua (identified match-3 group: 11 SFX keys) → Read p3-match-3/sounds.lua (confirmed 11 registered entries) → Grep SoundManager.play() for each key across all scripts → Read gameplay.lua + board-renderer.lua (found mixed calls: 11 match-3-specific + level_cleared/level_failed which are shared) → Edit test panel (remove match-3 group, update COUNT 33→22) → Edit sounds.lua (remove 11 entries) → Edit gameplay.lua (remove 11 match-3-specific play() calls, keep level_cleared/level_failed and SoundManager require) → Edit board-renderer.lua (remove all SoundManager.play() for match-3 SFX, SoundManager had no remaining calls so require was also removed) → post-edit Grep verified zero residual references → build pass. Key challenge: gameplay.lua needed surgical deletion (keep shared SFX calls) while board-renderer.lua needed total SoundManager removal.
+
+9dc56f96 T20 (17 steps, E:1, B:1, Grep:1, Read:1): selective delete from '未使用' category — delete all entries EXCEPT (correct_answer, level_complete, ui_tap). Agent: Grep test panel → Read to enumerate '未使用' group contents → Edit to remove all except 3 specified entries → Build. Partial-namespace variant: user specifies an exclusion list rather than deleting the full namespace. T21 (35 steps, E:9, B:1, Grep:1, Read:4): delete ALL Sokoban-category SFX + remove in-game references. Agent: Read sounds.lua (locate sokoban keys) → Read gameplay.lua files → Grep references → 9x Edit (test panel remove sokoban group + sounds.lua remove sokoban keys + gameplay.lua remove SoundManager.play calls) → Build. Matches 8a77e633:T6 pattern exactly (full-namespace delete with reference cleanup). T20 adds a new variant: exclusion-list partial delete (delete all EXCEPT named keys).
+
+---
+
+## `gene_fm_save_backend_migration`
+
+**存档后端迁移：计划驱动的跨游戏对称云存档升级** / Save Backend Migration — Plan-First Cross-Game Symmetric Cloud Save Upgrade
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `save_system_change`
+- `backend_migration`
+- `EnterPlanMode_triggered`
+- `cross_game_symmetric_change`
+- `cloud_save_upgrade`
+- `cn_keywords:gaiweyun,cundan,yunyun,cundang,yunzhicun,gawei,gabianju`
+
+**Preconditions:**
+- 用户发出简短指令要求切换存档后端（如「改为云存档」），之前已通过 2 轮询问（inquiry 链）确认了当前存档机制（本地/云）。
+- 所有使用该存档系统的游戏模块（如 P1、P2）都需要同步迁移——不存在「只改一个游戏」的选项。
+- 迁移需要了解新后端的 API（如 clientCloud），以及各游戏当前 save.lua 和 adapter.lua 的具体实现。
+
+**Evidence:** 9bbd20cc T09 (39 steps, 7 edits, 1 build): follows T07-T08 inquiry chain (T07: '目前通关进度是否有保存' → T08: '使用的是本地存档还是云存档'). User says '改为云存档'. Agent: (1) EnterPlanMode. (2) Task SA1 — read clientCloud API docs (engine-docs/recipes/client-cloud.md and related). (3) Task SA2 — read P1-推箱子/save.lua + P2-记忆翻牌/save.lua (current local API usage). (4) TodoWrite. (5) respond_to_user. (6) Read p1-puzzle-land/adapter.lua. (7) Read p2-memory-flip/adapter.lua. (8) respond_to_user. (9-11) Write plan file to /home/Maker/.claude/plans/ (initial attempt failed with mkdir, retried via Task SA to create file). (12) respond_to_user. (13) ExitPlanMode. (14-15) TodoWrite + respond_to_user. (16) Read p1-puzzle-land/save.lua. (17) respond_to_user. (18) Read p2-memory-flip/save.lua. (19) respond_to_user. (20-25) 3x Edit p1-puzzle-land/save.lua + respond_to_user between each. (26-27) Edit p1-puzzle-land/adapter.lua + respond_to_user. (28) TodoWrite. (29-34) 3x Edit p2-memory-flip/save.lua (+ responds) + Edit p2-memory-flip/adapter.lua + respond. (35) TodoWrite. (36) build success. (37) TodoWrite. (38) respond_to_user. Key pattern: prior 2-turn inquiry chain establishes context → terse migration command → EnterPlanMode (API docs SA + current impl SA + adapter reads + plan file) → ExitPlanMode → symmetric P1 then P2 migration (3 save edits + 1 adapter edit each) → single final build.
+
+---
+
+## `gene_fm_lobby_game_deactivation`
+
+**大厅游戏入口关闭：注册表删除 + 配置文件清理双机制** / Lobby Game Deactivation — Registry Remove + Config File Deletion Dual-Mechanism Cleanup
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `lobby_game_removal`
+- `game_registry_edit`
+- `config_file_deletion`
+- `dual_mechanism_removal`
+- `cn_keywords:shanchu,datang,rukou,youxi,peizhishi,caidan,zhuye`
+
+**Preconditions:**
+- 用户要求从大厅入口中移除一个或多个游戏（如「删除大厅中，色彩配队，数字华容道的入口」）。
+- 游戏入口由两套机制共同控制：游戏注册中心（game-registry init.lua 中的注册数组/CONFIG_PATHS）+ 独立的游戏配置文件（scripts/config/games/*.lua）。
+- 两个机制都需要修改才能彻底移除大厅入口——单独修改注册表会留下死配置文件；单独删配置文件会引发运行时注册错误。
+
+**Evidence:** 9bbd20cc T11 (16 steps, 1 edit, 1 bash-rm, 1 build): user says '删除大厅中，色彩配队，数字华容道的入口'. Agent: (1) respond_to_user — will locate registry first. (2) Task SA — searched scripts/ for game-registry entry file and CONFIG_PATHS; also found demo-color-match and demo-number-puzzle config directories. (3) respond_to_user. (4) TodoWrite. (5) Bash ls -la /workspace/scripts/games/demo-color-match/ + demo-number-puzzle/ (verify game dirs exist). (6) Read /workspace/scripts/modules/game-registry/init.lua (understand registration array). (7) respond_to_user. (8) Edit /workspace/scripts/modules/game-registry/init.lua — remove both demo-color-match and demo-number-puzzle entries from registration array. (9) TodoWrite. (10) Bash rm -f /workspace/scripts/config/games/demo-color-match.lua /workspace/scripts/config/games/demo-number-puzzle.lua (delete config files). (11) respond_to_user. (12) TodoWrite. (13) build success. (14) respond_to_user. (15) TodoWrite. (16) respond_to_user. Key pattern: Task SA locates registry → Bash ls verifies dirs → Read registry → Edit registry (remove entries) → Bash rm -f config files (dual cleanup) → build. Dual-mechanism removal distinguishes this from simple code deletion: both the registration code AND the config files must be removed to avoid runtime errors. Game logic directories (scripts/games/demo-*) left intact — only the lobby entry points removed.
+
+---
+
+## `gene_nf_sfx_event_type_wiring_chain`
+
+**跨游戏 SFX 事件类型渐进连线工作流（每 turn 一个事件类型）** / Cross-Game SFX Event-Type Wiring Chain — One Event per Turn, Progressive
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:audio`
+- `cross_game_sfx_wiring`
+- `specific_game_event_type`
+- `wired_one_sfx_per_turn`
+- `requires_event_hook_location`
+- `consecutive_sfx_wiring_turns_ge_3`
+- `cn_keywords:yinxiao,yingyong,suoyouYouxi,guanqajiesu,shibai,chenggong,zhengque,yundong`
+
+**Preconditions:**
+- 目标 SFX 文件已存在于 assets/audio/sfx/（由前序 turn 生成或已注册）。
+- 每个 turn 指定一个具体的游戏事件类型（「关卡失败时」「关卡成功时」「箱子进入正确位置时」「在角色移动时」），以及适用的游戏范围（「所有游戏」或「某个特定游戏」）。
+- 连续3个以上 turn 都是同类 SFX-to-event-type 连线请求，每次只换一个 SFX 或一个事件类型。
+- 各游戏的事件触发点分散在各自的 gameplay.lua、adapter.lua 或 board.lua 中，需逐文件定位。
+
+**Evidence:** 9dc56f96 T23-T27, T30-T31: 7-turn progressive SFX event wiring chain. Each turn wires one specific SFX to one specific game event type across applicable games. T23 (22 steps, E:4, B:1, Grep:5, Read:3): wire wrong_buzzer_soft → error events in 2 games (sokoban wrong-direction push, match-3 invalid swap). Agent: Grep 5× to locate error callbacks → Read 3 files → 4x Edit → Build. T24 (55 steps, E:8, B:1, Grep:14, Read:10): wire bounce_boing → level_fail in ALL 4 games. 14x Grep across all game scripts to locate levelFailed/gameOver callbacks → 10x Read → 8x Edit → Build. T25 (56 steps, E:13, B:1, Grep:7, Read:10): wire success_fanfare → level_success in ALL 4 games. 13x Edit (higher than T24 because some games have multiple success paths). T26 (51 steps, E:9, B:1, Grep:13, Read:10): wire bubble_pop_cute → 4 different correct-action events (sokoban: box on target; match3: successful elimination; link-match: successful connection; memory-flip: successful pair match). 13x Grep to find 4 different event hooks. T27 (91 steps, E:29, B:1, Grep:6, Read:19): wire level_complete with 0.5s delay → all 4 games on level victory. Most complex turn: requires timer/coroutine setup in each game; 29x Edit + 19x Read. T30 (10 steps, E:2, B:1, Read:2): wire bloop_bounce → sokoban player movement (single game, simple). T31 (11 steps, E:2, B:1, Grep:1, Read:3): wire bloop_bounce → memory-flip card-flip tap, conditional: do NOT play if successful pair match (another SFX plays then). Pattern: Grep-first to locate event callback in each game → Read to verify context → Edit to insert SoundManager.play() → Build. Step count scales with game count (T23: 2 games → T24-T25: 4 games). Delayed/conditional wiring variants require significantly more steps and edits.
+
+---
+
+## `gene_fm_match3_special_block_tier_balance`
+
+**消消乐特殊方块通关需求按层级批量调整** / Match-3 Special Block Win-Requirement Tier Balance — Bulk Level Sweep
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `match3_game`
+- `special_block_count_requirement`
+- `tier_based_scaling`
+- `level_group_bulk_edit`
+- `cn_keywords:xiugai,tiaojie,shuzi,poji,line,caihong,jiesuanxuqiu,1_2_3,3_5_7`
+
+**Preconditions:**
+- 目标是消消乐（或类似 match-3）游戏，关卡配置中存在「通关需求」字段，要求消除若干个指定特殊方块（boom/line/rainbow）。
+- 用户以「等级层」为单位指定新数量（例如「1/2/3」代表低/中/高3档），不是逐关指定，而是按关卡数区间分组。
+- 同一 session 内可能多次触发此模式（每次针对不同特殊方块类型），每次都是独立的批量编辑任务。
+
+**Evidence:** 9dc56f96 T14-T15, T19: 3 turns targeting match-3 special block win-requirement adjustment by tier. T14 (18 steps, E:8, B:1, Read:1): '修改消消乐的关卡胜利需求，将所有爆炸的需求数量降低，根据关卡数量，降低为1/2/3，最高到3' — boom block requirement set to tier 1/2/3 across all 25 levels. Agent: Read levels.lua → 8x Edit (each covering ~3 levels' boom count fields) → Build. T15 (27 steps, E:8, B:1, Grep:4, Read:3): '修改line类型的数量为3/5/7个，rainbow类型为2/3/4个' — two block types in one turn. Grep×4 to confirm field names (line/rainbow in goals table) → Read×3 → 8x Edit covering both line and rainbow fields → Build. T19 (9 steps, E:3, B:1, Grep:0, Read:1): '修改消消乐，通关rainbow的需求数量为1/2/3' — rainbow requirement revised again (different tier values than T15). Read levels.lua → 3x Edit (rainbow count per tier group) → Build. Pattern: data-layer only (no logic code changes), tier-group formula applied across all levels, 1-3 Edits per tier group depending on how many levels per group. When multiple block types in same turn (T15), use Grep to verify field names first.
+
+---
+
+## `gene_fm_cross_game_sequential_tweak`
+
+**跨游戏逐轮同变更推广：每 turn 一个游戏的顺序式样式/元素修改** / Cross-Game Sequential Same-Change Rollout — One Game Per Turn Style or Element Removal
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `cross_game_same_change`
+- `one_game_per_turn`
+- `consecutive_game_targets_ge_3`
+- `style_or_element_removal`
+- `cn_keywords:yese,yanse,nuanse,shanchu,anniu`
+
+**Preconditions:**
+- 用户要求对多个游戏（≥3）应用同一视觉变化（颜色风格调整、UI 元素删除等）。
+- 每次 prompt 只针对一个游戏，形成连续的「游戏 A → 游戏 B → 游戏 C → …」序列。
+- 变更类型为纯样式/布局类修改（无业务逻辑变化），可在各游戏间独立复用相同操作。
+
+**Evidence:** 9df66fd4 session: two warm-color rollout waves and one restart-button removal wave. Wave 1 (T09-T12): user asked to apply warm-background color changes to 消消乐 → 记忆翻牌 → 连连看 → 推箱子, one game per turn, 4 consecutive turns. Each turn: Grep color constant name → Read file → Edit color value → Build. Wave 2 (T15-T18): same sequence repeated for a second warm-color adjustment across same 4 games (further tuning). Wave 3 (T38-T40): restart button removal across 连连看 → 消消乐 → 记忆翻牌, 3 consecutive turns. Pattern: user never asks for all games at once — each prompt names one specific game and relies on agent applying the same magnitude of change. Agent never proactively applies the change to other games, even when the pattern is obviously repeating.
+
+---
+
+## `gene_fm_hint_mechanic_progressive_redesign`
+
+**提示机制多轮渐进式重设计：从简单定时器到累计计数逻辑的四阶段演化** / Hint Mechanic Progressive Redesign — Four-Phase Evolution from Simple Timer to Accumulating Counter
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `game_hint_system`
+- `idle_timer_mechanic`
+- `multi_turn_mechanic_redesign`
+- `implement_correct_redesign_tune`
+- `cn_keywords:tishi,jijishu,kongxian,judong,leijizhuangtai`
+
+**Preconditions:**
+- 用户已实现了一个基于计时器的提示机制（hint system），在初次实现后测试中发现行为不符合预期。
+- 具体表现为：提示只触发一次而非持续触发；或提示在切换操作类型后不重置；或触发阈值需要调整。
+- 用户通过多个 prompt 逐步重新描述游戏逻辑规则，推动将简单定时器重设计为累计计数器或更复杂的状态机。
+- 整个改进过程呈「实现 → 行为修正 → 逻辑重设计 → 参数微调」四阶段模式，每阶段一个 turn。
+
+**Evidence:** 9df66fd4 T34-T37: 4-turn hint mechanic evolution in 连连看 (link-match game). T34 (36 steps, feature_modification): initial implementation of idle-triggered hint system — user asked for hint to show after player is idle for N seconds. Agent implemented a simple idle timer. T35 (11 steps, feature_modification): user feedback — hint should show continuously, not just once; and should reset when player switches match type. Agent modified to continuous display + reset on type change. T36 (8 steps, feature_modification): user redefines the logic — count consecutive same-type moves, show hint after N consecutive same-type moves without a successful match. Agent rewrote the core counter logic from idle-timer basis to move-type accumulator. T37 (3 steps, feature_modification): parameter tuning only — threshold changed to 5 moves, cooldown to 3 seconds. Agent changed 2 numeric constants. Build success. Pattern: each phase re-scopes the mechanic; phase 3 is the pivot where full rewrite is required. Step counts (36→11→8→3) reflect narrowing change scope per phase.
+
+---
+
+## `gene_fm_optimization_backlog_doc_sequential_consume`
+
+**优化积压文档按优先级顺序消费：@文档 + 优先级N → 批量编辑 → 构建验证** / Optimization Backlog Doc Sequential Consumption — @Doc + PriorityN → Batch Edit → Build
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `has_attached_doc`
+- `target:optimization`
+- `doc_as_work_queue`
+- `priority_level_reference`
+- `sequential_doc_consumption`
+- `cn_keywords:youhua,youxianji,wenti,wendang`
+- `at_mention_optimization_doc`
+- `batch_code_edits`
+- `build_verification`
+
+**Preconditions:**
+- 用户通过 @文件名 附加了一份优化清单文档（通常是同一会话早前由「记录文档」指令生成的结构化优化清单 .md，内含多个优先级分组和带复选框的条目）。
+- 用户在提示中明确指定了要处理的「优先级 N」或对应的分类名称（如「优化优先级1的性能问题」「优先级2的稳定性问题」），未指定具体条目，让 Agent 自行从文档中提取该分组下所有未完成条目。
+- 文档中该优先级分组的条目均为未完成状态（☐），且每个条目注明了受影响的文件名。
+
+**Evidence:** a09c411b: same session produced 3 sequential doc-consumption turns across the session, each specifying a different priority level from the optimization-notes.md generated in T01. T02 (Priority 1 — 性能, ~20 steps, 3 edits, 1 build): user opened optimization-notes.md via <document> tag and @-mention, sent '优化[@optimization-notes.md]中的第性能问题'. Agent: (1) Read optimization-notes.md → located Priority 1 group (3 items: fox-mascot render-loop guard, NanoVG text caching, animation timer). (2) Read fox-mascot.lua + adventure/init.lua. (3) TodoWrite (3 tasks). (4) 3x Edit across fox-mascot.lua (add render guard), adventure/init.lua (cache NanoVG text bounds), fox-mascot.lua again (timer cleanup). (5) Build → success. (6) respond_to_user with completion summary. T04 (Priority 2 — 稳定性, similar structure): user re-opened doc, sent '优化[@optimization-notes.md]中，优先级2的稳定性问题'. Agent: Read doc → extracted Priority 2 items (event unsubscription, nil guards) → Read affected files → TodoWrite → batch Edits → Build → summary. Did NOT apply Priority 1 items (already done in T02). T05 (Priority 3 — 代码质量, similar structure): user re-opened doc, sent '优化[@optimization-notes.md]中 优先级 3：代码质量的内容'. Agent: Read doc → extracted Priority 3 items (constant extraction, duplicate logic refactor) → Read affected files → TodoWrite → batch Edits → Build → summary. Pattern: each of the 3 prompts names a different priority level, user treats the doc as an ordered work queue, agent strictly processes only the specified priority each time. Between T02 and T04, user had other intents (T03: pause page warm-color redesign; T06: generate test QR code) — confirming the doc is consumed across non-consecutive turns in the session. | f14c92eb T02-T07 (P2,P3,P5,P6,P7): 5 sequential backlog consumption turns from optimization-suggestions.md. T02 P2 (36 steps, 9 edits, 1 build): '@optimization-suggestions.md 优化9. 提取公共背景装饰组件'. T03 P3 (69 steps, 21 edits, 2 builds): '优化10. 提取公共设置弹窗组件'. T05 P5 (31 steps, 8 edits+1 write, 1 build): '优化11. 提取公共页面头部组件。并更新文档'. T06 P6 (39 steps, 8 edits, 1 build): '优化4. 冒险地图显示章节标题，并更新文档'. T07 P7 (25 steps, 5 edits, 1 build): '优化1. BGM场景切换，并更新文档'. Notable: 3 of 5 turns include '并更新文档' inline — user combines implementation + doc update in same prompt.
+
+---
+
+## `gene_inq_verify_then_serial_level_tweak`
+
+**先询问确认参数现状，再发起连续关卡参数调整序列** / Parameter-Audit-First Then Serial Level Tweak — Consecutive Inquiry Turns Gate Serial Modifications
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inquiry`
+- `consecutive_inquiry_turns_same_game`
+- `task_sa_resolved_no_edits`
+- `immediately_followed_by_serial_feature_modification`
+- `target:game_logic`
+- `target:level_data`
+- `cn_keywords:xingji,panjue,tuijian,bushu,xingji_panjue,tuijian_bushu,xingji_biaozhun`
+- `single_inquiry_gates_formula_bulk_modification`
+- `arithmetic_formula_bulk_edit_all_levels`
+
+**Preconditions:**
+- 用户连续发送两个（或以上）关于同一游戏机制参数的纯询问 prompt（如「现在推箱子，每关的星级判定是怎样的」「现在每关的推荐步数是多少」），两个 prompt 均属于 intent:inquiry，无修改意图。
+- 两个询问 turn 均通过 Task 子代理读取代码后回答，主代理不做任何文件编辑，也不 build。
+- 询问结束后，用户立即开始一系列 feature_modification prompt（通常 3 条以上），对该游戏的关卡数据（level data、关卡配置）进行逐项参数调整。
+- 用户在询问完成后直接给出具体数值修改指令，无需更多说明（说明已通过询问阶段获得）。
+- 【单条询问变体】用户仅发送一条纯询问 prompt（如「消消乐的通关条件和星级条件是怎样的」），通过 Task 子代理读取代码后结构化回答；随后立即发起基于上一轮回答结果的算术公式批量修改（如「基础值第一关3000，之后每关增加200」，触发对所有关卡的逐一 Edit，规模可达 20+ edits）。与两条连续询问变体行为完全对称，差别仅在于询问次数。
+
+**Evidence:** a7d1b207 T00-T04 (P0-P4): Two consecutive inquiry turns about P1 Sokoban parameters, followed by 3 serial modification turns. T00 (P0, 3 steps, 0 edits): '现在推箱子，每关的星级判定是怎样的'. Agent: TodoWrite + Task SA '查询推箱子星级判定代码' + respond_to_user. SA read board.lua + levels.lua, reported star rating thresholds. T01 (P1, 2 steps, 0 edits): '现在每关的推荐步数是多少'. Agent: Task SA '查询推箱子各关卡推荐步数配置' + respond_to_user. SA read levels.lua, returned per-level recommendedSteps as numbered list (L1:15, L2:15, L3:35, L4:20, L5:30). T02 (P2, 8 steps, 2 edits, 1 build): '第二关的推荐步数改为12，第三关的改为31'. Agent: Grep 'recommendedSteps' + Read levels.lua + 2x Edit (L2:15→12, L3:35→31) + Build success. T03 (P3, 7 steps, 2 edits, 1 build): '修改第五关，箱子出生点下方的格子也改为墙壁'. Agent: Read levels.lua + 2x Edit (wall layout in L5) + Build success. T04 (P4, 3 steps, 1 edit, 1 build): '第五关的推荐步数改为28'. Agent: Edit levels.lua L5 recommendedSteps 30→28 + Build success. Pattern: T00+T01 are pure audit (Task SA, 0 edits each). T01 response listed all recommendedSteps values, directly enabling T02-T04 precise edits without further lookup. The inquiry phase output (numbered level parameter list) enabled the modification phase.
+
+bc3f2ce9 T33→T34: T33 (1 step, 0 edits): "现在4个游戏的通关弹窗，是通用的还是每个游戏单独写的" — pure inquiry. Agent responded directly (1 step): each game has its own popup. T34 (39 steps, 25 edits, 1 build): "修改消消乐，通关星级需求，2星为通关分数+50+math.min(关卡数*25,200)，3星为通关分数+100+math.min(关卡数*50,400)". User got the popup-architecture answer, then immediately issued a precise star-formula modification. T37→T38: T37 (2 steps, 0 edits, 1 task): "现在连连看，在25~27关，有多少种方块类型，平均每个方块会出现几次" — pure inquiry. Agent dispatched Task subagent to read link-match level config and report tile-type counts per level. T38 (25 steps, 10 edits, 1 build): "修改消消乐主线关卡，降低分数需求。在达到通关分数后，直接显示3星并结算通关" — modification gated by T37 audit. New variant: T33 was answered in 1 step (no subagent) because the question was architectural (popup structure), resolvable from session context. T37 required Task subagent because the question was data-specific (level 25-27 tile counts). In both cases: inquiry turn has 0 edits, is immediately followed by a modification turn targeting the same subsystem.
+
+f4dd8c16 T3→T4 (single-inquiry + formula-bulk variant): T3 (P2, 2 steps, 0 edits): '现在消消乐的通关条件，和星级条件是怎样的，列给我看'. Agent: Task SA (read match-3 config) + respond_to_user — listed win conditions and star rating thresholds as structured table, 0 edits. T4 (P3, 35 steps, 24 edits, 1 build): '基础值修改为第一关3000，之后每关增加200'. Agent: Grep → Read → TodoWrite → 24x mcp__mkr__Edit (formula 3000+(n-1)*200 computed per level) → respond → Build success → TodoWrite → respond. Key differences from canonical two-inquiry variant: (a) only ONE inquiry turn (not two) precedes the modification; (b) the modification is formula-based arithmetic applied to ALL 24 levels (not specific 1-2 level tweaks). Pattern generalizes: even a single inquiry turn that surfaces current state is sufficient to gate a large formula-driven bulk modification. The inquiry phase still enabled the modification — agent knew which file and which fields to target.
+
+---
+
+## `gene_fm_discovery_end_condition_type_switch`
+
+**「但是现在...」触发的游戏结束条件类型切换：计划模式驱动的跨层核心机制重构** / Discovery-Triggered End-Condition Type Switch — Plan-Mode Cross-Layer Core Mechanic Rewrite
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `but_currently_behavior_discovery`
+- `end_condition_type_change`
+- `step_limit_to_timer`
+- `cn_keywords:dansishixian,xianzai,budui,xiugaiwei,erbuji,gaiwei,xianzhi,miaojishi`
+- `planmode_required`
+- `multi_file_core_logic_rewrite`
+- `cross_file_state_rename`
+- `immediate_refinement_followup`
+
+**Preconditions:**
+- 用户在上一轮询问某游戏的当前机制（如星级判定规则）后，发现当前行为与预期不符（用「但是现在...」开头），明确要求将游戏的结束条件从一种类型切换为另一种类型（如步数限制→倒计时；轮数限制→生命值；分数达成即结束→时间结束才结算）。
+- 改动涉及核心游戏循环：需要修改 levels.lua 中的配置字段类型（如 steps→timeLimit）、board.lua 中的状态变量（如 self.remainSteps→self.remainTime）、gameplay.lua 中的 update 驱动逻辑、hud-renderer.lua 中的 HUD 显示、以及 result-popup.lua 中的结算逻辑，预计 ≥ 4 个文件。
+- 用户在同一条 prompt 中描述了「当前错误行为」和「期望的新行为」，即同时提供了问题陈述和解决方向。
+
+**Evidence:** a7d1b207 T05-T07 (P5-P7): inquiry about star rating → end-condition type switch → immediate refinement. T05 (P5, 2 steps, 0 edits): '消消乐的星级判定是怎样的'. Task SA + respond_to_user. SA read board.lua + levels.lua, reported star rating uses remainSteps at game-over. T06 (P6, 62 steps, 30 edits, 1 build): '但是现在达到得分后游戏就结束了，修改为关卡限时60秒，而不是限制步数，倒计时结束后当局结束'. Agent: (1) EnterPlanMode. (2) Task SA '查阅消消乐代码' — read board.lua, gameplay.lua, hud-renderer.lua, result-popup.lua, levels.lua. (3) Read levels.lua. (4) Write plan to /home/Maker/.claude/plans/*.md → Internal error. (5) Bash mkdir -p → Write again → still failed. (6) Task SA Bash here-doc create file → succeeded. (7) ExitPlanMode. (8) Read levels.lua (all 15 levels). (9) TodoWrite. (10) Edit levels.lua: steps→timeLimit=60, bonusPerStep→bonusPerSecond=55 across all 15 levels. (11) Read+Edit board.lua: remainSteps→remainTime, add update(dt) countdown. (12) Read+Edit gameplay.lua: wire board.update(dt), handle time expiry. (13) Read+Edit hud-renderer.lua: steps display→timer display. (14) Read+Edit result-popup.lua: timer-ending text. (15) Build success. Key: plan file Write to .claude/plans/ failed twice — workaround via Task SA Bash here-doc. T07 (P7, 24 steps, 12 edits, 1 build): '修改消消乐每局时间为90秒，达到分数后不结束，倒计时结束后，根据多出的分数计算星级。在游戏内，当达到过关分数后，在上方显示未达到下一星级需要的分数。当星级满后直接显示三星'. Agent: Read board.lua+levels.lua+hud-renderer.lua → TodoWrite → Edits: timeLimit 60→90 in all 15 levels, board.lua stop-at-score removed, star calc rewritten to score-above-threshold, hud-renderer adds next-star score-gap progress indicator. Build success. T07 added 3 new requirements on top of T06 redesign: 90s duration, no end-on-score, HUD next-star indicator.
+
+---
+
+## `gene_doc_pinpoint_section_condense`
+
+**用户指定的日期条目精炼：单次外科手术式编辑压缩日志文档特定章节** / Pinpoint Dated-Section Condense — Single Surgical Edit to Simplify a Specific Log Entry
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `intent:documentation`
+- `user_opened_doc_via_mention`
+- `specific_dated_section_target`
+- `condense_or_simplify_request`
+- `single_surgical_edit`
+- `no_build`
+- `cn_keywords:jilian,jinglian,jianhua,taiduole,xijize,taixi,gaiyijia,zongjie`
+- `cross_date_style_reference`
+- `reference_date_as_style_guide`
+
+**Preconditions:**
+- 用户通过 @文件名 mention 或 file:// 链接打开了某个文档（通常是「完成记录.md」类的日期式日志文档）。
+- 用户指定了文档中的某个具体日期条目（如「2026-03-18」），要求对该条目的项目总结进行精炼/压缩（如「细则太多了」「太啰嗦」「精炼一下」）。
+- 用户的修改意图是减少文字量/简化表达，而非增加新内容。
+- 整个文档的其他部分无需改动。
+- 【变体·跨日期风格参考】用户要求「参考 [日期A] 的内容，优化/精简 [日期B] 的总结」——将 A 日的写法作为风格标杆，按其简洁度精炼 B 日条目；不涉及增加新内容，仅压缩 B 日至与 A 日相当的粒度。
+
+**Evidence:** a7d1b207 T09 (P9, 3 steps, 1 edit, 0 builds): user opened 完成记录.md via file:// link and sent '修改[@完成记录.md]的2026-03-18，将完成项目总结精炼一下，现在的细则太多了'. Agent: (1) Read 完成记录.md (full file). (2) Edit 完成记录.md — replaced the 2026-03-18 section: condensed multiple bullet-point sub-items (P3 match-3 timer and HUD implementation details) into a concise 2-sentence paragraph. (3) respond_to_user — confirmed condensation. Total: 3 steps, 1 file, 1 edit. Minimal surgical variant: Read→Edit→respond, no Glob, no Task SA, no build. User explicitly identified the section by date and provided motivation ('细则太多了'), giving clear scope and direction. | bdf118ee T10 (3 steps, 1 edit, 0 builds): user opened 完成记录.md via file:// and sent "精简完成记录中，3-24日的内容，增加主线相关功能描述". Agent: Read→Edit→respond. T11 (3 steps): "优化完成记录，3月24日内容，增加角色立绘生成描述" → Read→Edit→respond. T13 (3 steps): near-duplicate of T10 — user re-sent almost identical request (same date, same condensing ask, same augmentation) after first attempt did not satisfy. T14 (3 steps): near-duplicate of T11. Retry pattern: when doc condense does not satisfy, user re-opens the doc and re-sends a near-identical prompt; agent should re-Read the doc on retry to pick up any prior partial edits before applying the condensation.
+
+be94308f T4+T5 (json indices 4+5): Two-attempt pattern revealing the '修改' verb as a load-bearing signal. Turn 4 (json idx 4): user opened 完成记录.md via file:// and sent '完成记录中，将 3月19日的内容，精简总结一下' — NO '修改' keyword, no @-mention of file. Agent responded with text-only summary (no tool calls — no agent_run in traj). Turn 5 (json idx 5): user re-sent with '修改[@完成记录.md](file://...),将3月19日的内容，精简总结一下' — added '修改' verb + explicit @-mention. Agent: 3 steps — Read 完成记录.md → Edit (condense March 19 entry) → respond_to_user. Confirms: without '修改' + @-mention, the agent returns only a text summary without editing the file. With '修改' + @-mention, the agent executes the surgical single-edit. Re-send-with-修改 is a user escalation: 'show me a summary' → 'actually modify the file'.
+
+c44d6be2 T4+T5 (json indices 4+5): Two-step iterative condense of March 20 entry in 完成记录.md. Both turns have file:// document attached + @-mention of 完成记录.md. T4 (json idx 4, 4 steps, 1 edit): '优化和精炼[@完成记录.md]中 3月20号的内容' — agent: Read 完成记录.md → respond (interim note) → Edit (condense March 20 entry) → respond. 4 steps including 2 respond_to_user (initial analysis message + post-edit confirmation). T5 (json idx 5, 3 steps, 1 edit): '继续精简[@完成记录.md]中3月20号的内容' — user re-opens same doc, sends follow-up condense request. Agent: Read 完成记录.md → Edit (further condense) → respond. 3-step minimal surgical pattern. Two-pass condense: when user sends '继续精简' after initial condense, agent re-reads the doc (does not assume prior content is still in context) and applies a second, deeper condensation pass. Confirms: the '继续' prefix signals an escalation of the condense operation, not a new document target.
+
+dcc74462 T19 (4 steps, 1 edit, 0 builds): user attached 完成记录.md via file:// and sent '<document>用户打开了 file:///workspace/docs/完成记录.md 文档</document>参考[@完成记录.md]中3月25日的内容，优化和精简3月26日的总结'. New variant: cross-date style reference condense. March 25 entry is used as a style/length benchmark — agent reads both dates, determines what March 26 should look like if written at the same conciseness level as March 25, then applies a single Edit. 4 steps: Read 完成记录.md → respond_to_user (analysis) → Edit → respond_to_user (confirmation). The '参考X日' modifier is the distinguishing signal from standard pinpoint condense — it makes the target length explicit by reference rather than by a qualitative adjective ('太细' / '太多了').
+
+fa1daf15 T7 (3 steps, 1 edit, 0 builds): user opened 完成记录.md via file:// link (system-injected '<document>用户打开了 file:///.../完成记录.md 文档</document>') and sent '精简[@完成记录.md]中4月2日的内容'. Agent: Read 完成记录.md → Edit (condense April 2nd entry) → respond_to_user. 3 steps, 1 file, 1 edit. Minimal surgical variant confirmed. The date is specified precisely (4月2日), the action is condensation (精简), and the agent makes exactly one edit targeting that section. Consistent with established pattern: file:// attachment + date + 精简 → Read→Edit→respond with no Glob or discovery overhead.
+
+---
+
+## `gene_doc_abbreviation_clarify_then_replace`
+
+**占位符含义询问→立即触发全文档批量替换：两轮完成缩写到实际名称的映射** / Abbreviation Clarify Then Global Replace — Two-Turn Workflow from Placeholder Inquiry to Bulk In-Doc Rename
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inquiry`
+- `intent:feature_modification`
+- `user_opened_doc_via_mention`
+- `abbreviation_meaning_inquiry`
+- `respond_only_no_edits`
+- `immediate_replace_request`
+- `grep_then_bulk_edit_in_doc`
+- `no_build`
+- `cn_keywords:P1P2P3,shenmeyisi,juti,youxi,mingcheng,xiugai,xianshi`
+
+**Preconditions:**
+- 用户通过 @文件名 mention 或 file:// 链接打开了某个文档（通常是「完成记录.md」类的日志文档）。
+- 用户询问文档中某个占位符或缩写的含义（如「P1P2P3分别是什么意思」），该问题不涉及任何修改意图。
+- 代理以纯文字回答（respond_to_user），无文件读取，无编辑——因为占位符含义可从对话上下文或项目背景直接推断。
+- 用户紧接着发出将所有占位符替换为实际内容的请求（如「修改具体的游戏名字，而不是P1P2P3」）。
+- 替换目标为文档内的多处出现，需要 Grep 定位所有实例后批量 Edit。
+
+**Evidence:** a7d1b207 T10-T12 (P10-P12): abbreviation clarification + global replace across 完成记录.md. T10 (P10, 1 step, 0 edits): user opened 完成记录.md and asked '完成记录中的P1P2P3分别是什么意思'. Agent: respond_to_user only — answered from session context: P1=推箱子, P2=记忆翻牌, P3=消消乐. No file reads (1 step total). T11 (P11, no agent run): user sent '修改具体的游戏名字，而不是P1P2P3' — no agent run followed (possible UI/context issue). T12 (P12, 8 steps, 5 edits, 0 builds): user resent '修改文档中显示具体的游戏名字，而不是P1P2P3'. Agent: (1) Grep 完成记录.md for P1/P2/P3 pattern — found all occurrences. (2) Read 完成记录.md section with P1/P2/P3 usage. (3-7) 5x Edit on 完成记录.md: replaced each P1/P2/P3/P4 occurrence with corresponding game name (推箱子, 记忆翻牌, 消消乐, 连连看) preserving surrounding syntax (version numbers, parenthetical notes). (8) respond_to_user — confirmed all replacements. No build. Key pattern: (a) P10 answered from memory (0 file reads), (b) P11 no agent run — user resent as P12 with more explicit phrasing, (c) P12 Grep+Read mapped all occurrences before 5 sequential Edits.
+
+---
+
+## `gene_nf_shared_nav_tab_bar_introduction`
+
+**共享底部标签页引入 — 用 Tab Bar 替换各页面独立导航按钮** / Shared Bottom Tab Bar Introduction — Replace Per-Page Nav Buttons with Unified Tab Component
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:ui_layout`
+- `shared_component_introduction`
+- `navigation_restructure`
+- `cn_keywords:biaoqianye,yeqianqiehuan,gongxiangbiaoqian,yeqianUI,biaoqianye_qiehuan`
+- `follows_visual_polish_cascade`
+
+**Preconditions:**
+- 用户要求将两个或多个页面的独立导航按钮替换为共享底部标签页（Tab Bar）。
+- 新的标签页 UI 被多个页面共享，通常还包含设置按钮（位于最右侧或最左侧）。
+- 通常在一段时间的单页面视觉打磨连续序列之后发起——是从「微调」到「导航结构重构」的转折点。
+
+**Evidence:** bc3f2ce9 T14 (81 steps, 17 edits, 17 reads, 3 Task subagents, 1 build): user said '修改主线和自由模式，改为页签切换，在下方，最右侧是设置按钮，两个页面共用这个页签UI'. This is the largest single turn in the session — 81 steps vs the cascade average of ~8 steps. Agent: (1) 3x Task subagents — explore project structure, read adventure page init.lua, read free mode page init.lua. (2) 17x Read: read both pages' current nav button implementations in detail. (3) 17x Edit: implemented shared tab bar component across both pages (remove old buttons, add shared tab bar). (4) Build success. Context: this turn occurs at P14 in a 42-turn session, interrupting a 14-turn visual polish cascade (T00-T13). After completing the tab bar, the polish cascade resumed (T15-T16). Signature of this gene: step count and edit count spike 4-5× vs surrounding polish turns (81 vs ~8 steps). Subagent dispatch confirms: structural navigation changes require broader codebase survey than single-parameter tweaks. Post-implementation: T18-T22 are tab bar position tweaks (still in cascade pattern), confirming that even after structural change, user returns to iterative polish.
+
+---
+
+## `gene_fm_mode_bifurcated_win_condition`
+
+**主线/自由模式双轨胜利条件分叉 — 主线自动结算，自由模式手动触发** / Mode-Bifurcated Win Condition — Main Story Auto-Win vs Free Mode Manual Completion
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `mode_differentiation`
+- `win_condition_change`
+- `main_story_vs_free_mode`
+- `cn_keywords:zhuxian,ziyoumoshi,tongguantiaojian,zidongshengbai,wancheng_guanka,sanxing`
+
+**Preconditions:**
+- 用户要求同一个游戏的通关/胜利逻辑，在「主线模式」和「自由模式」中表现不同。
+- 主线模式通常被简化：达到条件后自动触发胜利弹窗，固定3星（减少决策负担）。
+- 自由模式通常保留复杂性：达到分数阈值后显示「完成关卡」按钮，用户手动决定结束时机，基于分数/时间计算星级。
+- 这种分叉通常在已有通用胜利弹窗或统一结算逻辑之后发起，用户要求根据模式做差异化。
+
+**Evidence:** bc3f2ce9 T30 (128 steps, 32 edits, 21 reads, 2 tasks, 2 builds): '修改主线游戏结束时的弹窗，不会显示下一关，而是显示完成关卡按钮，点击后回到主线菜单界面，主线通关总是3星'. First bifurcation turn: main story end popup changed to 'complete level → return to main menu' (instead of 'next level'), always 3 stars. This affects 4 games' popup code — largest step count in the session (128 steps). T36 (56 steps, 14 edits, 10 reads, 1 task, 1 build): '修改消消乐，在主线关卡，达到通关分数后就结束游戏，弹出胜利弹窗。在自由模式下，达到通关分数后，就在右上角显示完成关卡按钮，可以提前结束关卡'. Core bifurcation: match-3 game adds mode-conditional win behavior. Agent read game logic files, added isMainStory check, implemented auto-win path (main story) and 'show complete button' path (free mode). T38 (25 steps, 10 edits, 1 task, 1 build): '修改消消乐主线关卡，降低分数需求。在达到通关分数后，直接显示3星并结算通关。和自由模式下不同'. Follow-up: main story score requirements lowered, instant 3-star on score reached. Pattern: 3-turn sequence for full mode bifurcation — (1) popup UI differentiation, (2) win trigger differentiation, (3) threshold differentiation. T30 involved 4 games (128 steps, 32 edits); T36-T38 focused on match-3 only (56 + 25 steps). Bug consequence: T40 reports auto-win not triggering (see gene_br_auto_win_not_triggered).
+
+---
+
+## `gene_cc_narrative_doc_scaffold_then_fill`
+
+**叙事文档两步创作：先创建框架文档，再按关卡填充叙事内容** / Narrative Doc Scaffold-Then-Fill — Planning Doc Skeleton Followed by Per-Level Content Creation Turn
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `intent:content_creation`
+- `two_turn_doc_scaffold_fill_sequence`
+- `cn_keywords:jiqingduihua,zhuxian_jiqing,dongwuduihua,xianxie_wendang`
+- `user_opens_doc_between_turns`
+- `narrative_content_generation`
+
+**Preconditions:**
+- 第一条 prompt：用户声明内容创作意图（如「我准备为游戏主线关卡生成剧情对话」），并明确要求先创建一个文档（「先为我写一个文档」）——表明用户需要规划框架再填充内容。
+- 目标文档是为叙事/故事性内容设计的，而非技术实现文档（如对话脚本、关卡剧情文案）。
+- 第二条 prompt：用户打开了第一条 prompt 创建的文档，然后要求填充具体的叙事内容（如「为剧情生成动物相关的小对话、小知识」）——这是文档从框架到实质内容的转化步骤。
+
+**Evidence:** bc3f2ce9 T28 (12 steps, 1 edit, 3 reads, 1 task): '我准备为游戏的主线关卡生成简单的剧情对话。先为我写一个文档'. Agent: (1) Task subagent to explore docs/ and storyline structure. (2) Read 3 files (storyline.lua + existing docs) to understand level count and themes. (3) 1 Edit: Write 策划案-主线剧情对话.md — framework doc with per-level dialogue scaffold (slot for each of the 30 main story levels). T29 (16 steps, 8 edits, 2 reads): User opened the created document (system message: '用户打开了 file:///workspace/docs/策划案-主线剧情对话.md 文档'). User said: '为剧情，生成一些和动物相关的小对话，小知识'. Agent: (1) Read 策划案-主线剧情对话.md (confirm structure). (2) Read storyline.lua (level themes/animals per level). (3) 8 Edits: filled in animal-related dialogues and facts for each level. Distinctive two-turn workflow: turn 1 creates the doc skeleton (1 edit), user opens the doc between turns (system event), turn 2 fills all content (8 edits). The user opening the doc between turns is a signal that the scaffold phase was accepted and content-fill phase is starting. No build in either turn — pure content creation workflow.
+
+---
+
+## `gene_pd_devlog_guided_impl_start`
+
+**开发记录文档驱动的实施启动 — @Doc 引用触发全量规格解析、并行项目探索、分步实施** / Dev-Log-Guided Implementation Start — @Doc Reference Triggers Full Spec Parse, Parallel Project Exploration, and Step-by-Step Implementation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `user_opened_doc_via_mention`
+- `start_development_command`
+- `dev_log_as_specification`
+- `high_step_count_first_turn`
+- `task_subagent_project_exploration`
+- `cn_keywords:kaishi,kaifa,gen,fazhan,kaifa_jilu,m1,jiekou,shishi`
+
+**Preconditions:**
+- 用户通过 @文件名 mention 或 file:// 链接打开了一个开发计划/记录文档（如「开发记录-主线系统M1.md」）。
+- 用户的指令是「根据[@doc]开始开发」或等价的「按照文档实施」类命令，没有额外的口头规格说明。
+- 被引用的文档本身已包含完整的开发步骤/任务分解（即文档即规格），不需要 AI 进一步澄清需求。
+- 待实现的功能跨越多个文件（新建模块、修改 adapter、更新配置等），预计步骤数 > 50。
+
+**Evidence:** bdf118ee T01 (170 steps): user opened 开发记录-主线系统M1.md via file:// mention and said '根据[@开发记录-主线系统M1.md]开始开发'. Agent: (1) respond_to_user '让我先阅读开发记录文档'. (2) Read 开发记录-主线系统M1.md — extracted 6-step development plan for storyline system M1 covering: storyline config, story level data files, game-container storyline bridge, adapter modifications for each game, adventure page UI, and build+LSP check. (3) respond_to_user '了解项目结构' → Task SA #1 '探索项目结构和关键文件' (explored scripts/ directory, returned architecture report). Task SA #2 '查找 main.lua 入口文件'. (4) TodoWrite 6 tasks. Then systematic implementation: mcp__mkr__Read×54, mcp__mkr__Edit×26, mcp__mkr__Write×12, TodoWrite×10, mcp__mkr__Bash×3, mcp__sce-urhox__build×1, mcp__sce-urhox__lua_lsp_client×1. Final: build passed, LSP zero errors. respond_to_user with full completion summary listing all created/modified files.
+
+---
+
+## `gene_aoc_wrong_target_page_revert_reapply`
+
+**AI 修改错误页面的纠错处理 — 恢复错误页面后在正确目标页面重新应用修改** / Wrong-Target-Page Correction — Revert Mistakenly Modified Page, Then Re-Apply Changes to the Correct Page
+
+Category: `workflow`
+
+**Signals:**
+- `intent:ai_output_correction`
+- `agent_modified_wrong_page`
+- `two_structurally_similar_pages`
+- `revert_then_reapply_to_correct_target`
+- `ui_layout_change`
+- `cn_keywords:cuole,wode,zhuxian,ziyou,huifu,xiufu,cuowu,yingyong`
+
+**Preconditions:**
+- 上一轮中 AI 对某个 UI 页面做了布局/样式修改，但修改了错误的页面（如修改了「自由模式主页」而非「主线冒险页」）。
+- 项目中存在两个结构相似但用途不同的页面（如 home/init.lua vs adventure/init.lua，或两个游戏的同名 screen），AI 因命名或上下文误判而选错了目标。
+- 用户的纠错指令模式为：「错了，我要修改的是 [正确目标]，而不是 [错误目标]。将 [错误目标] 恢复，将 [正确目标] 改成刚才说的那样」。
+- AI 有能力从上下文或之前的版本中恢复错误页面的原始内容（如上下文中保留了原始文件内容或可 Grep 恢复）。
+
+**Evidence:** bdf118ee T20 (25 steps): user said '错了，我要修改的是主线的UI，而不是自由模式的主页UI，将自由模式的UI恢复，将主线的UI改成刚才说的那样'. Context: T18 applied S-shape layout with pagination to home/init.lua (free mode home page) instead of adventure/init.lua (main storyline page). Agent: (1) TodoWrite 2 tasks: '恢复自由模式主页 UI 为原始版本' (in_progress), '改造主线页面为 S 形分页布局' (pending). (2) respond_to_user '先恢复主页，再改主线页面'. (3) mcp__mkr__Write to home/init.lua — wrote back original content (agent had original in context from T16). (4) respond_to_user '主页已恢复'. (5) TodoWrite mark revert completed. (6) respond_to_user 'now rewriting adventure/init.lua'. (7) Read adventure/init.lua (twice). (8) 6× mcp__mkr__Edit to adventure/init.lua: update layout geometry, getPageNodePosition for 2-column S-shape, curves for connectors, bubble rendering, enlarged pagination buttons with vector arrows. (9) TodoWrite mark apply complete. (10) mcp__sce-urhox__build → passed. (11) respond_to_user with full summary of changes.
+
+---
+
+## `gene_doc_dated_section_augment`
+
+**用户指定文档日期条目增补：单次 Edit 向特定章节或文档末尾追加新内容** / Dated-Section or Doc-End Augment — Single Edit to Append New Content to a Specific Section
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `intent:content_creation`
+- `user_opened_doc_via_mention`
+- `additive_doc_operation`
+- `cn_keywords:zengjia,buchong,tianjia,xinzeng,dingshi,riqi`
+- `specific_dated_section_target_or_general_append`
+- `no_build`
+
+**Preconditions:**
+- 用户通过 file:// 链接或 @文件名 mention 打开了文档（通常是「完成记录.md」类的日期式日志文档）。
+- 用户明确要求在文档中「增加」/「补充」/「添加」新内容（而非精炼/压缩现有内容）。
+- 目标内容可能是：(a) 特定日期条目中新增若干开发项，或 (b) 向文档末尾追加一条新的完成记录语句。
+- 修改意图是扩增文字量/丰富描述，而非删减。
+
+**Evidence:** c44d6be2 T3 (json idx 3, 3 steps, 1 edit, 0 builds): 用户打开了 file:///workspace/docs/完成记录.md 并发送'在文档中增加，游戏主体框架基本完成，后续优化UI表现、音效、后期关卡'。Agent: Read 完成记录.md → Edit (在文档末尾或最新条目下追加该语句) → respond_to_user。3步，1次Edit。无Glob，无Task SA，无Build。文件已通过 file:// 前缀嵌入在 prompt 中（has_attached_doc=true）。用户未指定特定日期，表示追加到当前/最新条目即可。Minimal append variant: no date pinpointing, pure end-of-log append.
+
+c44d6be2 T6 (json idx 6, 3 steps, 1 edit, 0 builds): 用户打开了 file:///workspace/docs/完成记录.md，并通过 @-mention 引用，发送'增加[@完成记录.md]中3月20号内容，增加推箱子关卡内容，丰富消消乐玩法'。Agent: Read 完成记录.md → Edit (定位3月20号条目，插入推箱子关卡说明 + 消消乐玩法丰富描述) → respond_to_user。3步，1次Edit。Dated-section augment variant: 用户明确指定日期（3月20号）并提供两条新内容要点（推箱子关卡 + 消消乐玩法）。区别于 T4-T5 的 condense 操作（精简）：本次是向已有条目增加新信息。两个变体说明增补操作独立于精简操作，同一日期条目在同一会话中可先被增补（T6），此前也被精简（T4-T5），两者互不冲突。
+
+---
+
+## `gene_fm_cross_page_ui_inconsistency_unify`
+
+**用户发现跨页面 UI 不一致 → 整合为统一实现** / User Discovers Cross-Page UI Inconsistency → Consolidation to Single Implementation
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `cross_page_inconsistency_discovered`
+- `user_questions_inconsistency`
+- `two_modes_different_ui`
+- `consolidation_to_single_ui`
+- `cn_keywords:sihu,butong,bushi,tongyi,zhenghe,tong_yige,bushi_tong_yige,butong_ui`
+
+**Preconditions:**
+- 用户发现同一个游戏中的两个不同页面/模式（如「主线模式」和「换装页面」）使用了不同的设置面板或功能弹窗，彼此 UI 不一致。
+- 用户用疑问句表达发现（「似乎用的不是同一个UI？」「为什么X和Y不一样」），并要求整合为同一套UI。
+- 这两个页面各自维护了独立实现，通常是因为一个页面实现在先，另一个后来单独复制了一份但没有同步更新。
+
+**Evidence:** c68e9e21 T02 (31 steps, 1 Bash, 1 Write, 3 Grep, 8 Read, 3 Task, 4 TodoWrite, 1 build): user noticed: '主线模式和换装页面的设置似乎用的不是同一个UI？整合为同一个UI'. Agent: (1) Grep×3 to locate settings UI references in both main-story and outfit pages. (2) Read×8 to compare the two implementations (main story had a newer, more complete panel; outfit page had an older stripped version). (3) Task×3 subagents to explore deeper (one per page + one for shared component feasibility). (4) Write to create a unified settings panel file shared by both pages. (5) Edit both pages to require the new unified panel. (6) Build success. Trigger pattern: user uses a question-form sentence to surface an inconsistency ('似乎...？'), then immediately requests the fix in the same prompt. This differs from gene_fm_shared_component_extraction (which is about code duplication across multiple games) — here it is a within-game cross-page inconsistency, typically caused by one page copying another's UI independently and then diverging.
+
+---
+
+## `gene_fm_emoji_ban_policy_with_rule_doc`
+
+**Emoji 全局禁用 + 规则文档化：代码清除 + 开发规范追加双联动** / Emoji Ban Policy — Code Removal + Rule Codification in Dev Guidelines
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `intent:documentation`
+- `emoji_removal_no_replacement`
+- `doc_rule_codification`
+- `cn_keywords:jinyong_emoji,shanchu_emoji,guize,wendang,AI_guifan`
+- `unicode_grep_full_scope`
+- `build_after_code_removal`
+- `dual_target_code_and_doc`
+
+**Preconditions:**
+- 用户发出禁止使用 emoji 的指令，要求删除某游戏或全项目中的 emoji，并将该规则记录到文档中。
+- 与 gene_fm_emoji_to_nanovg_migration 不同：本模式不用 NanoVG 替换 emoji，而是直接删除 emoji（不提供视觉替代方案）。
+- 项目中有 AI 开发规范文档（如 AI开发规范.md、文档维护规范.md）可以追加禁用规则条目。
+
+**Evidence:** cc1dd130 P3 (56 steps, intents: feature_modification+documentation): user prompt '禁止使用emoji，删除推箱子中的emoji使用，并且将这个规则加入文档中'. Agent: (1) TodoWrite (tasks: scan emoji, remove from code, update doc, build). (2-3) 2x Task subagents. (4) Grep '📍|👣|🎉' in puzzle-land scripts. (5) Read board-renderer.lua. (6-11) 3x Grep with specific emoji char lists via mcp__mkr__Bash (grep -n '💧|🔥|🌿|⚡...' pattern). (12) Read board-renderer again. (13-14) 3x Edit board-renderer (remove emoji chars). (15) Grep level-select files. (16-17) 2x Read level-select. (18-19) mcp__mkr__Bash grep -rn with unicode range [\x{1F300}-...]. (20) Bash grep -cP for unicode count. (21) Read PuzzleGame.lua. (22-23) 2x Bash wc -l and ls. (24) Bash find all .lua files. (25) Bash grep -rn comprehensive emoji pattern across all files. (26) Read level-select. (27) Edit level-select (remove emoji). (28) Bash grep verify emoji removed from code files. (29) TodoWrite update. (30) Bash find docs. (31) Bash find docs (extended). (32) Read /workspace/docs/AI开发规范.md. (33-34) 2x Edit AI开发规范.md (append no-emoji rule). (35) TodoWrite complete. (36) Build. (37) TodoWrite done. Total: unicode-range grep for full scope, then targeted Edit removal, then doc rule append. Pattern: emoji ban always requires 3-tier grep (literal chars + unicode range + bash script) to ensure full scope, followed by Rule-in-doc update. | Follow-up: cc1dd130 P4 (89 steps): '检查文档是否有需要更新的部分' — while reviewing docs, agent found MORE emoji in shared components (game-card.lua, top-bar.lua, home/init.lua, profile/init.lua) that were NOT in P3 scope. Agent continued the emoji ban: (1) Grep emoji in shared scripts. (2) Read + Edit game-card.lua (remove emoji). (3) Grep .emoji pattern. (4) Edit game-card.lua again. (5) Read + Edit top-bar.lua. (6) Read + 3x Edit home/init.lua. (7) Read + 3x Edit profile/init.lua. (8) Bash grep verify all emoji removed. Then proceeded to doc updates. Pattern: post-ban doc review turn extends ban scope to files not covered in the original ban turn.
+
+---
+
+## `gene_doc_progress_tracking_scaffold`
+
+**从零开始的项目进度追踪文档体系脚手架：合成、修正、拆分、缺口填补** / Progress Tracking Doc Scaffold — Synthesize from Code, Scope Correct, Split to Sub-Doc, Fill Gaps
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `intent:content_creation`
+- `new_progress_doc_from_scratch`
+- `multi_turn_scope_correction`
+- `doc_split_to_separate_file`
+- `date_indexed_completion_log`
+- `gap_inspection_at_end`
+- `cn_keywords:zongti_jindu,wancheng_jilu,riji,riqisuo`
+- `no_code_changes`
+- `no_build_needed`
+- `consecutive_doc_creation_turns_ge_4`
+
+**Preconditions:**
+- 用户要求新建一份总体进度或完成情况的总结文档（如「新增总体进度文档」）——不是更新现有文档，而是从零开始。
+- 通常发生在项目发展到某个阶段，用户想系统整理已完成内容时。
+- 后续会连续发出多条修正/扩展指令（调整粒度、拆分子文档、补充日期记录等），形成 4-6 turn 的文档脚手架序列。
+- 与 gene_cc_source_doc_to_summary_distillation 不同：本模式是「从代码现状合成进度文档」，而不是「从已有进度文档提炼摘要文档」。
+
+**Evidence:** cc1dd130 P6-P11 (6-turn documentation scaffolding sequence, steps: 20+6+3+3+8+6):
+
+P6 (20 steps, intent:documentation): 'xinzeng zongti jindu wendang, baocun zai docs xia, zongjie mubiao youxi de wancheng neirong'. Agent: respond_to_user, Read 2 existing dev logs (kaifa jilu), Bash find existing md files (2 commands), respond_to_user, TodoWrite, 2x mkr__Edit (create/seed zongti jindu.md), Read+Bash file counts, 2x mkr__Edit (fill discovered content), respond_to_user. Pattern: new progress doc synthesized by reading existing dev logs + Bash discovery of project file tree.
+
+P7 (6 steps, intent:feature_modification+documentation, @zongti_jindu.md open): user asked to show only completed items at high-level (not granular details like 'ice surface effect'). Agent: Read -> respond_to_user -> Write (full rewrite, stripped effect-level detail, kept game-level completion summaries). Scope correction turn: Write replaces entire doc.
+
+P8 (3 steps, intent:inquiry, @zongti_jindu.md still open): 'Lifecycle SDK shi shenme'. Embedded informational inquiry mid-scaffold. Agent: mkr__Read + Task subagent + respond_to_user. No doc changes. Pattern: inline inquiry resolved without interrupting doc workflow.
+
+P9 (3 steps, intent:documentation, @zongti_jindu.md open): user asked to add a date-indexed completion log TO zongti_jindu.md. Agent: Read -> Edit (appended date section at bottom). Interpreted as 'append to existing doc' — misread intent, triggers P10 correction.
+
+P10 (8 steps, intent:content_creation+documentation, @zongti_jindu.md open): user clarified 'I meant organize completed content into a SEPARATE document, not below in the same doc'. Agent: Read zongti_jindu.md -> respond_to_user (confirm) -> Read again -> Write NEW wancheng_jilu.md (extracted completed items, reorganized as standalone completion log). Did NOT edit zongti_jindu.md. Split correction: creates new file rather than modifying source.
+
+P11 (6 steps, intent:inspection_review+documentation, @wancheng_jilu.md open): user found 'completion log does not record dating/Sokoban game development completion, only modification records'. Agent: Read wancheng_jilu.md -> respond_to_user (acknowledge gap) -> Write wancheng_jilu.md (rewrote to add major game completion milestone entries, not just modification records). Gap inspection: user caught that the log contained only small modifications, missing the key game-level completion milestones.
+
+Overall lifecycle: Create overall-progress -> Granularity correction (detail->summary) -> Embedded inquiry (no doc change) -> Append date log (misread as inline) -> Split correction (separate file) -> Content gap fill (add major milestones). Typical 'progress tracking doc system initialization from scratch' requiring 2-3 user corrections before the structure is satisfactory.
+
+---
+
+## `gene_nf_game_event_animation_chain`
+
+**连续游戏事件动画演出特性链（失败/碰撞/成功/重置/粒子）** / Consecutive Game-Event Animation Feature Chain (Failure/Collision/Success/Reset/Particle Effects)
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `consecutive_animation_feature_prompts`
+- `game_event_triggered_animation`
+- `particle_effects_requested`
+- `sokoban_or_puzzle_game_context`
+
+**Preconditions:**
+- Two or more consecutive new_feature prompts both requesting animation or visual effects for game events
+- First prompt adds animations triggered by player action outcomes (move blocked, collision, success)
+- Second prompt adds animations for system-driven state transitions (reset, shrink/disappear, respawn with particles)
+
+**Evidence:** d8f96672 T0 (40 steps, 18 edits, 1 build): '为角色增加动画演出，如无法推动箱子时，箱子撞到墙时，推动结束时'. Agent: Task SA (discover game rendering module) + Read ×4 (game renderer, update loop, event dispatch) + TodoWrite ×7 (enumerate 3 animation types) + Edit ×11 + build. Implemented character animations for 3 game events: push-blocked (wall collision), box-wall-collision, and move-completed. d8f96672 T1 (36 steps, 14 edits, 1 build): '为重置关卡增加动画，旧的箱子缩小消失，消失后产生飞散的粒子特效。根据数据读取的角色和箱子在初始位置生成。并同样有特效'. Agent: Read ×8 (game reset logic, renderer, particle candidates) + TodoWrite ×6 (shrink-anim, particle-emit, data-reset, respawn-anim phases) + Edit ×8 + build. Implemented shrink-disappear animation on old elements, particle explosion effect, then data-driven respawn with spawn animation. Pattern: two consecutive new_feature turns — each adds a distinct animation layer to the same Sokoban game. T0 focuses on reaction animations for player-driven game events; T1 focuses on procedural animations for system-driven state transitions (reset/respawn). Both use Task SA or broad Read for discovery, TodoWrite for multi-phase planning, and build-verify.
+
+---
+
+## `gene_cc_dialogue_voice_chattering`
+
+**对话角色配音生成：参考真实游戏风格的动物咿呀短声批量生成** / Dialogue Voice Chattering Generation — Real-Game Style Reference Animal Chattering SFX Batch
+
+Category: `workflow`
+
+**Signals:**
+- `intent:content_creation`
+- `target:audio`
+- `dialogue_voice_sounds`
+- `animal_chattering_sfx`
+- `real_game_style_reference`
+- `cn_keywords:jiasheng,dongwu,duihua,senyouhui,bofang,xiaodongwu,jiasheng`
+
+**Preconditions:**
+- 用户要求为游戏角色（小动物/NPC）生成对话时的语音/叫声（而非游戏效果音或 UI 音效）。
+- 提示词中引用了某款真实游戏作为风格参考（如「参考懂我森友会」，即 Animal Crossing 的闲聊口语化短促咿呀声）。
+- 目的是在对话气泡/聊天框触发时播放，作为角色语音配音的轻量替代。
+
+**Evidence:** dcc74462 T2 (3 steps, 0 edits, 0 builds): user sent '生成小动物的叫声，参考懂我森友会，用于对话时播放'. Agent: (1) respond_to_user (plan: batch-generate Animal Crossing-style chattering voice sounds). (2) mcp__sce-urhox__batch_sound_effects — single call generating chattering voice sounds using English prompts referencing the Animal Crossing dialogue chattering style. (3) respond_to_user — summary of generated files and paths. Zero file edits: pure asset-generation turn, no code wiring. Distinct from gene_cc_sfx_batch_genre_aware: (a) target is character dialogue voice sounds (animal chattering/murmuring), not gameplay SFX events; (b) uses a specific real-game title as style anchor ('懂我森友会' = Animal Crossing); (c) even lighter (3 steps total, single batch call); (d) sound duration target is much shorter (0.2-0.5s vs 0.4-1.5s for SFX). Pattern: '参考[真实游戏]的声音/叫声/配音风格' + dialogue context → single batch_sound_effects call → file path summary → no code wiring in same turn.
+
+---
+
+## `gene_nf_shared_component_reference_guided_integration`
+
+**参考式共享组件跨页扩展 + 事件触发补充：两轮串联集成工作流** / Reference-Guided Shared Component Cross-Page Integration + Event Trigger Wiring — Two-Turn Chain
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `extend_existing_shared_component`
+- `reference_existing_implementation`
+- `cross_page_integration`
+- `event_trigger_wiring_followup`
+- `cn_keywords:cankao,jiyoude,zengjia,liaotian,xuanzeguan,qiehuanmoshi,sigehyouxi`
+
+**Preconditions:**
+- 游戏已有一个共享 UI 组件（如聊天气泡/对话框），已在部分页面（主线模式、自由模式等）集成。
+- 用户要求将该组件扩展到其他新页面（如 4 个游戏的选关页），并明确要求「参考」已有实现（「参考主线模式和自由模式」「参考已有的聊天」）。
+- 通常紧跟一个事件触发补充 turn：要求在新集成页面上，为模式切换/页面进入等操作绑定新消息触发。
+
+**Evidence:** dcc74462 T7 (70 steps, 8 edits, 17 reads, 9 Grep, 5 Task subagents): user sent '在4个游戏的选择关卡页面，也增加点击左下角聊天的功能，参考主线模式和自由模式'. Key: '参考主线模式和自由模式' = reference-guided (no new design needed). Agent dispatched 5 Task subagents to research existing chat implementation, then 17 reads + 9 Greps to understand the full integration pattern (init, event binding, z-order, message content), then 8 edits to 4 target level-select files. No PlanMode — reference-guided means skip design, go straight to port. T8 (50 steps, 7 edits, 9 Grep, 2 Task subagents): user sent '这是一个面向儿童的益智游戏，参考已有的聊天，增加功能，当点击切换主线模式，自由模式，进入选择关卡时，增加聊天信息.' Event trigger supplement turn: 9 Greps to confirm T7 integration points, then 7 edits adding mode-switch and page-enter event handlers with corresponding chat messages. Edge case observed: dcc74462 T11 (prompt 10, '进入自由模式时，选择游戏的页面，没有出现聊天') was a bug report 3 turns later — T7 missed the free-mode game-selection page (distinct from level-select page), confirming that cross-page integration can miss edge-case entry points even with Task SA research.
+
+---
+
+## `gene_fm_cross_game_config_centralization`
+
+**跨游戏 UI 参数集中化：单参考游戏提取配置表 + 四游戏对称应用 + 立即微调** / Cross-Game UI Parameter Centralization — Extract Config Table from Reference Game, Apply Symmetrically, Then Tune
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `intent:configuration`
+- `target:game_logic`
+- `extract_hardcoded_params`
+- `config_table_centralization`
+- `cross_game_symmetric_apply`
+- `immediate_parameter_tune_followup`
+- `cn_keywords:zhenghe,peizhibiao,bianju,zuoyouliubai,shangxia,yiyang,sige,youxi,peizhidao`
+
+**Preconditions:**
+- 多个游戏存在相同用途的硬编码 UI 参数（边距、缩放比、偏移等），分散在各游戏的独立文件中。
+- 用户要求将某个参考游戏的参数提取为配置表，并要求其他游戏也统一应用同样的配置结构（「整合到配置表中。修改其他3个游戏，应用和消消乐一样的配置」）。
+- 通常在集中化完成后，用户会立刻发出参数微调 prompt（「修改上下留白比例」「左右留白30像素」），此时只需修改配置表中单一位置即生效。
+
+**Evidence:** dcc74462 T9 (73 steps, 15 edits, 22 reads, 8 Grep, 2 Task subagents): user sent '将消消乐，游戏主体的左右边距，和上下边距设定，整合到配置表中。修改其他3个游戏，应用和消消乐一样的配置'. Agent dispatched Task SAs to scan all 4 games, then 22 reads + 8 Greps to understand each game's current hardcoded margin positions; created Lua config table in match-3 and applied same config reference pattern to all 4 games (15 edits total). T10 (12 steps, 5 edits, 1 build): immediately following T9, user sent '修改上下留白比例，上方1，下方3，左右留白30像素'. Agent: Read config table → 2-3 Edits to adjust ratio (1:3) and pixel values (30px) → Build success. Pattern: T9 = centralization (heavy: Task SAs + read all games + symmetric edits) → T10 = immediate tune (light: single config file read + 2-3 edits + build). The centralization in T9 made T10 trivially simple: only config table modified, all games auto-updated. Distinct from gene_cfg_surgical_json_field_update (handles single JSON field updates) — this pattern involves cross-game Lua config table extraction with full symmetric refactor.
+
+---
+
+## `gene_cc_costume_expansion_dedup`
+
+**主角造型内容扩展：枚举去重后逐个生成图片并追加配置（未购买状态）** / Costume Content Expansion with Dedup — Enumerate Existing, Generate New Images Sequentially, Append as Unpurchased
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:game_logic`
+- `costume_or_outfit_expansion`
+- `generate_image_tool`
+- `dedup_constraint_explicit`
+- `unpurchased_default_status`
+- `append_after_existing`
+- `cn_keywords:shengcheng,zaoxing,huanzhuang,tianjia,weigoumai,budechongfu,gengduo,zhujue`
+
+**Preconditions:**
+- 游戏已有一个换装/皮肤系统，包含若干现有造型（各有购买状态字段）。
+- 用户要求生成更多造型图片，添加到已有造型列表末尾，状态设为「未购买」。
+- 用户明确强调「不要重复」——即新造型的外观/名称/主题不得与现有造型重叠（dedup 约束）。
+
+**Evidence:** dcc74462 T13 (40 steps, 5 generate_image calls, 3 edits, 3 Glob): user sent '生成更多的主角造型，添加到换装下方，设定为未购买，需要注意不要重复了'. Agent: (1) 3x Glob to enumerate existing costume image files and locate wardrobe config. (2) Read wardrobe config to understand data structure and current outfit list (themes, purchased status fields). (3) 5x mcp__sce-urhox__generate_image — sequential single-outfit calls (not batch), using English prompts with distinct visual themes ensuring no duplication (explicit dedup from prompt drove the enumeration-first approach). (4) 3x Edit to append new outfit entries to wardrobe config with purchased=false. (5) respond_to_user — summary of new outfits and their themes. Key signals: '不要重复了' drove Glob-first enumeration; '添加到换装下方' drove append-only edits; '设定为未购买' drove purchased=false default. Uses sequential generate_image rather than batch because each outfit needs individually designed prompts to avoid thematic overlap. Distinct from gene_cc_image_gen_sequential_fallback (fallback strategy for timeouts) — this is a proactive dedup-driven workflow combining image generation + config registration in a single turn.
+
+---
+
+## `gene_fm_cross_game_rating_system_unify`
+
+**跨游戏通关等级制统一：字母等级对齐为星级（参照已有游戏）** / Cross-Game Rating System Unification — Letter Grades Aligned to Star Ratings to Match Existing Games
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:multi_game_rating_display`
+- `cn_keywords:tongguandengji,xingji,tongbu,lianliankan,fanpai,tuixiangzi,xiaoxiaole`
+- `pattern:sync_to_existing_games`
+- `scope:main_and_free_mode`
+
+**Preconditions:**
+- 游戏项目中存在多个子游戏，其中部分使用一种评级展示（如字母等级 C/B/A/S），另一部分已使用另一种（如星级 1/2/3 星）。
+- 用户要求将前者的评级系统修改为与后者一致，并明确说明对应关系（如 C=1星、B=2星、A=3星、删除S级）。
+- 改动范围同时覆盖主线模式（story mode）和自由模式（free mode）。
+
+**Evidence:** e2076a78 T6 (140 steps, 38 edits, 35 reads, 44 respond_to_user, 5 greps): user prompt '将连连看和翻牌的通关等级，从C/B/A/S改为，一二三星，和推箱子、消消乐同步。C级位1星，B级为2星，A级为3星，删除S级评价。同时修改主线和自由模式.' Agent: read sokoban and match-3 reference implementations first, then systematically read/edit link-game and flip-cards files for both story and free mode. TodoWrite used to track 4 sub-tasks (2 games × 2 modes). 140 steps is the largest single turn in this session. Session summary confirms editing+localization phases. Key insight: the massive step count (140) reflects that rating system changes touch multiple files per game (score logic, UI rendering, resource references) and both mode branches; agent must cross-reference the existing star-rating games as ground truth before modifying the letter-grade games.
+
+---
+
+## `gene_fm_web_viewport_aspect_ratio_cap`
+
+**Web 端宽屏自适应宽高比上限约束 + 即时比值迭代** / Web Viewport Max Aspect Ratio Cap for Adaptive Resolution — Implementation + Immediate Ratio Tuning Turn
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:adaptive_resolution`
+- `symptom:web_too_wide_display`
+- `platform:web_wasm`
+- `cn_keywords:zidayin,fenbianlv,zikuanggaobi,wangyemoshi,zuikuan`
+
+**Preconditions:**
+- 游戏已有自适应分辨率功能（根据窗口宽高动态缩放 UI）。
+- 用户反映游戏在网页/浏览器端打开时出现异常宽的显示（宽高比过大），视觉不佳。
+- 用户给出了可接受的最大宽高比数值（如 1:1.5 或 1:1.2）。
+
+**Evidence:** e2076a78 T9 (88 steps, 32 edits, 20 reads, 20 respond_to_user, 6 TodoWrite): user prompt '现在游戏有自适应分辨率的功能，但是如果玩家在网页上打开，可能出现非常宽的情况，优化它。能接受的最大宽高比为1:1.5.' Agent: read adaptive-resolution init.lua and shared-ui files (20 reads), TodoWrite to plan cross-file changes, then 32 edits to inject max-ratio clamp across all affected UI layout calculations. Large step count reflects that the constraint must be propagated to every layout calculation site in the adaptive-resolution system. T11 (8 steps, 1 edit, 2 reads, 2 builds): user prompt '让屏幕分辨率，最高支持1:1.2.' Direct ratio update — agent reads the relevant file, changes the single ratio constant from 1.5 to 1.2, builds twice to confirm. Pattern: always extract ratio as a named constant in T9 so T11 can be a one-line edit.
+
+---
+
+## `gene_fm_en_text_localization_sweep`
+
+**多游戏英文文本定位与汉化扫描：关卡文字与通关弹窗审查修复** / Multi-Game English Text Localization Sweep — Level Text and Popup Audit with Inline Chinese Fix
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inspection_review`
+- `intent:feature_modification`
+- `target:multi_game_text_content`
+- `symptom:english_text_in_chinese_game`
+- `cn_keywords:yingwen,zhongwen,jiancha,guanka,tanchu,chuangguan,wenzi`
+
+**Preconditions:**
+- 游戏项目面向中文用户，但部分游戏的关卡名、通关弹窗、提示文案等存在未汉化的英文文本。
+- 用户要求对多个游戏进行英文文本检查，发现后直接修改为中文。
+- 通常通过 inspection_review 类意图触发，紧接着 feature_modification 实施修复。
+- 【变体·代码标识符泄露删除】用户发现某个关卡的标题显示的是程序内部标识符（如 story-30），而非正常的中文标题；要求扫描并删除所有类似的英文标识符（非汉化，而是清除），通常只涉及单个游戏。
+
+**Evidence:** e2076a78 T4 (10 steps): user prompt '检查几个游戏的关卡文字，通关时的弹窗，是否有英文，如果有，修改为中文.' Agent: TodoWrite to list all games and check targets, then Task (subagent dispatch) to handle the multi-game parallel check. Agent edits 2 files (found English in 2 games), respond_to_user twice to report findings. 10 steps is relatively short because the task delegates per-game work to subagents. The combined intent is inspection_review (check) + feature_modification (fix inline) — the agent does not produce a separate report; it finds and fixes in the same turn.
+
+fa1daf15 T2 (55 steps, 4 edits, 1 error): '主线第三十关的标题是story-30，删除所有类似的英文'. New variant: Code-identifier-as-display-text sweep. The English is not a UI string to translate but a programmatic level identifier (story-30) leaking into player-visible level titles. User provides one concrete example ('主线第三十关的标题是story-30') and asks to delete ALL similar English identifiers across storyline levels. Agent behavior: heavy Grep sweep (13x Grep, highest tool count in the session) across all story-N.lua level files to find which ones have English identifier titles, followed by 10x mcp__mkr__Read to inspect each candidate file, 4x mcp__mkr__Edit to remove the English identifiers, 7x TodoWrite for progress tracking, 18x respond_to_user. 1 error observed (likely a Grep returning no results for a search term). Single-game scope (unlike the original multi-game variant). Action is deletion (not translation) — the identifiers should not appear in player UI at all. Distinguishing signal: user mentions a specific file/identifier example AND uses the word '删除' rather than '修改为中文' — delete-sweep variant vs translate-sweep variant.
+
+---
+
+## `gene_fm_multi_game_preimpl_exploration_plan`
+
+**多游戏功能改动：预探索+TodoWrite规划+方案汇报（本turn不实现）** / Multi-Game Feature Modification — Pre-Implementation Exploration Turn: Task Subagent Scan, Per-Game Reads, TodoWrite Plan, and Report Without Edits
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `multi_game_scope_ge3`
+- `symmetrical_cross_game_request`
+- `no_prior_context_for_affected_screens`
+- `cn_keywords:xiugai,sige,youxi,yemian,jieshu,meiyou,manxing,xianshi,tiaojian`
+
+**Preconditions:**
+- 用户要求对多个（通常 3-4 个）游戏页面进行同样或对称的功能修改（如「修改4个游戏结束页面」）。
+- 功能逻辑已明确（如「如果没有满星，显示更高星级所需条件」），但实现细节依赖对各游戏代码的了解。
+- Agent 对这些页面的当前实现不熟悉（如果已熟悉则可直接实现，不需要此探索 turn）。
+- 涉及跨游戏对称改动，各游戏的页面结构可能略有差异，需要逐一确认后再实现。
+
+**Evidence:** e948a3d9 T3 (12 steps, 0 edits): user asked '修改4个游戏结束页面，如果没有满星，在下方显示更高星级需要的条件' (Modify 4 game-over screens: when not fully starred, show requirements for the next star rating below). Agent: (1) respond_to_user — acknowledged. (2) Task subagent — explored all 4 game-over pages and star-rating/scoring systems, returned structure summary. (3) mcp__mkr__Read shared result-page component (/workspace/scripts/shared/components/result-page.lua). (4) respond_to_user — partial findings (shared component structure understood). (5) TodoWrite — 4 per-game task items (p1-puzzle-land, p2-memory-flip, p3-match-3, p4-link-match). (6-9) mcp__mkr__Read each of p1/p2/p3/p4 game-over screens (p1-game-over, p2-game-over, p3-game-over, p4-game-over). (10) respond_to_user. (11) mcp__mkr__Read p1 scoring/star-rating logic. (12) respond_to_user — final implementation plan. Pattern: cross-game feature modification request → Task SA surveys all games → shared component read → interim progress update → TodoWrite per-game task decomposition → per-game screen reads → final structured plan with common changes + per-game differences → no edits in this turn. Feature type: conditional UI element addition (star requirements display when not fully starred) — a game-state-driven show/hide element added to 4 symmetric screens.
+
+---
+
+## `gene_cc_multi_ref_parallel_doc_synthesis`
+
+**多参考文档的平行新设计文档生成——读取全系列后再写** / Multi-Reference-Doc Parallel Design Doc Synthesis — Read All Siblings Before Writing
+
+Category: `workflow`
+
+**Signals:**
+- `intent:content_creation`
+- `intent:planning_design`
+- `has_attached_doc`
+- `multi_reference_doc_attached`
+- `new_parallel_design_doc_requested`
+- `sibling_series_doc_expansion`
+- `proactive_sibling_doc_discovery`
+- `no_code_changes`
+- `no_build_needed`
+- `single_write_output`
+- `cn_keywords:cankao,cehua_wenzhang,tonghangwenzhang,xinzu,xitong_cankao`
+
+**Preconditions:**
+- 用户通过 @-mention 或 file:// 链接附带了 2 个以上来自同一系列的已有设计文档（如 P1-推箱子、P2-记忆翻牌）作为参考样例，要求生成该系列中的新文档（如 P4-连连看）。
+- 项目中已存在 N ≥ 2 个平行设计文档，新文档应与它们保持格式、章节结构和命名约定一致。
+- 任务不涉及代码修改，最终交付物是单个新的 Markdown 设计文档。
+
+**Evidence:** fba2ad17 T00 (18 steps, 1-prompt session): user attached AI开发规范.md + P1-推箱子关卡详细设计.md + P2-记忆翻牌.md via @-mention, asked to generate P4-连连看 design doc. Agent: (1) Read all 3 referenced docs. (2) Bash ls docs/ → discovered P3-消消乐.md. (3) Bash ls game_modules/ → confirmed naming pattern p1/p2/p3. (4) Proactively Read P3-消消乐.md (not referenced by user). (5) Read 主策划案.md and 架构决策记录.md for global context. (6) TodoWrite. (7) Write P4-连连看.md (single Write, 18-step session). Pattern: user cites N sibling docs → agent reads N + discovers and reads all remaining siblings + reads global context docs → single Write produces new parallel doc. Key behavior: agent does NOT stop at reading only what user referenced — it proactively expands to the full sibling set.
+
+---
+
+## `gene_pd_design_discussion_to_impl_trigger`
+
+**设计讨论 → 立即实现触发模式** / Design Discussion to Immediate Implementation Trigger — PD to NF Clean Transition
+
+Category: `workflow`
+
+**Signals:**
+- `intent:planning_design`
+- `followed_by_new_feature`
+- `design_concept_discussion`
+- `mechanism_exploration`
+- `no_design_doc_output_expected`
+- `pd_to_nf_transition`
+
+**Preconditions:**
+- 用户发出1次 planning_design 消息，内容是探讨某个机制或功能的设计思路（而非要求生成设计文档）。
+- 下一轮用户直接发出 new_feature 实现请求，基于上一轮的设计讨论。
+- PD turn 中用户通常提出设计选项、询问可行性或要求 AI 提供创意方案；NF turn 中选定其中一个方向开始实现。
+
+**Evidence:** 08754637: 7 clean PD->NF transitions observed across the session. T36->T37: '探讨战斗机变身为高达的变形机制设计' -> '新增两种飞行模式：变形动画模式和飞机模式'. T358->T359: '围绕Battroid形态提出设计建议' -> '新增高达强化策略共6项战斗/机动类新能力'. T546->T547: '询问先驱者BOSS技能设计建议以区别于另两个BOSS' -> '新增追踪导弹机制：背部发射、贝塞尔弧线转向'. T564->T565: '为先驱者角色设计一个新技能' -> '新增交叉弹幕和聚焦炮两种弹幕机制'. T680->T681: '为飞机阶段设计围绕阵型的3个技能' -> '尝试实现环形阵玩法'. T687->T688: '为BOSS设计新增的2个技能' -> '实现BOSS的V字阵技能逻辑，含3秒公共冷却'. T807->T808: '将浅蓝冰晶关卡改造成跑酷关卡并提供设计点子' -> '添加跑酷式动态障碍物（漂浮冰晶、激光网、移动激光墙）'. Counter-example also observed: T678-T680 shows 3 consecutive PD turns with near-identical content ('围绕阵型设计飞机阶段的3个技能' x3 variants), indicating AI's PD responses were not actionable, prompting user to repeat the design request — this anti-pattern motivates the strategy rule to enumerate concrete implementable options rather than open-ended analysis.
+
+---
+
+## `gene_nf_animation_progressive_detail_chain`
+
+**玩家角色动画渐进细化链：宽泛 NF → 具体子机制 NF → 参数微调 FM** / Player Animation Progressive Detail Chain: Broad NF → Specific Sub-Mechanic NF → Parameter FM Tweak
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:visual_style`
+- `consecutive_animation_feature_prompts`
+- `player_character_animation`
+- `followed_by_feature_modification_tweak`
+- `cn_keywords:donghua,xiaoguo,yanchu,yan,yanjing,biaoqing,zitai`
+
+**Preconditions:**
+- 用户在连续2个 turn 内发送了 new_feature 类型的动画需求，第一个是宽泛的「更灵动的动画效果」，第二个是针对具体子机制的详细描述（如眼睛跟随移动方向、遇障变 X）。
+- 第三个 turn 是 feature_modification，对前一 turn 实现的子机制进行参数微调（如「让偏移更明显一些」）。
+- 三个 turn 的步骤数呈递减趋势：broad NF（47步）→ specific NF（18步）→ FM tweak（6步）。
+
+**Evidence:** T02 (47 steps, 32 tool calls): '为推箱子-玩家增加更灵动的动画效果' — broad NF. Agent: Read×13 (explore animation hooks), Edit×9, TodoWrite×6, Grep×2. Phases: editing×44, localization×3. T03 (18 steps, 10 tool calls): '增加表现，玩家移动时，眼睛会略微向移动方向移动…当移动遇到障碍时，眼睛变为X然后恢复' — specific sub-mechanic NF. Agent: Edit×4, TodoWrite×3, Read×2, build×1. Phases: editing×18. T04 (6 steps, 4 tool calls): '让眼睛的偏移更明显一些' — FM parameter tweak. Agent: Edit×3, build×1. Steps drop 47→18→6 as specificity increases. Key pattern: progressive scope narrowing across 3 turns, with each turn building on the previous implementation without re-exploring the full codebase.
+
+---
+
+## `gene_inq_capability_check_gates_nf`
+
+**能力差距询问后立即触发新功能实现：单次询问确认缺口 → NF 落地** / Capability Gap Check Gates Immediate NF Implementation: Single Inquiry Confirms Missing Feature → NF
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inquiry`
+- `target:game_logic`
+- `capability_support_check`
+- `immediately_followed_by_new_feature`
+- `single_inquiry_turn`
+- `cn_keywords:shifou,zhichi,shoudong,shoudanji,mobil,chumo,huadong,caozuo`
+
+**Preconditions:**
+- 用户发送单条询问 prompt，问某功能是否已支持/存在（如「目前推箱子是否支持手机操作」）。
+- 这是一次能力差距确认，而非参数查询——用户在问「有没有」而非「是多少」。
+- 下一 turn 立即是 new_feature，请求实现刚才询问的那个能力。
+
+**Evidence:** T05 (8 steps, 6 tool calls): '目前推箱子是否支持手机操作' — inquiry. Agent: Grep×3, Read×3. Phases: editing×5, localization×3. No file edits. T06 (21 steps, 14 tool calls): '增加滑动操控' — new_feature. Agent: Edit×6, Read×3, TodoWrite×3, Grep×1. Phases: editing×19, localization×2. Pattern: inquiry is purely read-only (8 steps), immediately followed by NF (21 steps) that implements exactly the missing capability confirmed in T05. The NF turn can rely on T05's exploration findings.
+
+---
+
+## `gene_inq_ux_timing_diagnosis_gates_surgical_fm`
+
+**UX 时长诊断询问后立即触发外科手术式 FM：量化差距 → 精准去阻塞** / UX Timing Diagnosis Inquiry Gates Surgical FM: Quantify Duration Gap → Minimal Non-Blocking Fix
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inquiry`
+- `target:game_logic`
+- `ux_timing_complaint`
+- `animation_duration_question`
+- `immediately_followed_by_feature_modification`
+- `cn_keywords:donghua,chixushi,duo jiu,bu keCAOZUO,zuseZUSOSE,yanzhi,yanchibiao`
+
+**Preconditions:**
+- 用户观察到两种游戏操作之间存在「不可操作时间」的明显差距，发送询问 prompt 要求量化各操作的动画持续时间。
+- 用户的询问语气中隐含问题意识（「感觉差别比较大」），但尚未明确要求修改。
+- 下一 turn 立即发送极简 FM（如「让推动演出不阻塞输入」），解决刚才询问暴露的 UX 问题。
+
+**Evidence:** T08 (10 steps, 5 tool calls): '玩家推动箱子时动画持续时间多久，玩家普通移动时动画持续时间多久。感觉两者的不可操作时间差别比较大' — inquiry with implicit UX complaint. Agent: Read×4, Grep×1. Phases: editing×8, localization×2. No file edits. T09 (5 steps, 4 tool calls): '让推动演出不阻塞输入' — ultra-surgical FM. Agent: Read×1, Edit×1, Bash×1 (mcp__mkr__Bash), build×1. Phases: editing×5. Pattern: user observed UX problem, asked diagnostic question (10 steps, no edits), received timing breakdown, immediately applied minimal fix (5 steps, 1 edit + 1 build). The diagnostic inquiry directly informs the FM scope — agent knows exactly which code to touch.
+
+---
+
+## `gene_fm_spec_guided_color_scheme_migration`
+
+**规范文档驱动的 UI 色彩体系全量迁移：读取色调规范 → 扫描全文件 → 系统替换** / Spec-Guided Color Scheme Full Migration: Read Palette Spec → Scan All Files → Systematic Replacement
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:visual_style`
+- `has_attached_doc`
+- `color_scheme_palette_change`
+- `warm_cool_bright_color_requested`
+- `cn_keywords:yanse,nuanse,liangse,nuansediao,mingliangse,zhuti,peise,palette`
+
+**Preconditions:**
+- 用户在 prompt 中通过 @文件名 或 file:// 路径引用了开发规范文档（AI开发规范.md），要求将 UI 颜色整体迁移到某种色调（暖色调、冷色调、明亮色等）。
+- 这是对现有游戏 UI 的色彩风格全量迁移，而非对单一元素的颜色调整。
+- 涉及多个文件中的颜色常量替换，规模较大（预计 ≥15 次编辑、≥50 步）。
+
+**Evidence:** T01 (53 steps, 31 tool calls): '根据[@AI开发规范.md]，修改推箱子的UI颜色，整体改为明亮的暖色调游戏' — FM with attached dev spec. Agent: mcp__mkr__Edit×16, mcp__mkr__Read×7, respond_to_user×22 (TodoWrite progress + replies), TodoWrite×6, Glob×1. Phases: editing×51, localization×2. Largest turn in session (53 steps). Pattern: attached dev spec (has_attached_doc=true) + palette-shift request triggers systematic read-plan-edit workflow across many UI files. Qualitatively different from gene_fm_bulk_visual_param_adjustment (relative value adjustments on decoration elements) — this is absolute palette replacement guided by a specification document.
+
+---
+
+## `gene_ir_doc_freshness_check_sweep`
+
+**inspection_review 触发的文档新鲜度检查与批量更新：广度优先扫描 → 按需编辑多文档** / Inspection-Review-Triggered Doc Freshness Check and Sweep: Breadth-First Scan → Batch Update Stale Docs
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inspection_review`
+- `target:documentation`
+- `no_attached_doc`
+- `follows_feature_completion`
+- `cn_keywords:jiancha,gengxin,wendang,shifou,xuyao,tongbu,wenjianyong`
+
+**Preconditions:**
+- 用户询问「是否有文档需要更新」（inspection_review 意图，非 documentation），通常发生在一轮或多轮功能实现之后。
+- 用户未指定更新哪些文档或更新什么内容，由 AI 自行判断哪些文档已过时。
+- 本轮 prompt 较简短（约 10 词以内），且无附加文档引用。
+
+**Evidence:** T07 (34 steps, 21 tool calls): '检查是否有文档需要更新' — inspection_review intent, documentation target. Agent: mcp__mkr__Edit×9, respond_to_user×13, TodoWrite×5, mcp__mkr__Read×3, mcp__mkr__Bash×3. Phases: editing×34. Notably expensive turn (34 steps, 9 edits) for a prompt that sounds like a read-only check — the agent found multiple stale docs and updated them in bulk. Distinct from gene_doc_terse_breadth_first (intent:documentation, terse ≤4 tokens, follows_feature_completion) — here intent is inspection_review, prompt is ~10 tokens, and the update scope is determined by the agent's freshness assessment rather than the user specifying what to update.
+
+---

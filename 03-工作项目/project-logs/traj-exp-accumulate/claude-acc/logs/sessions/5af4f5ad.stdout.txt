@@ -1,0 +1,15 @@
+Done. Here's what I found and did:
+
+**Session `5af4f5ad` analysis:**
+- 1 prompt, 3 steps, 47-second session
+- User asked: "为我生成新的游戏音效，需要是休闲游戏的音效，适合益智游戏，小孩游玩的音效"
+- Agent inferred 4 sound categories (UI interaction, feedback, game events, tactile) and called `mcp__sce-urhox__batch_sound_effects` once with 8 English-language descriptive prompts → 8/8 success
+
+**Dedup check:** No existing gene covered this pattern. Nearest were:
+- `gene_cc_image_gen_sequential_fallback` — image gen with timeout fallback (different tool, different outcome)
+- `gene_pd_audio_system_design_deferred_assets` — designing an audio system without generating assets (opposite of this)
+- `gene_nf_design_doc_system_build` — mentions `batch_sound_effects` but as one step in a 145-step design-doc-driven build
+
+**New gene created:** `gene_cc_sfx_batch_genre_aware` (workflow/genes.json, now 41 genes)
+
+The distinctive pattern: user provides game genre + audience context only → agent infers the full sound taxonomy → crafts English prompts for each sound (even in a Chinese-language project) → single batch call succeeds without fallback. Session was borderline at 1 prompt, but the specific MCP tool usage and English-prompt strategy are concrete enough to be reusable.

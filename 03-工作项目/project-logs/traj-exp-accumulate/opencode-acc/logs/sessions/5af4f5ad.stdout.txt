@@ -1,0 +1,26 @@
+Now I have a clear picture. This is a single-turn session focused purely on **audio content creation** via MCP batch tool. Let me check for overlap and create the gene.
+Now I'll add the new gene. This session has only 1 prompt but the pattern is distinctive — it's the first **audio content creation** gene, and the batch MCP audio tool pattern is clearly distinct from the existing image generation pipeline.
+Now regenerate the index:
+会话 `5af4f5ad` 分析完成。
+
+**会话概况：**
+- 仅 1 个 prompt，3 步（respond → batch_sound_effects → respond）
+- 意图：`content_creation`，目标：`audio`
+- 全程 0 代码编辑、0 构建、0 错误
+- 耗时约 40 秒
+
+**分析结论：**
+
+该会话模式极为简洁——用户给出风格描述（"休闲游戏/儿童益智"），Agent 自行推断 8 种音效类别（UI点击、正确/错误反馈、收集、泡泡、通关、连击、放置），用英文 prompt 通过 `batch_sound_effects` MCP 工具一次性生成，最后输出汇总表 + Lua 使用示例。
+
+**与已有基因对比：**
+- `gene_cc_ai_character_image_pipeline`（图像生成）：需要 batch→逐个精化→资产整理的多步管线
+- 本会话的音频生成更简洁：batch 一次完成，无需逐个精化
+
+**提取 1 个新基因：**
+
+| # | ID | Category |
+|---|---|---|
+| 39 | `gene_cc_batch_audio_generation` | workflow |
+
+**核心模式：** 风格描述 → Agent 推断音效清单 → 英文 prompt 设计（情绪+乐器+风格关键词）→ MCP batch 一次性生成 → 汇总表+代码示例。与图像生成的区别在于音频无需逐个精化，batch 即完成。

@@ -1,0 +1,1432 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_br_new_panel_click_interception",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:ui_layout",
+      "symptom:click_unresponsive",
+      "symptom:button_no_reaction",
+      "recent_ui_panel_added",
+      "cn_keywords:dianji,wufa,meiyoufanying,anniu"
+    ],
+    "preconditions": [
+      "用户报告某个原本正常的 UI 按钮或控件点击后无响应（如「点击没有反应」、「无法点击」）。",
+      "同一 session 中刚刚实现了一个新的面板组件（Panel/Layer/覆盖层），或该 bug 发生在近期新增 UI 组件之后。",
+      "点击失效的控件与新增面板位于同一屏幕区域。"
+    ],
+    "strategy": [
+      "定位最近新增或修改的 UI Panel 组件，检查其初始化时的尺寸和定位属性。",
+      "确认新 Panel 是否在初始（隐藏）状态下仍占据了屏幕区域（非零宽高或未正确绝对定位），从而拦截了下层 UI 的点击事件。",
+      "将新 Panel 的初始状态修改为不占据点击区域：设置 width=0, height=0（或等效的不可见且不响应事件的状态）。",
+      "确认面板的展开/收起逻辑仍然正确（展开时恢复正常尺寸，收起时重置为0）。",
+      "build 验证原有按钮恢复响应，新 Panel 的展开/收起功能正常。"
+    ],
+    "constraints": {
+      "fix_must_not_break_panel_open_close": true
+    },
+    "validation": [
+      "原来失效的 UI 按钮恢复点击响应",
+      "新 Panel 在关闭状态下宽高为 0 或等效不可见",
+      "build 成功",
+      "Panel 展开后覆盖正确区域，交互正常"
+    ],
+    "title_zh": "新增面板导致下层按钮点击失效（点击拦截 Bug）",
+    "title_en": "New Panel Click Interception — Underlying Button Becomes Unresponsive",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "014354fc",
+        "374e4eb7"
+      ],
+      "session_count": 2,
+      "turn_range": "014354fc:T04, 374e4eb7:T13",
+      "prompt_indices": [
+        3
+      ],
+      "evidence": "Turn 4 (11 steps): user reported debug button in top-right unresponsive after sound test panel was added in T02. Agent read sound-test-panel.lua, identified the panel was not initially hidden (intercepting clicks), fixed by setting initial state to width=0, height=0 with comment meaning 'no click interception'. Build succeeded. Pattern: new panel with non-zero initial dimensions intercepts touch events from underlying buttons. | 374e4eb7 T13 (45 steps, 1 edit, 1 build): user reported that in main story mode (adventure page), clicking the page-turn arrow button at bottom-left triggers fox mascot character chat instead of turning the page. Root cause: in handleClickAt(), the fox mascot click detection ran before the page-turn button detection. Fix: moved the page-turn button check to run BEFORE the fox mascot check in the event handler priority order. Agent: respond_to_user (identified priority issue), Read adventure/init.lua x2, TodoWrite, Edit adventure/init.lua (reorder click checks), Build success. Pattern confirmed: any newly added interactive component whose touch area overlaps an existing button will intercept clicks if added before the existing button in the click-handling priority chain."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_false_alarm_feature_verification",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "is_correction_of_ai_work",
+      "feature_supposedly_implemented",
+      "issue_still_reported",
+      "implementation_existence_questioned",
+      "cn_keywords:yinggai_zhizuole,weishenme_hai,haiyou_wenti,shifou_zhengchang"
+    ],
+    "preconditions": [
+      "用户相信某个功能已经实现（如「应该制作了…的功能」），但发现对应问题仍被标记为未解决，或在测试中仍复现。",
+      "用户的表述带有质疑语气（「为什么还有」「为什么没有」），暗示认为是 AI 遗漏了修复或集成不完整。",
+      "该功能可能已存在于代码库中，只是问题报告未同步更新，或集成路径与用户预期不同。"
+    ],
+    "strategy": [
+      "不要直接承认「有问题」，先声明「帮你核查一下实现情况」。",
+      "派出 Task 子代理专项搜索该功能的实现文件（按功能语义预测模块名，如 outfit-unlock-popup、skin-unlock-notify 等）。",
+      "用 Grep 确认功能的调用集成点（在哪个页面/adapter 中被引入和触发）。",
+      "Read 核心实现文件，确认功能逻辑完整性（初始化、触发条件、效果呈现）。",
+      "若功能已完整实现：向用户报告实现存在，给出关键文件路径和集成位置，并建议在问题报告中标记为已解决。",
+      "若发现功能确实未实现或存在缺陷：转为标准 bug 修复或 new_feature 实现流程。"
+    ],
+    "constraints": {
+      "do_not_assume_broken_without_verifying": true,
+      "report_file_locations_when_confirmed": true
+    },
+    "validation": [
+      "已通过 Grep + Read 确认功能实现文件存在且集成正确",
+      "向用户明确说明「功能已实现」及其位置，而非含糊应答",
+      "若功能确实存在，建议更新问题报告状态"
+    ],
+    "title_zh": "疑似遗漏功能的存在性核验（误报 Bug 识别）",
+    "title_en": "False Alarm Bug — Verify Feature Already Implemented Before Accepting Report",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "212062a8"
+      ],
+      "session_count": 1,
+      "turn_range": "212062a8:T01",
+      "prompt_indices": [
+        1
+      ],
+      "evidence": "212062a8 T1 (8 steps): user said '应该制作了皮肤解锁时弹窗提示的功能，检查为什么还有5.1的问题'. Agent: (1) respond_to_user declared 'let me verify'. (2) Task SA — search for 皮肤解锁通知 implementation → SA confirmed outfit-unlock-popup component is fully implemented. (3) Grep outfit.unlock|unlockPopup|pendingFirstClear in /workspace/scripts → found outfit-unlock-popup.lua + adventure/init.lua integration. (4) Glob scripts/**/*unlock* → confirmed file exists. (5) Grep outfit.unlock in adventure/init.lua → found pendingFirstClear_ pattern + popup trigger. (6) Read outfit-unlock-popup.lua → confirmed complete implementation (华丽动画, 背景彩条, 皮肤蹦出动画, 确认按钮). (7) respond_to_user — reported 'feature fully implemented; issue 5.1 can be marked resolved'. Pattern: user suspects AI missed a fix → Task SA + Grep + Read verify → confirm existence + report file locations → suggest doc status update."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_interactive_state_lock_one_shot",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:game_logic",
+      "symptom:click_only_once",
+      "symptom:subsequent_clicks_ineffective",
+      "interactive_overlay_or_dialog",
+      "stateful_component",
+      "cn_keywords:zhiyinengdianjiyi,zhihuixianshiyici,houxudianji_wuxiao,haishizhi,haishi"
+    ],
+    "preconditions": [
+      "用户报告某个点击触发的交互元素（聊天气泡、弹窗、对话框）只响应第一次点击，后续点击无反应。",
+      "该交互元素是有状态的组件（state machine），包含 idle/animating/showing 等状态。",
+      "组件的 init() 或 setActive() 在页面切换时被调用，但未完整重置所有状态变量。",
+      "可能存在两层问题：(1) init() 未重置状态机变量导致页面复用时锁死；(2) 气泡显示期间点击未被正确处理（未 dismiss 已有气泡 + 再触发）。"
+    ],
+    "strategy": [
+      "Grep 组件的状态变量名（如 state_, isChatBubble_, cooldownTimer_）确定状态机入口。",
+      "Read 组件 init() 和 cleanup() 函数，检查是否有状态变量未在 init() 中重置（特别是 state_、计时器、firstTrigger_ 等）。",
+      "若 init() 重置不完整，在 init() 中添加所有状态机变量的显式重置，与 cleanup() 对称。",
+      "Read 点击处理函数，检查当组件处于「显示中」状态（非 idle）时点击的处理逻辑——通常需要：先 dismiss 当前气泡，再立即触发新内容，避免状态死锁。",
+      "若气泡显示中点击未被处理，在触发函数（如 notifyChat()）中添加 '非 idle 时 dismiss 当前气泡并允许再触发' 的逻辑。",
+      "Build 验证，若用户反馈「还是只能点击一次」，升级为第二层排查：读取 update() 函数确认状态机流转路径，检查是否有隐藏的 once 绑定或错误的 cooldown 重置。"
+    ],
+    "validation": [
+      "init() 中所有状态变量（state_, timer, firstTrigger_ 等）均已显式重置",
+      "点击处理函数覆盖了「显示中」状态的点击（dismiss 当前 + re-trigger）",
+      "build 成功后用户可多次点击触发"
+    ],
+    "title_zh": "点击触发组件单次响应 Bug：状态机锁定未重置",
+    "title_en": "Interactive Element One-Shot Click Bug — State Machine Lock Due to Incomplete Init Reset",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "374e4eb7"
+      ],
+      "turn_range": "374e4eb7:T19-T21",
+      "prompt_indices": [
+        19,
+        20,
+        21
+      ],
+      "evidence": "374e4eb7 T19 (24 steps, 1 edit, 1 build): user reported fox mascot chat bubble on home page only shows once, subsequent clicks do nothing. Agent: Grep notifyChat/chatState/showChat → Read fox-mascot.lua x4 → found: init() sets inited_=true and firstTrigger_=true but does NOT reset state_ or cooldownTimer_ → when page is re-activated via setActive, init() is called again but state_ retains its previous value ('fade_out' or 'showing') → notifyChat() guards with state_~='idle' so returns immediately. Fix: added state_='idle' + cooldownTimer_=0 in init(). Build success. T20: user re-sent 'still only sequential' (no agent run). T21 (17 steps, 1 edit, 2 builds): agent re-investigated — Grep SKIN_CHATS + Read outfit-manager.lua (chat data OK, many lines) → Read home/init.lua (page logic OK) → realized: when bubble is showing and user clicks again, notifyChat() returns immediately because state_~='idle' — there is no 'dismiss current + re-trigger' logic. Added: if state_=='showing' or 'pop_in', skip cooldown guard and force-restart animation. Build (second attempt after initial build error due to missing entry config, recovered via Glob+Read project.json). Pattern: two-layer fix — Layer 1: init() must fully reset state machine; Layer 2: click-while-showing must dismiss and re-trigger.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_nanovg_api_return_type_mismatch",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "stacktrace_in_prompt",
+      "lua_runtime_error",
+      "symptom:arithmetic_on_table",
+      "nanovg_api_call",
+      "shared_component_error",
+      "cn_error:attempt_to_perform_arithmetic_on_a_table_value",
+      "cn_error:attempt_to_perform_arithmetic_on_a_nil_value_field_integer_index",
+      "nanovg_text_bounds_hud_renderer"
+    ],
+    "preconditions": [
+      "用户粘贴了包含结构化头部信息（Generated at、Error Count、Browser 等）的运行时错误报告，大量错误行指向同一个 Lua 文件和同一行号。",
+      "错误信息为 `attempt to perform arithmetic on a table value`，发生在调用 NanoVG API（如 nvgTextBoxBounds、nvgTextBounds）之后对返回值做算术运算的位置。",
+      "错误堆栈指向 `shared/components/` 下的共享组件文件（fox-mascot、chat-bubble 等），说明是共享组件中的 API 用法问题。",
+      "变体：错误信息为 `attempt to perform arithmetic on a nil value (field 'integer index')`，发生在调用 nvgTextBounds 后对返回的 table 进行 bounds[intKey] 索引时，因整数索引越界（如 bounds[0]，Lua 1-indexed）或函数在某些调用路径下返回 nil，导致算术操作失败。"
+    ],
+    "strategy": [
+      "从错误日志中提取文件名和行号（如 fox-mascot:337），直接 Read 该文件的对应区域。",
+      "若错误为 'arithmetic on a nil value (field integer index)'：说明代码试图对 table 索引结果做算术（如 bounds[0] 在 Lua 中为 nil，因 Lua 使用 1-indexed），或 nvgTextBounds 在当前调用路径返回 nil。同样先 Read 出错文件定位 NanoVG 调用，Grep engine 文档确认正确 API 签名，再调整为正确索引（[1],[2],[3],[4]）。",
+      "定位问题行：确认是否有 NanoVG API 返回值被当作多返回值（local a, b, c, d = nvgXxx()）使用，但实际 Lua 绑定返回的是 table（{xmin, ymin, xmax, ymax}）。",
+      "Grep engine 文档目录（如 .emmylua/NanoVG.d.lua 或 engine-docs/）查找该 API 的实际返回签名，确认返回类型是 table 还是多个 number。",
+      "若 API 返回 table，将代码改为 table 索引访问（local bounds = nvgXxx(...); local xmin = bounds[1]）而不是多返回值解构。",
+      "Build 验证修复，确认相同错误不再出现。"
+    ],
+    "validation": [
+      "修复后的代码对 NanoVG 返回值使用正确的 table 索引（[1],[2],[3],[4]）而非多返回值解构",
+      "build 成功，不再有 attempt to perform arithmetic on a table value 错误",
+      "nil 变体修复后：确认代码使用 bounds[1..4]（1-indexed），无 bounds[0] 或 nil 算术操作"
+    ],
+    "title_zh": "NanoVG API 返回值类型误用：table 被当作多返回值解构",
+    "title_en": "NanoVG API Return Type Mismatch — Table Return Destructured as Multiple Values",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "374e4eb7",
+        "cc1dd130"
+      ],
+      "turn_range": "374e4eb7:T23; cc1dd130:P2(T03)",
+      "prompt_indices": [
+        23,
+        2
+      ],
+      "evidence": "374e4eb7 T23 (10 steps, 1 edit, 1 build): user pasted TapTap Maker Error Report with 59 identical errors (same Lua stack trace: fox-mascot:337 'attempt to perform arithmetic on a table value', called from adventure/init.lua renderMap). Agent: (1) respond_to_user — identified line 337 as the problem site: `(b3 or maxW) - (b1 or 0)` arithmetic on what should be nvgTextBoxBounds return values. (2) Read fox-mascot.lua → confirmed: `local b1, b2, b3, b4 = nvgTextBoxBounds(...)` destructuring. (3) 3x Grep nvgTextBoxBounds in engine docs → found .emmylua/NanoVG.d.lua: API returns number[] table {xmin, ymin, xmax, ymax}, NOT 4 separate return values. (4) Edit: changed to `local bounds = nvgTextBoxBounds(...); local xmin=bounds[1]; local ymin=bounds[2]; local xmax=bounds[3]; local ymax=bounds[4]`. (5) Build success. Root cause: NanoVG Lua binding returns bounding-box APIs as array tables, not multiple return values — a common assumption error when porting from C++ NanoVG docs.\n\ncc1dd130 P2 (13 steps, intent: error_log_paste): user pasted TapTap Maker Error Report with 80 errors at board-renderer:996 drawHUD — 'attempt to perform arithmetic on a nil value (field integer index)', called from screens/gameplay:289 render → adapter:120 P1PZ_HandleNanoVGRender. Distinguishes from 374e4eb7 case (arithmetic on TABLE value): here the nil comes from integer indexing — likely bounds[intKey] where intKey=0 (1-indexed Lua) or nvgTextBounds returning nil in some code paths. Agent workflow: (1) respond_to_user (preliminary analysis). (2) Read board-renderer.lua at line ~996 (drawHUD function). (3) respond_to_user. (4-5) 2x Grep nvgTextBounds in puzzle-land scripts. (6) respond_to_user. (7-9) 3x Grep nvgTextBounds in engine-docs, examples, .emmylua (same doc-lookup pattern as 374e4eb7). (10) respond_to_user. (11) Edit board-renderer (targeted fix). (12) Build. (13) respond_to_user. Same diagnosis-and-fix pattern: Read error file → Grep NanoVG API in engine docs → single Edit → build. Nil variant note: this pattern can manifest as 'arithmetic on nil' rather than 'arithmetic on table' depending on whether the code uses table indexing or multiple-return destructuring.",
+      "session_count": 2
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_cross_game_structural_comparison_debug",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "intent:error_log_paste",
+      "symptom:error_persists_after_fix",
+      "user_cites_other_games_as_working",
+      "new_game_module_recently_added",
+      "nanovg_migration_context",
+      "cn_keywords:haishi_baocuo,cankao_qita_youxi,duibi,qita_youxi_zhengchang"
+    ],
+    "preconditions": [
+      "用户在多次报告错误并尝试修复后，仍然遇到同类错误，并明确提到「其他游戏是正常的」或「参考其他游戏对比一下」。",
+      "当前出错的游戏模块是近期新增或迁移的（如 NanoVG 自绘迁移、新游戏模块接入），而其他已有游戏的同类文件（adapter.lua、level-select.lua、init.lua 等）运行正常。",
+      "错误不是简单的语法错误，而是结构性问题（如模块 return 缺失、require 路径错误、key 覆盖等），需要与正常文件进行对比才能定位。"
+    ],
+    "strategy": [
+      "派发 Task 子代理，系统性比较所有正常游戏与问题游戏的同类文件结构（adapter.lua、level-select.lua、init.lua、config 文件），重点关注 return 语句、require 路径、模块命名等结构元素。",
+      "使用 Bash 脚本对各游戏同名文件做逐项对比（如 for game in p1 p2 p3; do grep -n 'return' $game/adapter.lua; done），输出差异摘要。",
+      "检查 dist/ 编译输出目录，确认源文件修改是否已正确反映到构建产物中（manifest.json + 编译后文件）。",
+      "识别出结构性差异后，以正常游戏的同类文件为模板，重写问题文件（用 Write 而非 Edit），保留业务逻辑但对齐结构。",
+      "重写后立即 build 验证，若仍报错则继续用 Bash 对比依赖关系（require 链、key 命名空间）进行深度调查。",
+      "修复完成后，对用户总结根本原因（如「与其他游戏相比，p4 的 level-select.lua 缺少 return M 语句」）。"
+    ],
+    "constraints": {
+      "compare_all_working_games_before_fixing": true,
+      "rewrite_from_working_template_if_structural": true
+    },
+    "validation": [
+      "Build 成功，无之前报告的错误类型",
+      "重写的文件与正常游戏文件在结构（return、require、模块命名）上保持一致",
+      "用户确认「没有报错，可以正常进入游戏了」"
+    ],
+    "title_zh": "持续报错跨游戏结构对比调试：以正常游戏为模板重写问题文件",
+    "title_en": "Persistent Error Cross-Game Structural Comparison Debug — Rewrite from Working Template",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "3ee927f3"
+      ],
+      "session_count": 1,
+      "turn_range": "3ee927f3:T00-T07",
+      "prompt_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "evidence": "3ee927f3 T00-T07 (8-turn error cascade debugging p4-link-match after NanoVG migration): T00 (33 steps): first error paste — adapter:133 nil value 'draw'. Agent reads adapter.lua, globs files, 0 edits, 1 failed build. T01 (70 steps): second error paste — 2 edits, 2 builds, 24x Bash investigations into level-select and adapter. T02 (55 steps): user says 'build' — agent uses mcp__sce-urhox__lua_lsp_client 4x for type checking, 9 edits, 4 builds (iterative fix). T03 (32 steps): third error — agent examines dist/ compiled files via Bash (manifest.json + compiled lua bytecode) to verify source changes reflect in build output. T04 (1 step): inquiry about p4 file paths → pure respond_to_user. T05 (23 steps): user says '还是报错，参考其他游戏，对比一下，其他游戏是正常的'. Agent: (1) Task SA 'compare p1/p2/p3 vs p4 game structure' → SA did comprehensive structural comparison. (2) Bash loops: compare level-select.lua return statements across all games, compare adapter.lua require patterns, compare init.lua and config files. (3) Read p2-memory-flip/adapter.lua as working template. (4) Write new p4-link-match/adapter.lua from scratch following template. (5) Build → partial success (one more error type remained). T06 (41 steps): user says '还是报错，检查是否覆盖了什么key引起的' — another error variant. Agent: Bash 5x investigating require dependency chain → Read 12 files → 6 edits → build success. T07 (1 step): user says '没有报错，可以正常进入游戏了，总结是什么问题' → pure text explanation of root cause. Pattern: first fix attempts → dist inspection → cross-game Task subagent comparison → Bash structural diff loops → rewrite from working template → verify. Key signal: user explicitly saying 'other games are working' triggers systematic cross-game comparison rather than continued point-by-point patching."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_web_platform_text_input_disabled",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:ui_layout",
+      "paste_not_working",
+      "text_input_not_responding",
+      "modal_or_overlay_context",
+      "platform_specific_behavior",
+      "web_platform_mentioned",
+      "nanovg_drawn_ui",
+      "cn_keywords:wufa_zhantie,wufa_shuru,web_wufa,zhantie,shuru_wufa"
+    ],
+    "preconditions": [
+      "用户报告在某个关卡编辑器或对话框 UI 中无法粘贴或输入文字（「无法粘贴」「无法输入数据」）。",
+      "该 UI 是用 NanoVG 自绘的模态框（而非引擎原生 UIKit 文本框），显示为覆盖在游戏画布上的自绘弹窗。",
+      "问题在 Web/WASM 平台（TapTap Maker Web 预览）可复现，可能在本地客户端不复现。",
+      "第一次报告时用户未指明平台，第二次报告时明确提到「web」或「web无法」。"
+    ],
+    "strategy": [
+      "第一次报告：搜索引擎文档（engine-docs/ + .emmylua/）中的 clipboard、TextInput、SetScreenKeyboardVisible API——NanoVG 自绘 UI 不会自动触发键盘，需要显式调用引擎 API 才能接收文字输入。",
+      "向用户说明发现的平台限制（NanoVG 模态框在 web 端需要 `SetScreenKeyboardVisible(true)` 才能激活键盘输入），并声明将实施修复。",
+      "第二次报告（用户明确说「web 无法粘贴」）时实施修复：在模态框打开（showImportModal_=true）时调用 `SetScreenKeyboardVisible(true)`，关闭时调用 `SetScreenKeyboardVisible(false)`，确保键盘事件正确路由。",
+      "同时检查文本输入事件处理链（OnTextInput 回调 / handleTextInput 函数），确认模态框处于激活状态时文字字符正确追加到输入缓冲区。",
+      "Build 并验证 Web 平台粘贴功能恢复。"
+    ],
+    "constraints": {
+      "do_not_use_native_uikit_text_input": true,
+      "fix_must_toggle_keyboard_on_modal_open_close": true
+    },
+    "validation": [
+      "Build 成功",
+      "模态框打开时 SetScreenKeyboardVisible(true) 被调用",
+      "模态框关闭时 SetScreenKeyboardVisible(false) 被调用",
+      "Web 端可以在模态框中正常粘贴和键盘输入"
+    ],
+    "title_zh": "NanoVG 模态框 Web 端键盘输入失效：SetScreenKeyboardVisible 修复",
+    "title_en": "NanoVG Modal Web Platform Text Input Disabled — SetScreenKeyboardVisible Fix",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "4f916c20"
+      ],
+      "turn_range": "4f916c20:T27-T32",
+      "prompt_indices": [
+        14,
+        15,
+        16
+      ],
+      "evidence": "4f916c20 T27-T32: three-prompt escalation pattern for platform-specific paste bug. T27-T28 (P14, 10 steps, 0 edits): user said '输入关卡数据UI，无法粘贴和输入数据' — did not mention platform. Agent: 7x Grep in engine-docs/ + .emmylua/ searching for TextInput, SetTextInput, clipboard, clipboard APIs. Found no direct clipboard paste API in engine docs. respond_to_user — reported: NanoVG-drawn modal has no native paste support; engine needs SetScreenKeyboardVisible to enable keyboard. Zero edits — agent did not implement fix in this turn. T29-T30 (P15, 2 steps, 0 edits, 1 build): user sent 'build' (1 word). Agent built with no code changes (build from T25 implementation). T31-T32 (P16, 33 steps, 6 edits, 1 build): user said '现在推箱子，关卡编辑器，输入关卡数据，web无法使用粘贴' — explicitly named 'web' platform. Agent: (1) Grep clipboard, KEY_PASTE, clipboard in engine-docs/ + .emmylua/ + urhox-libs/UI/Widgets/TextInput. (2) Grep SetScreenKeyboardVisible → found it in .emmylua. (3) TodoWrite: fix modal to call SetScreenKeyboardVisible(true) on open, false on close. (4) Read level-editor.lua. (5) 6x Edit level-editor.lua: add SetScreenKeyboardVisible(true) to showImportModal_ = true block, add false to showImportModal_ = false block, add text character handling to OnTextInput callback, ensure backspace/clear handled, fix input buffer init/clear. (6) Build success. Root cause: TapTap Maker web runtime (WASM) does not route keyboard/paste events to a NanoVG-drawn modal unless explicitly told to via SetScreenKeyboardVisible. Native UIKit components handle this automatically; NanoVG modals must do it manually. Key pattern: first report (no platform specified) → investigation-only (0 edits, finds root cause) → user says 'build' (build old code) → second report (explicit 'web') → implement fix.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_blank_screen_nanovg_render_event_unbound",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:inquiry",
+      "symptom:blank_white_screen",
+      "game_just_scaffolded",
+      "pause_button_visible",
+      "nanovg_adapter_newly_created",
+      "render_event_chain_suspect",
+      "cn_keywords:baise_yemian,kongbai,zhi_you_anniu,ying_xianshi_shenme,meiyou_huamian"
+    ],
+    "preconditions": [
+      "用户进入刚脚手架搭建的新游戏后，看到的是白色（空白）页面，只有游戏容器的系统级 UI（如暂停按钮）可见，游戏主画布完全空白。",
+      "用户询问「理论上应该出现什么画面」或「为什么是白色页面」，语气为询问而非明确的 bug 报告——这是一个掩盖了 bug 的 inquiry。",
+      "该游戏的 adapter.lua 在本 session 中刚刚被创建（Write），尚未经过完整的渲染事件绑定验证。",
+      "项目使用 NanoVG 全自绘渲染，游戏 adapter 需要注册 afterBg/afterUi 回调并调用 nvgBeginFrame → nvgEndFrame 才能在游戏容器中渲染画布。"
+    ],
+    "strategy": [
+      "将「白色页面 + 只有系统UI可见」的 inquiry 识别为隐性 bug 报告，立即切换到诊断模式而非纯文字说明。",
+      "Read adapter.lua 检查是否有 afterBg 或 afterUi 回调函数，以及 nvgBeginFrame/nvgEndFrame 调用。",
+      "Read 游戏容器（game-container/init.lua）和参考游戏（demo-color-match adapter.lua）以理解正确的 NanoVG 渲染事件注册方式。",
+      "Grep NanoVGRender、afterBg、nvgBeginFrame 等关键词，追踪从 main.lua → game container → adapter 的渲染事件链。",
+      "Read main.lua 和 pages/game/init.lua 确认 NanoVGRender 事件订阅位置。",
+      "如果发现 adapter 的 afterBg 回调未包含 nvgBeginFrame → render calls → nvgEndFrame，重写 adapter.lua（Write，非 Edit）以正确实现渲染循环。",
+      "如果 main.lua 未订阅 NanoVGRender 事件，Edit main.lua 添加事件绑定。",
+      "Build 验证画面是否正常渲染。"
+    ],
+    "constraints": {
+      "do_not_respond_as_pure_inquiry": true,
+      "write_adapter_not_edit": true
+    },
+    "validation": [
+      "Build 成功后游戏主画布不再是纯白色",
+      "adapter.lua 中包含 nvgBeginFrame + 渲染调用 + nvgEndFrame 三段式结构",
+      "main.lua 或 game-container 正确订阅了 NanoVGRender 事件"
+    ],
+    "title_zh": "新游戏脚手架后白色空白屏幕：NanoVG 渲染事件链未绑定诊断",
+    "title_en": "Post-Scaffold Blank White Screen — NanoVG Render Event Chain Unbound Diagnostic",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "5c2aeaee"
+      ],
+      "turn_range": "5c2aeaee:T7",
+      "prompt_indices": [
+        5
+      ],
+      "evidence": "5c2aeaee T7 (index 5, ~25 steps, 1 Write + 1 Edit + 1 build): user said '进入推箱子后，页面是白色的，右侧有一个暂停按钮。理论上应该出现什么画面' — ostensibly an inquiry but describes a blank screen bug. Agent: (1) TodoWrite (switched to diagnosis mode). (2) Read adapter.lua + level-select.lua + gameplay.lua (read all scaffolded screens). (3) Read demo-color-match/adapter.lua (reference for NanoVG rendering pattern). (4) Read game-container/init.lua + NanoVG standalone example. (5) 6x Grep: NanoVGRender event chain, afterBg/afterUi callbacks, nvgBeginFrame usage across files, game container callbacks, render pipeline. (6) Read main.lua + pages/game/init.lua + router.lua. (7) Write adapter.lua (complete rewrite — added correct nvgBeginFrame → board render → nvgEndFrame in afterBg callback, fixed game state initialization). (8) Edit main.lua (add NanoVGRender event subscription + nvg context variable). (9) Build → success. Root cause: adapter.lua was written as a skeleton with empty afterBg callback — it did not include nvgBeginFrame/nvgEndFrame calls, so the NanoVG canvas was never initialized for the game container, producing a white canvas. The pause button appeared because it is rendered by the game-container infrastructure (UIKit layer), not NanoVG. Key behavioral insight: 白色页面 + 系统UI可见 = NanoVG canvas not initialized (nvgBeginFrame never called) or render event not connected, NOT a logical game rendering bug.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_missing_asset_cross_game_config_ref",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "target:asset_resource",
+      "missing_texture_or_asset",
+      "newly_registered_game",
+      "config_file_path_suspect",
+      "nvgCreateImageUrho_error",
+      "cn_error:Could_not_find_resource",
+      "cross_game_config_comparison"
+    ],
+    "preconditions": [
+      "用户粘贴了含 'Could not find resource' 或 'Failed to load texture' 的错误报告，错误指向一个 Textures/games/xxx-cover.png 或 icon.png 路径。",
+      "错误发生在刚刚注册到大厅的新游戏上，该游戏的 config 文件中包含了 icon/cover 字段且值为非空图片路径。",
+      "项目中其他已正常运行的游戏（P1、P2 等）有相同结构的 config 文件，可用于对比。"
+    ],
+    "strategy": [
+      "立即识别错误类型：nvgCreateImageUrho 找不到纹理资源 → 问题在 config 文件的 icon/cover 路径字段，不是代码逻辑。",
+      "Glob 查找 assets/Textures/games/ 目录，确认该目录是否存在或图片文件是否真实存在。",
+      "Grep 其他游戏 config 文件中的 icon 和 cover 字段（搜索 cover.*\\.png|icon.*\\.png），对比其他游戏的值。",
+      "通常发现：其他已正常运行的游戏的 icon 和 cover 都是空字符串（\"\"），大厅代码有空字符串兜底处理。",
+      "修复方案：将新游戏 config 中的 icon/cover 路径改为空字符串，与其他游戏保持一致，直到真实图片资源创建完毕。",
+      "Edit 该游戏的 config 文件，将 icon 和 cover 都改为 \"\"，然后 Build 验证。"
+    ],
+    "constraints": {
+      "single_file_fix": true,
+      "no_code_logic_changes_needed": true
+    },
+    "validation": [
+      "Build 成功，无资源找不到的错误",
+      "大厅中新游戏显示默认/兜底封面（非报错白屏）"
+    ],
+    "title_zh": "新游戏注册时缺失纹理资源：参照其他游戏改为空字符串兜底",
+    "title_en": "Missing Texture on New Game Registration — Cross-Game Config Comparison → Empty String Fallback",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "61467d20",
+        "9bbd20cc"
+      ],
+      "session_count": 2,
+      "turn_range": "61467d20:T05, 9bbd20cc:T02",
+      "prompt_indices": [
+        4
+      ],
+      "evidence": "61467d20 T05 (12 steps, 1 edit, 1 build): user pasted TapTap Maker Error Report with 2 errors — 'ERROR: Could not find resource Textures/games/p3-match-3-cover.png' + 'nvgCreateImageUrho: Failed to load texture'. Agent: (1) respond_to_user — identified P3 missing cover image. (2) Glob assets/Textures/games/* (not found). (3) Glob **/Textures/games/* (not found). (4) Glob **/Textures/games* (not found). (5) respond_to_user — need to check how other games handle this. (6) Grep 'cover.*\\.png|icon.*\\.png' across configs → found P1/P2 configs. (7) Grep 'cover|icon' across configs → confirmed P1/P2 both use empty string (\"\") for icon/cover. (8) respond_to_user — P1 and P2 use empty strings; game-card has fallback for missing images; P3 was configured with a path that doesn't exist. Fix: change P3 icon/cover to empty strings. (9) Read scripts/config/games/p3-match-3.lua. (10) Edit: changed icon = \"Textures/games/p3-match-3-icon.png\" → \"\" and cover = \"Textures/games/p3-match-3-cover.png\" → \"\". (11) Build → success. (12) respond_to_user. Root cause: when generating the new game config file in T01 (97-step scaffolding), agent wrote placeholder image paths that followed convention but the actual asset files were never created. Other existing games (P1, P2) either always used empty strings or had their image paths removed. Pattern: error for missing asset → Glob confirms asset doesn't exist → Grep other game configs to find established fallback pattern → apply same pattern (empty string) → build. | 9bbd20cc T02 (17 steps, 2 edits, 2 builds): user pastes TapTap Maker Error Report — '2026-03-18 03:25:12 ERROR: Could not find resource Textures/games/p2-memory-flip-cover.png'. Agent: (1) respond_to_user. (2) Read scripts/config/games/p2-memory-flip.lua (game config). (3) Bash ls assets/Textures/games/ (confirm asset absent). (4) Bash find assets/ for p1/cover patterns. (5-6) Grep p1-puzzle.*cover|icon in scripts/config/games (find sibling config handling). (7) respond_to_user. (8) Edit scripts/config/games/p2-memory-flip.lua — set cover to empty string (matching P1 pattern). (9) build — passes cover error but reveals secondary lua error in log. (10) Read logs/lua_errors.log. (11) respond_to_user. (12) Grep cjson|diagnostic in p1-puzzle-land/save.lua (diagnose secondary error). (13) respond_to_user. (14) Read p2-memory-flip/save.lua. (15) Edit p2-memory-flip/save.lua (fix secondary save issue). (16) build success. (17) respond_to_user. Two-edit two-build variant: first edit fixes cover config → first build reveals secondary runtime error in save.lua → second edit fixes save → second build succeeds. Grep sibling-config pattern confirmed: agent looked at P1 config to find the empty-string convention for missing cover assets."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_special_block_rainbow_swap_bug",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:game_logic",
+      "match3_game",
+      "special_block_behavior",
+      "rainbow_block_or_wildcard",
+      "swap_operation",
+      "state_inconsistency_after_swap",
+      "cn_keywords:teshu_fangkuai,huancuo_weizhi,bug,huanse,suoyou_yanse,cuhfa_baocuo"
+    ],
+    "preconditions": [
+      "用户报告消消乐中与特殊方块（彩虹块/通配块）的换位操作触发了 bug，具体表现为换完位置后出错，或换位后消除逻辑行为异常。",
+      "游戏逻辑包含 trySwap → _handleRainbowSwap 的调用链，_handleRainbowSwap 内部先执行了物理换位（_swap()），再运行颜色匹配/消除检查。",
+      "项目中同时存在多个游戏模块（Sokoban、match-3 等），文件名相似（board.lua）可能导致读取错误文件。"
+    ],
+    "strategy": [
+      "明确项目结构：当 bug 在消消乐（match-3/P3）中，直接读取 p3-match-3/ 路径下的文件，而非 p1-puzzle-land/（推箱子 Sokoban）——同名文件 board.lua 存在于多个游戏。",
+      "Read p3-match-3/logic/board.lua，搜索 _handleRainbowSwap 函数，追踪完整调用链：trySwap → _swap（物理换位）→ _handleRainbowSwap（用换位后的坐标查询颜色）。",
+      "Read gameplay.lua（或调用 trySwap 的文件）确认 trySwap 的入口和参数传递方式。",
+      "识别根本原因：_handleRainbowSwap 在 _swap() 之后执行，此时彩虹块已移动到新坐标，但消除检查需要的是「彩虹块换到哪里、对方是什么颜色」——若逻辑使用 post-swap 坐标查询 colorId，得到的是彩虹块本身，而非目标方块的颜色，导致状态不一致。",
+      "修复策略：在调用 _swap() 之前保存目标方块的 colorId（pre-swap state），在 _handleRainbowSwap 内使用该预存 colorId 而非从换位后的棋盘读取。",
+      "Grep spawnElimParticles 或渲染相关函数，确认渲染层无需修改（通常渲染层只读取棋盘 state，不影响 swap 顺序逻辑）。",
+      "1 个 Edit 修改 board.lua 的 trySwap 或 _handleRainbowSwap，然后 Build 验证。"
+    ],
+    "constraints": {
+      "read_correct_game_module_first": true,
+      "fix_in_board_lua_only": true,
+      "preserve_pre_swap_color_before_calling_swap": true
+    },
+    "validation": [
+      "彩虹块与相同颜色方块换位后，正确消除目标颜色的所有方块",
+      "换位操作不再触发状态不一致错误",
+      "Build 成功"
+    ],
+    "title_zh": "消消乐彩虹块换位 Bug：pre-swap 颜色状态被覆盖",
+    "title_en": "Match-3 Rainbow Block Swap Bug — Elimination Uses Post-Swap State Instead of Pre-Swap ColorId",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "61467d20"
+      ],
+      "session_count": 1,
+      "turn_range": "61467d20:T15",
+      "prompt_indices": [
+        14
+      ],
+      "evidence": "61467d20 T15 (21 steps, 1 edit, 1 build): user said '检查特殊方块，消除所有相同颜色的方块，与相同颜色的方块换位置时，好像会触发BUG，导致直接换了位置，然后出错'. Agent first read p1-puzzle-land/logic/board.lua (wrong file — Sokoban board), self-corrected: '这是推箱子的 board.lua，不是消消乐的'. Then read p3-match-3/logic/board.lua + gameplay.lua → traced trySwap → _handleRainbowSwap call chain → identified root cause: _handleRainbowSwap called _swap() first (physically moves rainbow block to target position), then ran elimination check — but by the time elimination runs, the rainbow block is already at the target location, so the colorId lookup returns the rainbow block's own (null/wildcard) color rather than the original target block's color, causing state inconsistency. Fix: save target colorId before calling _swap(), pass pre-swap colorId to _handleRainbowSwap. Grep spawnElimParticles confirmed renderer needs no change. 1 edit to board.lua → build success. Key behavioral note: agent self-corrected wrong-file read mid-turn without user prompting — recognized 'p1-puzzle-land' path vs expected 'p3-match-3'."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_match3_config_field_name_mismatch",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:game_logic",
+      "match3_game",
+      "obstacle_blocks_recently_added",
+      "symptom:obstacle_not_visible",
+      "story_level_config_edited",
+      "cn_keywords:meiyou_kandao,kanbudao,youxi_nei_meiyou,bingkuai_meiyou_xianshi"
+    ],
+    "preconditions": [
+      "在 session 中刚刚对 story-N.lua 主线关卡配置文件添加了障碍物（冰块/石块）数据，使用了 frozenCells 或 stoneBlocks 字段名。",
+      "用户运行游戏后报告「游戏内看不到冰块/石块」，且该关卡是消消乐（match-3）主线关卡。",
+      "项目中存在 p3-match-3/logic/board.lua，其中读取障碍物时使用的字段名（icePositions/stonePositions）与关卡配置文件中写入的字段名（frozenCells/stoneBlocks）不同。"
+    ],
+    "strategy": [
+      "Grep 游戏逻辑文件中实际读取冰块/石块的字段名（在 board.lua 中查找 icePositions、stonePositions 等关键词），确认规范字段名。",
+      "Grep 所有已修改的 story-N.lua 文件中使用的字段名（查找 frozenCells、stoneBlocks 等），确认与规范名不一致。",
+      "批量 Edit 所有受影响的 story-N.lua 文件，将 frozenCells 重命名为 icePositions，将 stoneBlocks 重命名为 stonePositions。",
+      "Build 验证障碍物在游戏中正确显示。",
+      "后续在所有 story-N.lua 配置中，始终使用 icePositions（而非 frozenCells）和 stonePositions（而非 stoneBlocks）作为障碍物字段名。"
+    ],
+    "constraints": {
+      "canonical_field_names": "icePositions (not frozenCells), stonePositions (not stoneBlocks)",
+      "fix_all_affected_story_files_in_one_turn": true
+    },
+    "validation": [
+      "Grep 确认所有 story-N.lua 文件中 frozenCells 和 stoneBlocks 已全部替换",
+      "Build 成功后游戏内冰块/石块正常显示"
+    ],
+    "title_zh": "消消乐主线关卡障碍物字段名不匹配：frozenCells/stoneBlocks 导致障碍物不显示",
+    "title_en": "Match-3 Story Level Obstacle Field Name Mismatch — frozenCells/stoneBlocks vs icePositions/stonePositions",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "6b8566ea"
+      ],
+      "session_count": 1,
+      "turn_range": "6b8566ea:T09-T13",
+      "prompt_indices": [
+        8,
+        11,
+        12
+      ],
+      "evidence": "6b8566ea T07-T09: agent added obstacle blocks using non-canonical field names — frozenCells (for ice) and stoneBlocks (for stones). T12 (24 steps, 5 edits, 1 build): user reported '糖糖的冰火花园关卡，游戏内没有看到冰块'. Agent: (1) Grep 'frozenCells|frozenCell|frozen' → only in story-N.lua, not game logic. (2) Grep 'frozen|ice|冰' → board.lua uses 'icePositions' and 'stonePositions'. (3) Read board.lua → confirmed mismatch. (4) 5 edits: frozenCells→icePositions, stoneBlocks→stonePositions across story-27/31/35.lua. (5) Build success. T13 (6 steps): user asked '检查石块的字段是否正确'. Agent: Grep confirmed all stone fields now use stonePositions. Root cause: agent guessed intuitive field names that don't match board.lua canonical names."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_stale_report_version_reaudit",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:inspection_review",
+      "has_attached_doc",
+      "stale_report_warning",
+      "version_mismatch_suspected",
+      "re_verify_against_current_code",
+      "cn_keywords:jiu,baogao,jiuban,dangqianbanben,shifouxiangfu,jiancha"
+    ],
+    "preconditions": [
+      "用户打开了之前 AI 生成的问题报告，但明确提示「这个报告是基于旧版写的」，要求验证某一章节的问题在当前版本中是否仍然存在或已变化。",
+      "问题报告中某个章节描述了数值或内容一致性问题（如关卡配置参数与设计文档不符），而代码库可能已经被其他 session 修改过。",
+      "需要将报告中描述的期望值与当前代码文件中的实际值进行逐项对比，而非直接相信报告结论。"
+    ],
+    "strategy": [
+      "不要直接相信报告中描述的问题仍然存在——先读取报告中涉及章节所引用的实际源文件（如 storyline.lua、story-N.lua），提取当前实际值，再与报告中的期望值对比。",
+      "若项目中有独立关卡配置文件（story-N.lua），建议派发 Task 子代理批量读取所有关卡文件，提取关键参数，与主索引文件（storyline.lua）中的注册值进行逐一比对。",
+      "比对结果分三类处理：① 报告中问题已不存在（当前版本已匹配）→ 在报告中标记 [已修复]；② 报告中问题仍存在 → 立即修复（Edit 修改源文件），然后 build；③ 当前版本出现报告中未记录的新问题 → 修复 + 在报告中新增条目并标记为 [新发现并已修复]。",
+      "完成所有代码修复后统一执行 build，确认无编译错误。",
+      "更新问题报告：对已修复的每条问题（包括新发现的）在报告中执行 4 类 Edit（节标题加 [已修复]、更新摘要表、优先级列表划线、Changelog 追加行）。"
+    ],
+    "validation": [
+      "实际读取了当前版本的源文件，而非仅依据报告结论判断",
+      "发现的所有差异（包括报告未提及的新问题）均已修复",
+      "Build 通过",
+      "报告更新覆盖了所有已修复条目（含新发现条目的新增记录）"
+    ],
+    "title_zh": "旧版报告驱动的当前版本重审：版本偏差检测与修复",
+    "title_en": "Stale-Report-Driven Current-Version Re-audit — Version Drift Detection and Fix",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "762afe73"
+      ],
+      "session_count": 1,
+      "turn_range": "762afe73:T07",
+      "prompt_indices": [
+        7
+      ],
+      "evidence": "762afe73 T07 (52 steps): user said '三、关卡内容一致性，但是注意，这个报告是基于旧版写的，需要注意与当前版本是否相符，并且检查当前版本是否有问题'. Agent: (1) Read storyline.lua (at 3 offsets) to get current level configs. (2) Task SA — read all 35 story-N.lua files and extract score/board-size/obstacle-count params. (3) Grep for specific values referenced in report (targetScore, boardSize fields). (4) Compare: found 10 items where current storyline.lua values differed from story-N.lua definitions — some were regressions (undone by earlier edits), some were new issues not in the original report. (5) 45 Edits to storyline.lua fixing score/count/boardSize mismatches across all 10 affected levels. (6) 2x build (first revealed a secondary issue, second passed). (7) 20x Edit on 自查问题报告.md: marked all 10 Section III items [已修复], added 2 new entries for newly discovered issues (also marked [已修复]). Pattern: stale-report warning → read actual source files first → 3-way classification (already fixed / still broken / new issue) → fix all categories → 2-pass build → report update includes newly discovered items."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_animation_update_loop_not_wired",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "intent:ai_output_correction",
+      "symptom:animation_static_no_movement",
+      "recent_animation_implemented",
+      "update_loop_registration_missing",
+      "floating_or_particle_effect",
+      "cn_keywords:piaodong,yundong,meiyou,donghua,guanlu,shezhi"
+    ],
+    "preconditions": [
+      "上一个 turn 刚刚实现了某种动态效果（浮动、飘动、粒子动画），用户报告效果「看起来没有移动」或「浮动效果不见」。",
+      "动画逻辑代码已写入目标文件（update 函数、位置累加、速度字段均存在），但视觉上静止不动。",
+      "这是区别于「空白屏幕」（NanoVG 渲染事件未绑定）的另一种无效果 bug：渲染本身正常，但动画帧每帧不更新。"
+    ],
+    "strategy": [
+      "Read 目标文件（含动画逻辑的 lua 文件），确认动画 update 函数（如 updateFloating、animateDots）是否存在。",
+      "搜索文件或游戏主循环文件（main.lua / game-main.lua / level-select.lua），确认动画 update 函数是否被注册到游戏循环的 update 回调中（如 UrhoX 的 self:SubscribeToEvent('Update', ...) 或 on_update 钩子）。",
+      "若 update 函数存在但未注册：在合适位置（通常是 init() 或场景加载完成后）添加 update 事件订阅，将动画 update 函数挂入回调。",
+      "若 update 函数逻辑本身有误（如 dt 参数未传入、速度字段未初始化）：同时修复函数体和注册逻辑。",
+      "Build 验证，确认动画效果可见（浮动/飘动/移动）。"
+    ],
+    "constraints": {
+      "distinguish_from_blank_screen_bug": "This pattern is NOT the NanoVG render event missing bug (gene_br_blank_screen_nanovg_render_event_unbound). Rendering works; update loop is the issue.",
+      "must_check_both_function_existence_and_registration": true
+    },
+    "validation": [
+      "动画 update 函数已注册到游戏循环的 update 事件中",
+      "Build 成功",
+      "动画效果在运行时可见（位置随帧更新）"
+    ],
+    "title_zh": "动画效果代码存在但静止不动：Update 回调未注册",
+    "title_en": "Animation Implemented but Static — Update Loop Not Registered in Game Loop",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "9dc56f96"
+      ],
+      "session_count": 1,
+      "turn_range": "9dc56f96:T08-T09",
+      "prompt_indices": [
+        8,
+        9
+      ],
+      "evidence": "9dc56f96 T08-T09: Two consecutive correction turns for floating background decoration effect. T07 had implemented the animation (colors + movement code written), but T08 (ai_output_correction, 15 steps, E:2, B:1, Read:3): '看起来并没有浮动效果，改为缓慢的向上飘动' — agent rewrote animation velocity logic (upward drift). T09 (bug_report, 17 steps, E:2, B:1, Read:3): '还是没有移动效果，检查是什么问题' — agent investigated and found the animation update function was not registered in the game loop's update callback. Fix: added SubscribeToEvent (or equivalent UrhoX update hook) to call the floating-animation update each frame. Build succeeded after fix, effect became visible. Root cause: the animation function (calculating position offsets per dt) existed but was never called per frame — common when implementing animations in a new file or component without hooking into the engine's update event. Distinct from gene_br_blank_screen_nanovg_render_event_unbound (that pattern: NanoVG render event not bound → nothing drawn; this pattern: drawing happens, but positions never change because update callback missing)."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_pagination_level_index_offset_bug",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "symptom:level_navigation_fails",
+      "symptom:click_level_does_nothing_on_page2plus",
+      "pagination_level_select_screen",
+      "level_index_computation_error",
+      "cn_keywords:dierye,dianjihouguanqajinru,xuanzeGuanqaye,fenye,suoyin,pianyi"
+    ],
+    "preconditions": [
+      "关卡选择页面（level-select）实现了分页功能（第1页/第2页/...）。",
+      "用户报告：在第2页（或后续页）点击关卡后无法进入该关卡，但第1页点击正常。",
+      "关卡选择的点击回调中计算目标关卡序号的逻辑存在错误（通常是页内 index 未叠加页码偏移量）。"
+    ],
+    "strategy": [
+      "Read 关卡选择屏幕的代码文件（level-select.lua 或等价文件），定位「点击关卡」的点击回调函数。",
+      "找到回调中计算目标关卡序号的表达式。检查该表达式是否包含当前页码的偏移量：正确写法为 `currentPage × itemsPerPage + itemIndex`，错误写法通常为仅使用 `itemIndex`（当 currentPage=0 时正确，但 currentPage>0 时计算出错）。",
+      "Edit 修正索引计算逻辑：添加或修复页码偏移量。",
+      "Build 验证，确认第2页及以后各页的关卡点击均能正确导航。"
+    ],
+    "constraints": {
+      "fix_must_not_break_page1_navigation": true,
+      "only_fix_index_calculation": true
+    },
+    "validation": [
+      "第1页关卡点击导航仍正常",
+      "第2页及后续页关卡点击后正确进入对应关卡序号",
+      "Build 成功"
+    ],
+    "title_zh": "分页关卡选择页第2页点击无法进关：关卡序号缺少页码偏移",
+    "title_en": "Level Select Pagination Bug — Page 2+ Click Fails Due to Missing Page Offset in Level Index",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "9dc56f96"
+      ],
+      "session_count": 1,
+      "turn_range": "9dc56f96:T17",
+      "prompt_indices": [
+        17
+      ],
+      "evidence": "9dc56f96 T17 (8 steps, E:1, B:1, Read:2): '连连看选择关卡页面，切到第二页时，点击关卡后无法进入关卡，检查是什么问题' — user reports page 2 level clicks don't navigate. Agent: Read level-select.lua (link-match version) → identified click callback computing level index as itemIndex without adding page offset → Edit to fix: levelIndex = currentPage * LEVELS_PER_PAGE + itemIndex → Build success. Classic off-by-page bug: page 1 (index 0) works because 0 × N + i = i (correct), but page 2 (index 1) gives 1 × N + i which maps to correct levels — the fix is simple once located, but requires reading the callback to find the exact expression. Only 1 edit needed; resolution in 8 steps total."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_cloud_save_visual_state_unapplied",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "cloud_save_migration_recent",
+      "symptom:visual_state_not_applied_on_load",
+      "log_shows_correct_data",
+      "skin_or_outfit_not_loading",
+      "refresh_or_restart_triggers_bug",
+      "cn_keywords:pifuweibaoliou,shuaxin,huanzhuang,yunduanbaocun,jiazaishizhi"
+    ],
+    "preconditions": [
+      "本 session 或近期 session 完成了从本地存档到云存档（cloud save）的迁移。",
+      "用户报告刷新或重启后皮肤/换装/视觉状态未被保留（显示为默认外观）。",
+      "日志中显示 [skinId] 或 [outfitId] 等键的值正确读取自云端，但游戏内渲染仍为默认皮肤。",
+      "问题在多次修复尝试后仍持续（可能存在多处保存/读取路径未同步更新）。"
+    ],
+    "strategy": [
+      "分两路独立排查，不要只检查一路：",
+      "（路径 A）保存路径：确认皮肤选择事件触发后，调用的是云存档写入函数（如 CloudSave.set / cloudSave:write）而非旧本地存档函数（LocalStorage.set / PlayerPrefs.set）。Grep 旧本地存档函数名，确认调用链中不再出现。",
+      "（路径 B）读取-应用路径：确认云存档读取回调中，读到的 skinId/outfitId 值被正确传递给皮肤应用函数（如 OutfitManager.applySkin / SkinSystem.activate），而非仅存入变量但未调用渲染更新。",
+      "如果日志已显示读取值正确，重点排查路径 B：Read 读取回调函数，检查 skinId 读到后是否调用了 applySkin（或等价函数）。",
+      "若路径 B 存在遗漏：在云存档读取成功的回调中显式添加 applySkin(skinId) 调用，紧跟在 skinId 赋值之后。",
+      "Build → 确认刷新后皮肤持久化。",
+      "如仍失败，检查是否存在多个保存触发点（如关卡结束时、皮肤购买时、页面切换时）各自独立调用，需逐一检查是否都已切换为云存档 API。"
+    ],
+    "constraints": {
+      "verify_both_write_and_read_apply_paths": true,
+      "do_not_assume_single_fix_point": "Cloud save migrations often have multiple save-trigger points — check all of them"
+    },
+    "validation": [
+      "Grep 确认旧本地存档 API 调用已全部替换",
+      "云存档读取回调中皮肤应用函数被显式调用",
+      "刷新后皮肤/视觉状态正确持久化（用户确认）",
+      "Build 成功"
+    ],
+    "title_zh": "云存档迁移后皮肤/视觉状态刷新不持久：读取正确但未调用应用函数",
+    "title_en": "Cloud Save Migration — Skin or Visual State Not Applied on Load Despite Correct Data Read",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "9df66fd4"
+      ],
+      "session_count": 1,
+      "turn_range": "9df66fd4:T28-T31",
+      "prompt_indices": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "evidence": "9df66fd4 T28-T31: 4-turn cascade after cloud save migration (completed in T27). T28 (bug_report, 17 steps): user reports skin not persisting after refresh — agent checks write path, appears to fix. T29 (ai_output_correction, 5 steps): user says still broken. T30 (bug_report, 12 steps): escalation — user provides more detail about behavior. T31 (bug_report, 11 steps): user pastes log evidence showing [skinId] reads correct value from cloud, but game renders default skin. Agent re-examines read path: cloud read callback stores skinId but does NOT call OutfitManager.applySkin — the apply-to-render call was missed in the migration. Fix: added applySkin(skinId) in the cloud read success callback. Build succeeded, persistence confirmed. Pattern: cloud save migration bugs typically manifest as a read-write split — write path migrated, read-apply path missed — and require 4+ turns to fully diagnose because write appears to succeed (log confirms) before read-apply is examined."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_nanovg_cross_context_image_handle_white",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "visual_artifact_white",
+      "nanovg_image_rendering",
+      "cross_page_navigation_trigger",
+      "shared_component_regression",
+      "escalating_scope",
+      "cn_keywords:baise,tupian,bai,jiaose,baicheng",
+      "page_switch_trigger",
+      "init_double_call_symptom",
+      "router_replace_lifecycle",
+      "purchase_unlock_trigger",
+      "ui_state_change_trigger"
+    ],
+    "preconditions": [
+      "游戏中有 NanoVG 图像渲染（如 nvgCreateImage/nvgImagePattern），且某个或多个图像显示为白色方块。",
+      "问题在页面切换（Router.replace / replace 路由）或页面反复进入后出现，而非首次启动时。",
+      "涉及一个共享组件（如 fox-mascot.lua）在各页面的 init() 函数中创建 NanoVG 图像句柄，并在 init() 或 destroy() 中手动调用 nvgDeleteImage。",
+      "变体触发场景：问题在购买/解锁操作后出现（不经过页面切换），如购买皮肤后皮肤图像立即显示为白色。此时触发机制可能是购买成功回调引起了 UI 状态重置或组件重新渲染，间接触发了 nvgDeleteImage 被误调用，或图像句柄在状态变更中失效。修复方向与页面切换变体相同：移除 init() 和 destroy() 中的 nvgDeleteImage 调用。"
+    ],
+    "strategy": [
+      "检查 init() 函数中 nvgDeleteImage 和 nvgCreateImage 的调用顺序：「先删后建」（nvgDeleteImage 旧句柄 → nvgCreateImage 新句柄）是已知错误模式——旧句柄来自上一个页面的 nvgCtx_，保留它或操作它会导致跨上下文句柄污染，使新句柄在渲染时失效（显示为白色）。",
+      "检查 Router.replace 调用链：destroyTop() → showPage() 通常依次触发 create() → setActive()，若两者都调用 init()，则同一 nvgCtx_ 上的 init() 被调用两次。第二次调用时上一次创建的句柄仍有效，但若 init() 内有 nvgDeleteImage 逻辑，将错误地删除刚建立的有效句柄，导致白色。",
+      "正确修复方向：从 init() 和 destroy() 中**彻底移除所有 nvgDeleteImage 调用**，依靠 NanoVG 上下文（nvgCtx_）整体销毁（页面 destroy 时）来自动清理图像句柄，而非手动管理每个句柄的生命周期。不要尝试「先建后删」或「加 nil 判断」等中间方案。",
+      "若白色图像问题在修复单个组件后扩散到其他页面（全局退化），说明多处均有 nvgDeleteImage 调用：使用 Grep 搜索整个 scripts/ 目录中的 nvgDeleteImage，在所有命中文件的 init() 中统一移除。",
+      "确认修复后，在所有受影响的页面（主线模式、自由模式、游戏内）逐一验证图像显示正常，而非只测试当前页面。"
+    ],
+    "constraints": {
+      "fix_direction": "remove_all_nvgDeleteImage_from_init_and_destroy",
+      "do_not_swap_create_delete_order": "先建后删（create-first-then-delete）仍是错误的，因为旧句柄来自不同 nvgCtx_",
+      "do_not_add_nil_guard_for_old_handle": "nil 判断不能解决跨上下文句柄问题，是无效修复方向"
+    },
+    "validation": [
+      "修复后所有页面（含页面切换后）均无白色图像",
+      "init() 函数中无 nvgDeleteImage 调用（或任何对旧句柄的主动操作）",
+      "Grep scripts/ 确认无其他文件在 init() 中有 nvgDeleteImage",
+      "NanoVG 图像句柄依赖 nvgCtx_ 上下文生命周期自动清理，不再手动管理"
+    ],
+    "title_zh": "NanoVG 跨上下文图像句柄白色渲染：Router.replace 双重 init 触发，修复方向为移除所有 nvgDeleteImage",
+    "title_en": "NanoVG Cross-Context Image Handle White Render — Router.replace Double-Init, Fix by Removing All nvgDeleteImage",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "a09c411b",
+        "e7d71628"
+      ],
+      "session_count": 2,
+      "turn_range": "a09c411b:T08-T11; e7d71628:T03",
+      "prompt_indices": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "evidence": "a09c411b T08-T11: 4-turn escalating white-image bug cascade. T08 (bug_report, ~15 steps, 1 edit, 1 build): user reported '主线模式，左下角的角色图像，现在是一块白色的'. Agent: Read fox-mascot.lua → identified init() has 'delete-then-create' pattern (nvgDeleteImage old → nvgCreateImage new) → changed to 'create-first-then-delete' (create new → nvgDeleteImage old), reasoning this is a safer swap. Build → success, but WRONG FIX DIRECTION — old handle is from a different nvgCtx_, deleting it after creating the new one still corrupts the state. T09 (bug_report, 108 steps, 4 edits, 3 builds): user reported '主线模式，和游戏内，的图片都变为了白色' — scope ESCALATED to ALL images. Agent: deep investigation, multiple re-reads of adventure/init.lua, fox-mascot.lua, Grep chains, Task SA for Router lifecycle. Multiple wrong hypotheses explored (constant extraction from T05 broke something? adventure/init.lua foxImage_ variable shadowing?). Eventually: 4 edits reverting T08 change + additional changes, 3 builds, but still not fully fixed. T10 (bug_report, ~20 steps, 2 edits, 1 build): user reported partial fix — '现在主线模式和游戏内显示正常了，但是自由模式选择游戏的页面左下角的角色变成白色了'. Agent: narrowed to free-mode page specifically, applied targeted fix. T11 (bug_report, ~30 steps, 3 edits, 1 build): user reported '在主线模式，自由模式页面切换时，左下角的角色就会变成白色' — trigger precisely identified as mode switching. Agent: (1) investigated Router.replace lifecycle → confirmed destroyTop()→showPage()→create()→setActive() causes init() to be called TWICE on same nvgCtx_. (2) FINAL FIX: removed ALL nvgDeleteImage calls from fox-mascot.lua init() AND adventure/init.lua (which had a separate foxImage_ variable). (3) Build → success. Root cause: NanoVG creates a separate nvgCtx_ per page; image handles from one context are invalid in another. Router.replace lifecycle double-calls init() on the same context, and any nvgDeleteImage in init() creates handle-lifecycle inconsistency. The safe pattern is: create handles in init(), never explicitly delete them, rely on nvgCtx_ destruction (page destroy) for cleanup. Key learning: wrong fix in T08 (swap order) → regression in T09 (all images white) → 108-step over-investigation → final root cause confirmation in T11.\n\ne7d71628 T03 (intent: feature_modification, target: visual_style): user reported '购买解锁后，突变会变成白色的' (after purchase unlock, the mutation becomes white). This is a distinct trigger variant from the Router.replace double-init case (a09c411b) — the white rendering is triggered by a purchase/unlock event rather than page navigation. Root cause is likely the same: nvgDeleteImage called in init()/destroy() with a stale handle from a different nvgCtx_, invalidating the newly created image handle when the unlock causes a re-render or component re-initialization. The fix direction is identical: remove all nvgDeleteImage calls from init() and destroy()."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_auto_win_not_triggered",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:game_logic",
+      "auto_trigger_not_firing",
+      "win_condition_logic",
+      "recent_mode_bifurcation_impl",
+      "cn_keywords:zidongshengbai,tongguantiaojian,buhui,jiancha_shenme_yuanyin"
+    ],
+    "preconditions": [
+      "用户报告：某个本应在达成条件后自动触发的游戏结束/胜利事件没有发生（如「达成通关分数后不会自动胜利」）。",
+      "该自动触发逻辑是在最近 1-2 个 turn 内刚实现的（如双轨胜利条件分叉、新增的 checkWin 调用）。",
+      "用户描述的是「条件已达成，但预期事件没有发生」，而不是「程序崩溃」或「功能完全不存在」。"
+    ],
+    "strategy": [
+      "先读取胜利条件判断代码（如 checkWin()、分数比较逻辑）：确认条件判断本身是否正确，条件达成时执行哪条代码路径。",
+      "检查条件判断代码的调用时机：是在 update 循环中周期性调用，还是只在特定事件触发时调用一次？（类比 gene_br_animation_update_loop_not_wired：逻辑正确但未挂载到 update 循环）",
+      "如果是新实现的双轨逻辑（主线/自由模式分叉）：重点检查模式判断的控制流 → 条件达成后，主线路径是否正确调用了 victory()/endGame()，还是错误落入了自由模式的「显示按钮」路径？",
+      "检查 event dispatch：胜利事件的监听器是否已正确注册（事件名是否拼写一致、listener 是否在正确生命周期挂载）？",
+      "一旦定位漏洞（条件判断错误、函数调用缺失、事件未注册、模式判断路径错误），做最小化 Edit 修复，Build 验证。"
+    ],
+    "constraints": {
+      "minimal_edit_diagnosis_first": "先读取足够多文件确认根因，再做最小化 Edit",
+      "verify_mode_flag_control_flow": "双轨逻辑必须逐步检查每个 if/else 分支的控制流",
+      "must_build_to_verify": true
+    },
+    "validation": [
+      "Build 成功",
+      "主线模式下：达到通关分数后，游戏自动触发胜利/结束事件，无需用户操作",
+      "自由模式行为（手动触发）不受修复影响"
+    ],
+    "title_zh": "自动胜利条件未触发 — 检查条件判断路径与事件分发",
+    "title_en": "Auto-Win Condition Not Triggered — Diagnose Win-Condition Check Path and Event Dispatch",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "bc3f2ce9"
+      ],
+      "session_count": 1,
+      "turn_range": "bc3f2ce9:T40",
+      "prompt_indices": [
+        40
+      ],
+      "evidence": "bc3f2ce9 T40 (19 steps, 1 edit, 5 reads, 1 build): '现在主线消消乐，达成通关条件后不会自动胜利，检查是什么原因'. This bug occurred immediately after T36+T38 implemented mode-bifurcated win conditions for match-3. Agent: (1) 5x Read: read match-3 game logic files (gameplay.lua, score tracking, win check, event dispatch). (2) Identified root cause: the auto-win trigger in the main story path was not correctly dispatching the win event (likely a conditional branch error or missing function call). (3) 1 Edit: minimal fix to the win condition check / event dispatch. (4) Build success. Pattern: auto-win bugs almost always follow recent mode-bifurcation implementation — the bifurcation introduces conditional branches, and one path (typically the new auto-win path) has a missing or misrouted function call. Reads (5x) >> Edits (1x): diagnosis is read-heavy, fix is minimal. Compare with gene_br_animation_update_loop_not_wired (feature implemented but event/update not registered): both share the 'implemented but not wired' root cause; this gene is the win-condition specialization."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_board_init_bypass_data_transform_nil",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "runtime_error_nil_field_access",
+      "error_field:wallSet_or_similar_derived_field",
+      "story_mode_level_entry",
+      "board_or_grid_initialization",
+      "cn_keywords:wallSet,nil,board,initializaion,storyline,adapter"
+    ],
+    "preconditions": [
+      "错误日志显示 `attempt to index a nil value (field 'wallSet')` 或类似的 nil 字段访问，发生在棋盘/网格渲染或逻辑调用中。",
+      "游戏在主线/故事模式下进入关卡时崩溃，自由模式无此问题。",
+      "项目有独立的 level-loader 或 data-transform 模块，负责将原始关卡数据转换为游戏运行时所需格式（如 walls[] → wallSet{} 哈希表）。"
+    ],
+    "strategy": [
+      "阅读报错行附近的文件（board.lua 或对应的棋盘逻辑文件），确认崩溃字段（如 wallSet）是在哪一步被初始化的：通常是在 Board.new(levelData) → self:reset() 中，期望 levelData 已经过 data-transform 处理。",
+      "追溯主线模式的数据流：读取 adapter.lua 中主线模式的关卡入口代码（通常有 `if storylineMode_ then` 分支），确认传给 Board.new() 的数据是来自 storylineOpts.levelData（原始数据）还是经过 levelLoader.load() 转换后的数据。",
+      "读取 level-loader.lua，确认哪个函数执行了原始数据→运行时格式的转换（如 M.load(raw)）。",
+      "修复：在主线模式的 adapter 中，将 `levels_ = { ctx.storylineOpts.levelData }` 改为 `levels_ = { levelLoader.load(ctx.storylineOpts.levelData) }`，确保走相同的数据转换路径。",
+      "用 Grep 检查同项目其他游戏的 adapter（p2、p3、p4 等）是否有相同的原始数据未转换问题，统一修复。",
+      "Build 验证，确认 nil 错误消失。"
+    ],
+    "constraints": {
+      "data_transform_bypass_root_cause": "崩溃根因是主线模式跳过了 level-loader 的数据转换步骤；不要修改 board 本身的 reset 逻辑或 wallSet 的初始化方式",
+      "cross_game_check_required": "修复一个游戏的 adapter 后，必须 Grep 检查其他游戏 adapter 是否有同样问题并统一修复",
+      "build_verify": "每次修复后执行 build 确认无运行时错误"
+    },
+    "validation": [
+      "nil 字段访问错误（wallSet/类似字段）不再出现",
+      "主线模式下可正常进入关卡，自由模式行为不变",
+      "其他游戏 adapter 已逐一检查，同类 bypass 问题均已修复",
+      "Build 通过"
+    ],
+    "title_zh": "棋盘初始化绕过数据转换层导致的 nil 字段崩溃 — 主线模式 levelData 未经 loader 转换",
+    "title_en": "Board Init Bypasses Data-Transform Layer — Story-Mode Raw levelData Skips level-loader, Causing nil Field Crash at Runtime",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "bdf118ee"
+      ],
+      "session_count": 1,
+      "turn_range": "bdf118ee:T03",
+      "prompt_indices": [
+        2
+      ],
+      "evidence": "bdf118ee T03 (38 steps, 12 Greps, 4 Reads, 1 Edit): user pasted error log with 62 repeated errors 'attempt to index a nil value (field wallSet)' at board:81 in P1PZ_HandleNanoVGRender. Agent: TodoWrite (fix wallSet nil). Read board.lua → found Board.new(levelData) calls self:reset() which sets self.wallSet = {} from walls data. Read gameplay.lua → confirmed call site. Read level-loader.lua → confirmed M.load(raw) transforms walls[] → wallSet{}. Read adapter.lua at line 588 → found storyline branch: 'levels_ = { ctx.storylineOpts.levelData }' passes raw data directly, bypassing levelLoader.load(). Agent said 'problem is clear: storyline mode uses raw levelData directly'. Edit adapter.lua → wrapped raw data with levelLoader.load(). Then Grep p2/p3/p4 adapters for 'storylineOpts.levelData' → all three had same bypass. Checked p2/p3 level-loaders for matching load functions. Build → confirmed fix."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_story_level_field_name_adapter_mismatch",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "intent:bug_report",
+      "runtime_error_nil_concatenation",
+      "story_level_loading_failure",
+      "persistent_bug_repeated_report",
+      "adapter_field_name_mismatch",
+      "cn_keywords:gamingLoadFailed,story,levelId,lv.id,adapter,nil"
+    ],
+    "preconditions": [
+      "玩家进入主线关卡时显示「游戏加载失败，请返回重试」，且该问题在修复后仍复现（用户连续两次报告同一问题）。",
+      "错误日志或运行时日志中存在 `attempt to concatenate a nil value (field 'id')` 或类似的 nil 字段拼接错误，发生在 adapter.lua 中。",
+      "项目同时存在主线模式（story-N 关卡，使用自定义字段如 `levelId`）和各游戏模块的自由模式（使用字段如 `id`），两套数据格式字段名不同。"
+    ],
+    "strategy": [
+      "运行 `cat /opt/log/dev/user_script.log | tail -80`（或等效的运行时日志命令）读取最新错误，定位具体报错文件和行号（通常是 adapter.lua 的日志打印行）。",
+      "读取该 adapter.lua 报错行附近的代码，确认 adapter 使用的字段名（如 `lv.id`）。",
+      "读取对应的主线关卡配置文件（如 story-2.lua），确认该文件实际使用的字段名（如 `levelId`）。",
+      "对比两者的字段名：主线关卡配置中用 `levelId`，但 adapter 打日志时引用 `lv.id`（该字段在主线关卡数据中不存在）。",
+      "用 Grep 搜索同项目所有 adapter（p2/p3/p4 等）的相同模式（如 `'storyline gameplay started.*lv\\.id'`），确认哪些 adapter 有相同的字段名不匹配问题（p1 若关卡字段就叫 `id` 则无问题）。",
+      "修复每个受影响的 adapter：将 `lv.id` 改为 `lv.levelId`（或统一字段名），并为主线模式添加 fallback（如 `lv.id or lv.levelId`）。",
+      "Build 验证，确认故障排除。"
+    ],
+    "constraints": {
+      "runtime_log_first": "先读取运行时日志（user_script.log）确认当前真实错误，不要仅凭用户描述猜测根因",
+      "cross_game_grep_required": "修复一个 adapter 后必须 Grep 其他 adapter 的相同模式，统一修复",
+      "field_name_check": "p1 若本身就使用 `id` 字段则不需要修改；只修改字段名实际不匹配的 adapter"
+    },
+    "validation": [
+      "运行时日志中 nil concatenation 错误消失",
+      "主线模式所有关卡可正常加载，不出现「游戏加载失败」提示",
+      "所有受影响的 adapter（p2、p3 等）均已修复",
+      "Build 通过"
+    ],
+    "title_zh": "主线关卡字段名与 Adapter 不匹配导致加载失败 — 运行时日志定位 nil 拼接，跨游戏 Grep 统一修复",
+    "title_en": "Story-Level Config Field Name Mismatch in Adapter — Runtime Log Pinpoints nil Concatenation, Cross-Game Grep Fixes All Adapters",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "bdf118ee"
+      ],
+      "session_count": 1,
+      "turn_range": "bdf118ee:T04,T05",
+      "prompt_indices": [
+        3,
+        4
+      ],
+      "evidence": "bdf118ee T04 (52 steps): user said '进入第二关时，显示游戏加载失败，请返回重试'. Agent: Read storyline.lua, story-2.lua, game-container/init.lua. Identified state machine transition issue (game container state not IDLE). Made fix but problem persisted. | bdf118ee T05 (20 steps): user said 'story-2还是显示游戏加载失败'. Agent: Bash 'cat /opt/log/dev/user_script.log | tail -80' → found 'attempt to concatenate a nil value (field id)' at p2-memory-flip/adapter.lua:398. Read adapter.lua:390-410 → found 'logger.info(MODULE, \"storyline gameplay started\" .. lv.id)' — uses lv.id. Read story-2.lua → field is 'levelId', not 'id'. Grep 'storyline gameplay started.*lv\\.id' across all adapters → found p2 and p3 both have same mismatch (p1 correctly uses id because its levels actually use that field). Fixed p2 and p3 adapters. Build passed."
+    }
+  },
+  {
+    "type": "gene",
+    "id": "gene_br_transition_overlay_stuck_black_wasm",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "intent:error_log_paste",
+      "symptom:screen_stays_black",
+      "nanovg_overlay_recently_implemented",
+      "transition_fade_feature",
+      "taptap_maker_platform",
+      "wasm_indirect_call_to_null"
+    ],
+    "preconditions": [
+      "Screen transition/fade overlay was recently implemented using NanoVG full-screen rect rendering",
+      "Bug report says screen fades to black and never recovers (stays permanently black)",
+      "Platform is TapTap Maker (web/WASM runtime)"
+    ],
+    "strategy": [
+      "NanoVG full-screen overlay transition bugs manifest as permanent black screens when the fade-to-opaque animation completes but the overlay is never removed or hidden. Two root cause branches: (1) the overlay update loop continues drawing after the transition completes and never sets opacity back to 0 or hides the overlay node — fix: ensure the overlay node is explicitly hidden or removed from the render tree after transition ends; (2) the WASM 'indirect call to null' error (RuntimeError in TapTap Maker error report) indicates a Lua callback or C-function pointer registered for animation stepping was garbage-collected or never properly initialized — fix: re-read the NanoVG adapter registration pattern and ensure the animation callback is stored as a persistent Lua reference. Investigation path: Read the transition/overlay Lua module → trace the animation update loop → verify the termination condition and the final hide/remove call. If WASM error appears, the callback registration site is the primary suspect."
+    ],
+    "constraints": [
+      "Do not use persistent black rect overlays without a guaranteed termination path that restores visibility",
+      "Animation update callbacks in NanoVG must be stored as persistent Lua references to avoid GC",
+      "Always verify transition completes in both enter and exit directions before marking feature complete"
+    ],
+    "validation": [
+      "Click enter game: screen briefly fades then game content becomes visible",
+      "Click exit game: screen briefly fades then lobby/list becomes visible",
+      "No persistent black screen in any navigation path",
+      "No TapTap Maker error report (no WASM indirect call to null)"
+    ],
+    "title_zh": "NanoVG全屏遮蔽转场 → 持续黑屏 + WebAssembly崩溃级联诊断",
+    "title_en": "NanoVG Fullscreen Overlay Transition → Persistent Black Screen + WASM Crash Cascade Diagnostic",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "d8f96672"
+      ],
+      "session_count": 1,
+      "turn_range": "d8f96672:T8-T12",
+      "prompt_indices": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "evidence": "d8f96672 T8 (no agent run) + T9 (54 steps, 16 edits, 1 build) + T10 (13 steps, 4 edits, 1 build) + T11 (40 steps, 14 edits, 2 builds) + T12 (18 steps, 9 edits, 1 build): 5-turn cascade. T8: user sent '点击进入和退出游戏时，增加黑屏遮蔽淡入淡出效果' — no agent run (user immediately re-sent in T9). T9: user re-sent '点击进入和退出游戏时，增加遮蔽屏幕的转场效果'. Agent: EnterPlanMode + 2 Task SAs (plan + implementation subtasks) + Grep ×3 + Read ×10 + Edit ×10 + Write ×1 + build. Implemented full NanoVG screen overlay transition. T10: user reported '点击推箱子后，屏幕渐黑，然后就一直维持全黑了'. Agent: Read ×2 → Edit ×2 → build. First fix attempt — partial, bug persisted. T11: user reported '现在仍然是变成全黑' (escalation, still black). Agent: Grep ×4 + Read ×4 + Edit ×8 + Write ×2 + build ×2. Deep investigation of overlay lifecycle. T12: user pasted TapTap Maker Error Report — RuntimeError: indirect call to null (WebAssembly crash at engine level). Agent: Write + Read + Edit ×4 + build. Fixed callback registration. Pattern: new_feature NanoVG overlay (T9, PlanMode+2SA, 54 steps) → bug_report persistent black (T10, 13 steps, partial fix) → escalation still black (T11, 40 steps, deep investigation) → error_log_paste WASM crash (T12, 18 steps, callback fix). 5-turn implementation+debug cascade."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_event_handle_userdata_type_error",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "symptom:hundreds_identical_errors",
+      "symptom:userdata_expected_string_got",
+      "symptom:timer_or_event_callback_repeated_fire",
+      "api:UnsubscribeFromEvent",
+      "cn_keywords:unsubscribefromevent,userdata,jiechu,dingyue"
+    ],
+    "preconditions": [
+      "错误报告中出现大量相同的错误条目（数百至数千次），所有错误来自同一文件的同一行。",
+      "错误信息包含 userdata 类型期望但传入了 string（或反之）的类型不匹配描述。",
+      "错误发生在事件订阅/取消订阅 API 的调用处，常见于 UrhoX 的 `UnsubscribeFromEvent`、定时器取消等场合。",
+      "通常在近期添加或修改了某个定时器循环（Timer/UpdateEvent/PostUpdateEvent）之后发生，且该循环在每帧都尝试取消订阅。"
+    ],
+    "strategy": [
+      "定位错误行（如 `health-advisory.lua:98`），读取对应文件。",
+      "检查该行的 API 调用：`UnsubscribeFromEvent(eventName)` — 若参数为字符串（事件名），则是类型错误；正确用法应传入订阅时返回的 userdata 句柄（即 `SubscribeToEvent` 的返回值）。",
+      "在文件顶部或订阅处找到原始 `SubscribeToEvent(...)` 调用，确认其返回值是否被捕获并保存为变量。",
+      "将 `UnsubscribeFromEvent(stringName)` 修改为 `UnsubscribeFromEvent(savedHandle)`，其中 `savedHandle` 是 `SubscribeToEvent` 的返回值。",
+      "若返回值未被保存，需在订阅处添加 `local handle = SubscribeToEvent(...)` 并在需要取消时使用 `handle`。",
+      "build 验证错误消失，功能仍正常（fade/timer 效果生效）。"
+    ],
+    "constraints": {
+      "string_event_name_not_valid_for_unsubscribe": true,
+      "must_capture_subscribe_return_value": true
+    },
+    "validation": [
+      "相同错误不再出现（错误报告中该文件该行的错误为零）",
+      "UnsubscribeFromEvent 的参数为 SubscribeToEvent 返回的 userdata 句柄",
+      "build 成功",
+      "对应的 fade/timer/动画效果运行正常"
+    ],
+    "title_zh": "事件取消订阅 API userdata 类型错误：传入字符串而非订阅句柄导致批量崩溃",
+    "title_en": "UnsubscribeFromEvent Userdata Type Error — String Passed Instead of Subscription Handle Causes Flood of Errors",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "e2076a78"
+      ],
+      "session_count": 1,
+      "turn_range": "e2076a78:T1",
+      "prompt_indices": [
+        1
+      ],
+      "evidence": "e2076a78 T1 (6 steps): error report contained 904 identical errors from health-advisory.lua:98 in HealthAdvisory_FadeTimer. The error was userdata type mismatch on UnsubscribeFromEvent — the code was calling UnsubscribeFromEvent('UpdateEvent') with a string event name instead of passing the userdata handle returned by SubscribeToEvent. UrhoX requires the actual subscription object (userdata), not a string. Agent: read health-advisory.lua, identified the call site at line 98, changed parameter from string to the saved subscription handle, build, 904 errors eliminated. Key distinction from gene_elp_nanovg_api_return_type_mismatch: that gene covers NanoVG C-binding return value misuse (table vs multi-return); this gene covers UrhoX event subscription API where the caller must retain and pass the opaque handle returned by SubscribeToEvent."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_lua_api_arg_type_table_not_string",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "stacktrace_in_prompt",
+      "lua_runtime_error",
+      "symptom:bad_argument_string_expected_got_table",
+      "shared_component_init",
+      "new_feature_implementation_prior_turn",
+      "cn_error:bad_argument_string_expected_got_table",
+      "storage_or_data_api_call",
+      "outfit_or_skin_system"
+    ],
+    "preconditions": [
+      "用户粘贴了包含 TapTap Maker 结构化头部信息的运行时错误报告。",
+      "错误信息为 ，发生在某个共享模块（如 outfit-manager、storage-manager）的 init 函数中，从主入口（main:Start）调用。",
+      "触发场景：刚实现了一个新功能（如皮肤购买/换装系统），引入了新的数据结构（如 skinConfig table 或皮肤信息对象），并将该 table 作为参数传递给了一个期望字符串键（key）的 API 函数（如 Storage.Get(key)、DataManager.Get(key)）。",
+      "错误发生在模块的 init 阶段，说明数据结构初始化时即出错，而非运行时动态调用。"
+    ],
+    "strategy": [
+      "从错误日志中定位文件和行号（如 outfit-manager:435），Read 该文件的对应区域。",
+      "识别 init 函数中调用 Get/Fetch/Load 等 API 的位置，检查第一个参数：如果参数是一个 table（如 skinConfig、skinData 等），而非字符串 key，则为本 gene 所描述的错误。",
+      "检查调用方（如 main:Start 或模块构造函数）传入的参数：确认是否将整个皮肤配置对象（table）传入了 init，而 init 内部将其直接转发给了 Get() API。",
+      "修复方向：从 table 中提取字符串 key（如 skinConfig.id 或 skinConfig.name），将 key 传给 Get() 而非整个 table；或在 init 入口添加参数类型断言（assert(type(key) == 'string', ...)）以便快速暴露问题。",
+      "Build 验证修复，确认 init 不再报 bad argument 错误。"
+    ],
+    "constraints": {
+      "do_not_pass_table_to_string_api": "不要将 table 对象直接传给期望字符串参数的 API，必须提取 .id / .key / .name 等字符串字段",
+      "check_all_callers": "如 init 接受 table 参数，检查所有调用方（main、其他模块）是否有同样的错误传参"
+    },
+    "validation": [
+      "修复后 init 函数中 Get/Fetch/Load API 调用的第一个参数为字符串类型",
+      "Build 成功，不再有 bad argument #1 to 'Get' (string expected, got table) 错误",
+      "若 init 接受多态参数，添加了 type() 断言以防止类似问题复现"
+    ],
+    "title_zh": "Lua API 参数类型错误：table 传入期望 string 的 Get 函数（新功能引入新数据结构时的常见错误）",
+    "title_en": "Lua API Argument Type Error — Table Passed to Get() Expecting String (Common When New Data Structures Introduced)",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "e7d71628"
+      ],
+      "session_count": 1,
+      "turn_range": "e7d71628:T01",
+      "prompt_indices": [
+        1
+      ],
+      "evidence": "e7d71628 T01 (intent: error_log_paste, urgency: high): user pasted TapTap Maker Error Report immediately after T00 which implemented a new skin purchase/outfit system. Error: [string \"shared/outfit-manager\"]:435: bad argument #1 to 'Get' (string expected, got table). Stack: [C] Get → outfit-manager:435 init → main:62 Start. Pattern: new feature implementation (T00) introduced a skin data structure (table) that was incorrectly passed as the key argument to a storage Get() API in the module init function. The error fires at startup (main:Start → init) because the wrong type is passed immediately during initialization, not during user interaction. Distinct from gene_elp_nanovg_api_return_type_mismatch (which covers wrong assumption about return type); this gene covers wrong argument type when calling an API."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_callback_closure_nil_entity_id",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "stacktrace_in_prompt",
+      "lua_runtime_error",
+      "symptom:concatenate_nil_local_variable",
+      "shared_popup_component_callback",
+      "new_feature_implementation_prior_turn",
+      "cn_error:attempt_to_concatenate_nil_value_local",
+      "profile_or_entity_page",
+      "purchase_or_unlock_flow"
+    ],
+    "preconditions": [
+      "用户粘贴了包含 TapTap Maker 结构化头部信息的运行时错误报告。",
+      "错误信息为  或类似的命名实体 ID（levelId、itemId、entityId）nil 拼接错误，发生在一个回调函数 (local 'cb') 内部。",
+      "调用堆栈显示：共享弹窗组件（如 purchase-popup、confirm-dialog）的 handleClick 方法调用了父页面注册的回调函数，而该回调函数内部引用了一个本应非空的局部变量（skinId、levelId 等实体标识符）。",
+      "触发场景：刚实现了新的购买/解锁流程，父页面（如 profile/init）向共享弹窗组件注册了一个匿名回调函数，该回调函数需要访问当前选中实体的 ID，但 ID 变量（skinId）在回调被调用时为 nil。"
+    ],
+    "strategy": [
+      "从错误日志中定位父页面文件和回调所在行号（如 pages/profile/init:485），Read 该文件的对应区域（上下各 20-30 行），同时读取共享弹窗组件文件（如 purchase-popup.lua）的 handleClick 方法。",
+      "分析 nil 来源的两种可能：(1) 闭包捕获时机问题 — 回调函数在 skinId 被赋值之前定义并注册，而非在用户点击选择皮肤后动态构造；(2) 参数传递缺失 — 父页面期望弹窗组件将 skinId 通过回调参数传回，但弹窗组件的 handleClick 只调用 cb() 不传任何参数，skinId 是期望但未实际接收的参数。",
+      "闭包捕获问题的修复方向：在用户点击皮肤（handleClickAt）时，动态构建闭包，将当前 skinId 捕获进去（如 local id = skinId; popup:show(function() ... use id ... end)），而非在模块级别定义一个引用外部变量的通用回调。",
+      "参数传递缺失的修复方向：修改弹窗组件 handleClick，将注册时存储的实体 ID 通过参数传给回调（cb(self.entityId)），同时修改回调定义为接受该参数（local cb = function(id) ... end）。",
+      "Read 共享弹窗组件的全部回调触发路径，确认修复不会影响其他使用该弹窗的页面。",
+      "Build 验证修复，在实际购买流程中测试。"
+    ],
+    "constraints": {
+      "close_over_at_click_time": "回调必须在用户点击目标实体时构造，将当前 ID 封闭进闭包，而非在模块初始化时定义通用回调引用可变外部变量",
+      "component_id_passing": "如弹窗需要将实体 ID 传回父页面，必须在组件存储并通过 cb(id) 显式传参，不依赖父页面的外部变量"
+    },
+    "validation": [
+      "修复后点击购买/解锁触发弹窗后，回调函数内的 skinId（或同类实体 ID）始终非 nil",
+      "Build 成功，不再有 attempt to concatenate a nil value (local 'skinId') 错误",
+      "检查同一弹窗组件的所有其他使用方，确认修复未引入参数不匹配的退化"
+    ],
+    "title_zh": "Lua 回调闭包实体 ID 为 nil：共享弹窗组件回调未正确捕获或传递实体标识符",
+    "title_en": "Lua Callback Closure Entity ID Nil — Shared Popup Component Callback Fails to Capture or Pass Entity Identifier",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "e7d71628"
+      ],
+      "session_count": 1,
+      "turn_range": "e7d71628:T02",
+      "prompt_indices": [
+        2
+      ],
+      "evidence": "e7d71628 T02 (intent: error_log_paste, urgency: high): user pasted TapTap Maker Error Report after fixing T01 error. Error: [string \"pages/profile/init\"]:485: attempt to concatenate a nil value (local 'skinId'). Stack: profile/init:485 local 'cb' → purchase-popup:145 handleClick → profile/init:446 upvalue 'handleClickAt' → profile/init:543 Profile_HandleMouseDown. Pattern: the newly created purchase-popup shared component (T00) is registered with a callback from profile/init. When the user clicks confirm in the popup, handleClick calls the callback cb. Inside cb, skinId is nil — the variable was either not captured in the closure at registration time (defined before the skin was selected), or the popup component was expected to pass the skinId back as an argument to cb() but does not. The callback chain: user click → Profile_HandleMouseDown → handleClickAt → purchase-popup registers cb → popup.handleClick calls cb() → cb fails because skinId not in scope. Root pattern: shared popup component with callback interface where the entity identifier is not properly threaded through the closure or argument chain."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_br_bulk_formula_edit_stale_override",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:bug_report",
+      "target:game_logic",
+      "follows_arithmetic_formula_bulk_edit",
+      "stale_value_after_bulk_edit",
+      "grep_only_diagnosis_no_edits",
+      "deferred_fix_on_fragment_followup",
+      "cn_keywords:rengran,jiushi,haishi,meibian,jiancha,wenti,xuyao"
+    ],
+    "preconditions": [
+      "前一 turn（或本 session 近期 turn）对某个游戏的所有关卡参数执行了算术公式批量 Edit（如「第一关3000，每关增加200」），逐一 Edit 了所有关卡的配置字段。",
+      "用户随后报告某一特定关卡的该参数「仍然是旧值」（如「第十四关分数需求仍然是9000」），说明批量 Edit 遗漏了该关卡，或该关卡存在独立的硬编码覆盖值未被覆盖。",
+      "用户描述问题时使用「仍然是X」「还是X」「没变」「检查是什么问题」等表述，并给出具体旧值数值（问题可量化）。",
+      "用户在诊断结果输出后，发送极短/残缺输入（如「需要」「好」「是」「修」）作为跟进，表明「请执行上一轮识别出的修复」。"
+    ],
+    "strategy": [
+      "诊断 turn（用户报告旧值残留时）：立即 Grep 目标参数在所有相关文件中的出现位置，不要先重读已知文件——Grep 可以快速定位遗漏的硬编码值或未更新字段的全局分布。",
+      "诊断 turn 仅输出诊断结论：「第十四关的旧值存在于 X 位置，因 Y 原因未被前次批量编辑覆盖」。本 turn 严禁执行任何 Edit——让用户确认后再修复。",
+      "跟进 turn（用户发送极短/残缺输入）：结合诊断 turn 的 Grep 结果，推断用户意图为「执行诊断识别出的修复」，无需再次询问确认，直接批量 Edit 所有遗漏位置 + Build。",
+      "跟进 turn 的批量修复应覆盖 Grep 诊断阶段识别的所有遗漏位置（不仅仅是用户点名的那一关）——一次性清除所有残留旧值。"
+    ],
+    "constraints": {
+      "diagnosis_turn_grep_only": "诊断 turn（用户报告旧值时）只做 Grep，不执行任何 Edit——等待用户确认",
+      "grep_global_not_file_reread": "先 Grep 全局定位，不要仅重读上次已知文件（可能有多处遗漏）",
+      "batch_fix_all_missed": "跟进修复时一次性覆盖所有遗漏位置，不仅修复用户点名的那一个",
+      "build_after_batch_fix": "跟进修复完成后必须 Build 验证"
+    },
+    "validation": [
+      "诊断 turn 的回复中明确说明了旧值残留的位置和根因",
+      "诊断 turn 无任何 Edit 操作",
+      "跟进 turn 执行了完整的批量修复（Grep 识别的所有遗漏位置均已更新）",
+      "Build 成功，无语法错误",
+      "修复后对应关卡的参数值与公式计算结果一致"
+    ],
+    "title_zh": "批量公式更新后遗漏关卡旧值残留：Grep 诊断 + 残缺输入触发补丁修复",
+    "title_en": "Post-Bulk-Formula-Edit Stale Level Override — Grep-Only Diagnosis Then Fragment-Triggered Patch Fix",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "f4dd8c16"
+      ],
+      "session_count": 1,
+      "turn_range": "f4dd8c16:T4-T6",
+      "prompt_indices": [
+        3,
+        4,
+        5
+      ],
+      "evidence": "f4dd8c16 T4-T6: T4 (P3, 35 steps, 24 edits, 1 build): '基础值修改为第一关3000，之后每关增加200'. Agent: Grep (locate score config) → Read → TodoWrite → 24x mcp__mkr__Edit (formula 3000+(n-1)*200 applied per level) → respond → Build success. T5 (P4, 3 steps, 0 edits): '现在消消乐第十四关的分数需求仍然是9000，检查是什么问题'. Agent: respond → Grep → respond — diagnosed that Level 14's old value 9000 survived the T4 bulk edit, reported root cause to user, NO edits in this diagnostic turn. T6 (P5, 15 steps, 9 edits, 1 build): '需要'. Fragment input — agent inferred from T5 diagnosis context that user wants the stale value fixed. Agent: respond → TodoWrite → 9x mcp__mkr__Edit → respond → Build success → TodoWrite → respond. The 9 edits address Level 14 plus other levels whose stale values the Grep in T5 had revealed. Pattern: arithmetic formula bulk edit (T4) → stale override reported (T5) → grep-only diagnosis, no fix (T5) → fragment '需要' (T6) → batch patch edits covering all Grep-identified missed locations + build."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_aoc_display_config_numerical_mismatch",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:ai_output_correction",
+      "intent:inspection_review",
+      "target:game_logic",
+      "symptom:display_text_number_ne_actual_count",
+      "cn_keywords:xianshi,shiji,jiancha,shuzi,zhang,ge,peizhiwen,fubiaoti,shuliang,budui"
+    ],
+    "preconditions": [
+      "用户发现游戏中某处显示文字（副标题、提示文案、UI 标签等）中的数字与游戏配置文件中的实际数量不符（如「副标题写36张卡片，但配置中只有32张图片」）。",
+      "该不一致是 AI 在之前实现功能时引入的笔误——写副标题时使用了估算值或错误记忆，未对照配置核实。",
+      "用户要求：①检查文档 ②检查游戏内配置 ③修复两处的数字 ④更新文档。",
+      "通常同时提供了不一致的描述（「副标题是X，但实际上是Y」），使 AI 可以直接定位需要核查的两个来源。"
+    ],
+    "strategy": [
+      "先用 Grep/Read 定位副标题/文案所在文件及其位置，确认当前显示的具体数字（配置中的文本字符串或注释）。",
+      "再用 Grep/Read 定位实际配置数据（资源文件列表、关卡配置数组等），统计实际项目数量（必须逐项计数，不可凭记忆）。",
+      "将两处数字进行比对，确认哪个是正确的（通常以配置数据的实际数量为准）。",
+      "精准修复显示文字：将错误数字改为与配置一致的正确值（单次 Edit，定位到具体行）。",
+      "同步检查并修复文档中的该数字（主线关卡总览等）——文档、代码/UI 文案、配置三处必须对齐。",
+      "最后在「完成记录」或进度文档中追加本次修正条目。",
+      "无需 build（通常为纯文本数字修改），除非修改了 Lua 逻辑中的变量。"
+    ],
+    "validation": [
+      "已通过读取配置文件确认实际数量（非估算）",
+      "显示文字中的数字已与配置数量对齐",
+      "文档描述中的数字已同步更新",
+      "配置数据、代码/UI 文案、文档三处数字完全一致"
+    ],
+    "title_zh": "显示文案数字与配置实际数量不符的修正：三源对齐工作流",
+    "title_en": "Display Text Numerical Mismatch — Align Subtitle / Caption Count with Actual Config",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "fa1daf15"
+      ],
+      "session_count": 1,
+      "turn_range": "fa1daf15:T5",
+      "prompt_indices": [
+        5
+      ],
+      "evidence": "fa1daf15 T5 (54 steps, 18 edits, 0 builds): user prompt '18关显示的副标题是36张卡片的万花筒挑战，但是实际上是32张图片，检查这个文档和游戏内的配置，修复这些问题，并更新文档'. User identified that level 18's subtitle text claimed '36张卡片' but the actual image array in the game config had only 32 images. Agent: (1) 5x TodoWrite (task planning and progress). (2) 8x mcp__mkr__Read (level config files, game adapter, subtitle source file). (3) 5x Grep (locate the '36' occurrences in docs and image list definitions in config). (4) 18x mcp__mkr__Edit (fix the numerical value in the game config/UI text, fix the document description, update 主线关卡总览.md, update 完成记录.md). (5) 16x respond_to_user (interim status messages throughout the fix). Confirmed fix: subtitle had '36张卡片', actual image array in config had 32 entries → changed subtitle to '32张卡片', updated 主线关卡总览.md level 18 entry, appended fix note to 完成记录.md. This is ai_output_correction: the model introduced the wrong number during a prior feature-build turn by writing the subtitle text without counting the actual images in the config. The intent classification correctly flagged is_correction_of_ai_work=true. Step count (54) is high because the agent must read multiple files to verify before editing — never correct a numerical claim without first confirming the ground-truth count from config data."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_inq_mcp_tool_unavailable_first_turn",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:inquiry",
+      "mcp_tool_invocation_command",
+      "tool_not_found_in_available_tools",
+      "tool_name_specified_in_prompt",
+      "no_attached_doc"
+    ],
+    "preconditions": [
+      "User requests a specific named MCP tool",
+      "That tool is not present in the agent's current available tools list",
+      "No fallback or alternative tool is specified by the user"
+    ],
+    "strategy": [
+      "Acknowledge clearly that the requested tool is not available in the current environment",
+      "List the actually available tools so the user knows what is accessible",
+      "Do not attempt to simulate or approximate the tool's output from prior context",
+      "Suggest the user check MCP server configuration or reconnect the MCP server if applicable"
+    ],
+    "constraints": [
+      "Never hallucinate tool results when the tool is not available",
+      "Do not use Bash or other tools as a proxy to approximate the missing tool's behavior unless explicitly instructed"
+    ],
+    "validation": [
+      "Response clearly states the tool is unavailable",
+      "Available tools list is provided",
+      "No fabricated or approximate tool output returned"
+    ],
+    "title_zh": "MCP工具首轮不可用：清晰告知并列出可用工具",
+    "title_en": "MCP Tool Unavailable on First Turn: Graceful Disclosure with Available Tools List",
+    "_provenance": {
+      "sessions": [
+        "019c99e5"
+      ],
+      "projects": [
+        "zzj"
+      ],
+      "pattern_type": "diagnostic",
+      "turn_range": "1",
+      "notes": "Turn 1 of 019c99e5: agent lacked mcp__sce-urhox namespace entirely. Agent correctly listed available tools (Read, Write, Bash, etc.) and did not fabricate results. From turn 2 onward MCP became available and calls succeeded — transient unavailability, likely MCP server initialization timing at session start."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_aoc_logic_reexplain_cluster",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:ai_output_correction",
+      "consecutive_aoc_ge_2",
+      "same_target_artifact_consecutive",
+      "escalating_constraint_specificity",
+      "logic_mechanic_correction",
+      "correction_not_applied_signal"
+    ],
+    "preconditions": [
+      "用户已发送1次 ai_output_correction，AI 作出了修改，但下一轮用户再次用 ai_output_correction 指出同一逻辑约束未被正确实现。",
+      "同一逻辑规则（如能量扣除时机、删除特定代码路径、方向判断）被用不同措辞重复说明2-3次。",
+      "后续 AOC turns 的措辞比第一次更精确、更具体，表明 AI 的修改方向根本上是错的，而非细节偏差。"
+    ],
+    "strategy": [
+      "收到第2次针对同一话题的 AOC 时，视为代码从未正确实现该约束——不要做增量修改，要重新 Grep+Read 定位所有相关代码后重写。",
+      "在 Read 阶段先理解当前实现的逻辑结构，再明确陈述用户要求的不变量（invariant），然后在代码中显式实现该不变量。",
+      "修改完成后，在回复中明确列出「你要求的规则：X；我的实现：Y」的对应关系，让用户可以验证。",
+      "如果连续出现3次AOC，应先向用户确认对该逻辑规则的理解是否正确，再动手修改。",
+      "特别注意：游戏机制中「阶段A不耗能、阶段B耗能」、「删除X不要影响Y」等带时序条件的约束，容易被 AI 以简单条件覆盖而非阶段判断实现，需在代码中显式区分状态机阶段。"
+    ],
+    "constraints": {
+      "must_reread_before_edit_on_second_aoc": true,
+      "must_state_invariant_explicitly": true,
+      "no_incremental_patch_on_second_aoc": true
+    },
+    "validation": [
+      "修改后在回复中明确列出实现的逻辑规则与用户要求的对应",
+      "确认第2次 AOC 指出的问题在新代码中被直接且完整地解决",
+      "build 通过后用户未发第3次同类 AOC"
+    ],
+    "title_zh": "AI逻辑修正反复聚集 — 同一约束多轮重述",
+    "title_en": "AOC Logic Re-explanation Cluster — Same Constraint Restated Across Consecutive Correction Turns",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "zzj",
+      "session_hashes": [
+        "08754637"
+      ],
+      "turn_range": "08754637:T97-T99,T299-T301,T834-T835",
+      "prompt_indices": [
+        97,
+        98,
+        99,
+        299,
+        300,
+        301,
+        834,
+        835
+      ],
+      "evidence": "08754637 T97-T99: 3 consecutive AOC turns about the charge-mechanic energy rule. T97: '纠正蓄力机制不应扣除能量'. T98: '纠正蓄力时不扣能量的逻辑错误'. T99: '纠正蓄力技能逻辑：蓄力阶段不耗能，持续发射阶段才耗能且可手动停止' — user restated the invariant with increasing specificity, breaking it into two distinct phases, indicating the AI kept treating it as a single-state rule rather than a two-phase state machine. T299-T301: 3 consecutive AOC about beam deletion methodology. T299: '要求用正规方式删除指定光束，避免误恢复已删光束'. T300: '删除AI新添加的2条拖尾，拖尾应加在最长光翼上'. T301: '质疑新增光束的必要性，并要求若必须则使其角度与最高光束重叠'. T834-T835: 2 consecutive AOC about damage formula. T834: '质疑AI提供的怪物伤害公式，认为应为cycle+4'. T835: '质疑AI拉取数据错误，怀疑残留代码导致误导'. Pattern: in all cases the AI made a partial or directionally-wrong correction on first AOC, triggering a 2nd (and sometimes 3rd) AOC with more explicit constraint specification. The escalating specificity is the diagnostic signal.",
+      "session_count": 1
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_elp_platform_noise_continue_pattern",
+    "category": "diagnostic",
+    "signals_match": [
+      "intent:error_log_paste",
+      "recurring_same_error_type",
+      "platform_level_error",
+      "followed_by_unrelated_intent",
+      "no_explicit_fix_request",
+      "next_intent_not_bug_report"
+    ],
+    "preconditions": [
+      "用户粘贴错误日志，但错误类型为平台层面的非阻断性警告（如 TapTap Maker 的「View exceeds maximum limit」）。",
+      "该错误在同一会话中已出现过多次（3次以上），用户每次粘贴后都继续进行不相关的工作（feature_modification 或 inquiry），而非明确要求修复该错误。",
+      "用户粘贴行为本身是「记录/分享」性质，而非「请修复」请求——下一轮的 intent 不是 bug_report 或 ai_output_correction。"
+    ],
+    "strategy": [
+      "识别这类平台层报错为「噪声错误」：不阻断核心功能，用户了解并接受其存在，每次粘贴只是分享日志记录。",
+      "用一句话确认已收到日志（例如「收到，这是平台视图层的已知限制，不影响当前功能」），然后直接处理用户下一个请求。",
+      "不要主动展开对该错误的根因分析或修复方案，除非用户明确要求。",
+      "若多次出现相同平台错误，可在第3次后主动告知用户该错误的触发规律（如场景中 View 对象超出平台上限），提供一次性预防建议，不阻断当前工作流。",
+      "关键区分：error_log_paste 后跟 bug_report/ai_output_correction 意味着用户要求修复；跟 feature_modification/inquiry 意味着用户只是分享日志、继续工作——两种情况需要不同应对策略。"
+    ],
+    "constraints": {
+      "must_not_block_workflow_on_noise_error": true,
+      "acknowledge_briefly_only": true,
+      "no_unsolicited_fix_attempt": true
+    },
+    "validation": [
+      "AI 回复长度适当简短（不展开无必要的错误分析）",
+      "用户下一轮的实际请求被正确处理",
+      "未发生因等待错误修复而中断正常工作流的情况"
+    ],
+    "title_zh": "平台噪声错误日志 — 确认后继续工作模式",
+    "title_en": "Platform Noise Error Log — Acknowledge-and-Continue Pattern Without Unsolicited Fix",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "zzj",
+      "session_hashes": [
+        "08754637"
+      ],
+      "turn_range": "08754637:T58-T59,T66-T67,T94-T95,T133-T134,T164-T165,T207-T208,T293-T294,T317-T318",
+      "prompt_indices": [
+        58,
+        59,
+        66,
+        67,
+        94,
+        95,
+        133,
+        134,
+        164,
+        165,
+        207,
+        208,
+        293,
+        294,
+        317,
+        318
+      ],
+      "evidence": "08754637: 'View exceeds maximum limit' platform error appeared 11 times across the 854-turn session. Post-paste intents: T58(elp)->T59(fm: remove top beam); T66(elp)->T67(inq: query player speed param); T94(elp)->T95(br: compound bug fix, unrelated to this error); T133(elp)->T134(fm: enlarge player bullet); T164(elp)->T165(nf: implement main-menu music); T207(elp)->T208(br: post-death position bug). In no case did the user request a fix for the 'View exceeds maximum limit' error itself; all follow-up turns addressed unrelated concerns. This error is a TapTap Maker/UrhoX platform constraint triggered when the scene creates too many UI View nodes; it is non-fatal and users implicitly accept it as a background constraint during active development.",
+      "session_count": 1
+    }
+  }
+]

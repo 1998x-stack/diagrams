@@ -1,0 +1,36 @@
+Only 3 prompts. Let me extract trajectory details from the .traj file.
+Now I have the full picture. Let me check for overlap with existing genes before creating new ones.
+Now I have the complete picture. This is an extremely thin session (3 prompts, 29 steps, ~4 min). Let me check what's worth extracting.
+
+**Session Summary:**
+- T0 (doc): 1 step, respond_to_user only, 0 edits
+- T1 (inquiry): 16 steps, 9 Read + 2 Grep + 2 Glob, 0 edits, 0 builds
+- T2 (feature_modification): 12 steps, 6 Read + 1 Task + 1 TodoWrite, **0 edits, 0 builds** — session ended without implementation
+
+The T2 pattern is notable: a feature_modification request that triggered investigation but the session terminated before any code was written. Let me check if this overlaps with existing genes and create what's genuinely new.
+Now let me create the genuinely new gene. The T2 pattern (feature_modification with zero implementation) is a distinct failure mode not covered by existing genes.
+Now let me create the new gene and append it to the diagnostic genes file.
+Now update the index:
+Done. Here's the analysis summary:
+
+## 会话 e948a3d9 (wzp) 分析结果
+
+**会话概况**: 3 prompts, 29 steps, ~4分钟, claude-opus-4-6
+
+| Turn | Intent | Steps | Tools | Edits | Builds |
+|------|--------|-------|-------|-------|--------|
+| T0 | documentation | 1 | respond_to_user×1 | 0 | 0 |
+| T1 | inquiry | 16 | Read×9, Grep×2, Glob×2, respond×3 | 0 | 0 |
+| T2 | feature_modification | 12 | Read×6, respond×4, Task×1, TodoWrite×1 | 0 | 0 |
+
+**生成的Gene**: 1个
+
+### `gene_fm_investigation_without_implementation` (diagnostic)
+
+**功能修改调查无实施模式** — feature_modification请求触发了重度调查（6 Read + Task + TodoWrite），但整个turn零Edit零Write零Build，会话直接终止。
+
+这是一个此前未记录的失败模式：所有已有session的feature_modification turn均至少包含1处Edit，而本session的T2是唯一一个纯调查无实施的feature_modification turn。
+
+**未生成其他Gene的原因**:
+- T0仅1步respond_to_user，模式过于简单
+- T1的inquiry零编辑模式与已有`gene_nf_localization_heavy_zero_edit`部分重叠，但intent不同(inquiry vs new_feature)且步骤数(16)低于该gene的阈值(30+)，不足以构成有意义的扩展

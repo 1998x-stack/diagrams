@@ -1,0 +1,73 @@
+Now I have full context. This session has only 2 prompts, which is below the 3-prompt threshold. Let me check for overlap with existing genes before deciding whether to enhance or create new.
+I detect **research/analysis** intent — analyzing a session trajectory to extract reusable gene patterns. My approach: extract trajectory data → check overlap with existing genes → enhance existing or create new → regenerate index.
+
+This session has only **2 prompts** (below the 3-prompt threshold), so I need to check if patterns are distinctive enough to warrant enhancement of existing genes.
+
+Let me check the most relevant existing genes for overlap:
+Now I have a complete picture. This session has only **2 prompts** (below the 3-prompt threshold), so I need to be selective. Let me analyze what's distinctive:
+
+**Session Summary:**
+- **T0** (inspection_review, 5 steps): "检查修复方案是否有问题" → 3 respond + 1 Read + 1 Task, 0 edits
+- **T1** (documentation, 32 steps): "修改文档" → 11 Edit + 11 respond + 9 TodoWrite + 1 Read, all on single file `主线关卡一致性问题报告.md`, 0 builds
+
+**Overlap check results:**
+- `gene_doc_post_implementation_sync` — closest but triggered by code changes, not inspection→doc-edit
+- `gene_nf_edit_drift_without_verification` — matches drift-start at step 4 (4 consecutive edits)
+- `gene_sr_respond_think_before_act` — matches announce-before-edit rhythm (11 respond interleaved with 11 edits)
+
+**Decision:** This session is too short (2 prompts) for a standalone gene, but it **enhances** two existing genes. I'll also check if the inspection→doc-edit pattern is distinct enough from `gene_doc_post_implementation_sync`.
+Now I have full picture. This session has only **2 prompts** (below the 3-prompt threshold), so I need to be selective. Let me analyze what's distinctive:
+
+**Session 4807e6ed (wzp) — 2 turns, 37 steps**
+
+| Turn | Intent | Steps | Tools | Edits | Builds |
+|------|--------|-------|-------|-------|--------|
+| T0 | inspection_review | 5 | 3 respond + 1 Read + 1 Task | 0 | 0 |
+| T1 | documentation | 32 | 11 Edit + 11 respond + 9 TodoWrite + 1 Read | 11 (single file) | 0 |
+
+**Pattern analysis:**
+1. **inspection→doc-edit pipeline**: T0 reviews a report doc → T1 edits the same report (11 systematic edits, TodoWrite-tracked, 7 items)
+2. **Single-file doc edit drift**: 4 consecutive edits at step 4 without verification (drift-start marker)
+3. **announce-each-edit rhythm**: 11 respond interleaved with 11 Edit (1:1 ratio)
+
+**Overlap check:**
+- `gene_doc_post_implementation_sync` — closest match but triggered by **code changes**, not inspection→report-edit
+- `gene_nf_edit_drift_without_verification` — matches drift-start marker, already covers doc drift
+- `gene_sr_respond_think_before_act` — matches announce-before-edit rhythm
+
+**Decision**: This session is too short (2 prompts) for a standalone gene, but it **enhances** two existing genes. I'll update `_provenance` for both.
+Now let me also enhance `gene_sr_respond_think_before_act` in session_rhythm:
+Now let me update `gene_sr_respond_think_before_act` with evidence from 4807e6ed:
+Now let me check the `gene_nf_edit_drift_without_verification` in workflow to see if 4807e6ed should be added:
+The drift-start marker at global step 4 is a session-level marker, but the max consecutive edits in T1 is only 2 (TodoWrite interleaves break the chain). This doesn't meet the `consecutive_edits_ge_10` threshold for `gene_nf_edit_drift_without_verification`. Skip enhancement for that gene.
+
+Now let me also check if there's a pattern for **inspection_review → documentation** pipeline that's not yet captured. Let me check the workflow genes:
+No existing gene captures the `inspection_review → documentation` pipeline. However, with only 2 prompts, this session is below the threshold for a standalone gene. The pattern is already partially covered by the enhanced `gene_doc_post_implementation_sync` (which now includes this session as a doc-edit variant).
+
+Now let me regenerate the index:
+Let me verify the updated index entries reflect the new session:
+Let me verify the index tables were updated with new session counts:
+Analysis complete. Here's the summary:
+
+## Session 4807e6ed (wzp) — Analysis Results
+
+**Session profile**: 2 prompts, 37 steps, 23 tool calls, 4 subagents
+
+| Turn | Intent | Steps | Key Tools | Edits | Builds |
+|------|--------|-------|-----------|-------|--------|
+| T0 | inspection_review | 5 | 3 respond + 1 Read + 1 Task | 0 | 0 |
+| T1 | documentation | 32 | 11 Edit + 11 respond + 9 TodoWrite + 1 Read | 11 (single file) | 0 |
+
+**Decision**: Only 2 prompts (below the 3-prompt threshold). No standalone genes created. Instead, enhanced 2 existing genes:
+
+### Enhanced Genes
+
+1. **`gene_doc_post_implementation_sync`** (operational) — 3→4 sessions
+   - New evidence: 4807e6ed expands the trigger scenario — not just "更新文档" after code changes, but also `inspection_review → doc-edit` pipeline where the user reviews a report, confirms fixes, then asks to modify the same report document. 11 edits on a single file (主线关卡一致性问题报告.md), TodoWrite-tracked 7 items, no build.
+
+2. **`gene_sr_respond_think_before_act`** (session_rhythm) — 8→9 sessions
+   - New evidence: 37.8% respond ratio (14/37 steps). T0: 60% (3/5), T1: 34% (11/32). Each of 11 edits preceded by announce of which issue to fix, followed by confirm + preview next item. Classic 'announce→Edit→confirm→announce next' cycle in pure doc-edit context.
+
+### Patterns Not Gene-Worthy
+- **inspection→doc-edit pipeline**: Distinctive but only 1 session, below threshold
+- **Edit drift**: drift-start marker at step 4 but max consecutive edits = 2 (TodoWrite interleaves break the chain), doesn't meet `consecutive_edits_ge_10` threshold

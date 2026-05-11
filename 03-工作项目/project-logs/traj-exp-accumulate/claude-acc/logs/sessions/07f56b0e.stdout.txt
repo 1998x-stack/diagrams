@@ -1,0 +1,14 @@
+Done. Here's a summary of what happened:
+
+**Session `07f56b0e` analysis (wzp, 2 prompts, 286s):**
+
+- **T1** (22 steps, 0 edits): User asked to add minor protection (未成年人游戏限制). Agent tried an Explore subagent (failed, API 404), then fell back to sequential Glob discovery. It searched semantically for `play-time-guard*` and found the module already fully implements `isRestricted()` + `renderOverlay()`, integrated in both entry pages. Agent correctly reported the feature as complete and made **no edits**.
+- **T2** (4 steps, 0 edits): User asked to add a test toggle to config. Agent read `settings-save.lua`, ran a Grep, then hit an API error on final response — incomplete turn, no usable pattern.
+
+**Gene created (1):**
+
+| ID | Category | Title |
+|---|---|---|
+| `gene_nf_existing_impl_reuse_audit` | workflow | New Feature Existing Implementation Audit — Semantic Module Discovery Before Reimplementing |
+
+The key behavioral insight: when asked for a compliance/access-control feature without a design doc, predict likely module names from feature semantics (「时间限制」→ `play-time-guard*`), Glob for them first, and if found fully implemented, **audit integration then report — don't reimplement**. This is distinct from all existing genes which always result in code edits. Workflow index updated to 7 genes.

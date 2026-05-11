@@ -1,0 +1,185 @@
+You are a trajectory analysis expert. Your task is to analyze a game-development AI agent session and extract reusable behavioral patterns ("genes") from it.
+
+## GOAL
+Analyze session `014354fc` (project: `wzp`) and generate Gene objects organized by intent category. Write them to the plugins directory.
+
+## INPUT FILES (use Read/Bash tools to access these)
+1. **Intent classifications**: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/examples/wzp/014354fc.json`
+   - Contains classified user prompts with intent_primary, target_artifact, summaries
+2. **Full trajectory**: `/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/014354fc.traj`
+   - Contains the full agent trajectory (may be very large — use Bash with python/jq to extract summaries, don't try to read the whole file at once)
+
+## ANALYSIS STEPS
+1. Read the .json file to understand intent distribution and prompt sequences
+2. Use Bash to extract per-turn summary from the .traj file:
+   - Per turn: step count, tool distribution, phase, edit count, build count, error count
+   - Session-level: total duration, total steps, tool frequency, phase distribution
+3. Identify reusable behavioral patterns:
+   - Consecutive same-intent sequences (e.g., 5+ visual tweaks in a row)
+   - Workflow chains (e.g., design doc → implement → polish → doc checkpoint)
+   - Failure patterns (repeated bug reports, escalation sequences)
+   - Session rhythm (doc checkpoint cadence, phase boundaries)
+   - Content creation workflows (generate → preview → apply)
+4. Check existing genes (below) for overlaps
+5. Generate new genes or enhance existing ones
+
+## INTENT TAXONOMY
+  - new_feature: First-time request for a new capability, system, screen, or game mechanic that does not yet exist.
+  - feature_modification: Tweak / adjust / extend an existing feature the user already accepted.
+  - bug_report: User observed broken behavior in the running product; expects diagnosis + fix.
+  - ai_output_correction: User is correcting the AI's most-recent or recent delivery.
+  - inquiry: Question seeking information, status, or judgment. Does not request code change.
+  - inspection_review: Ask the AI to inspect / audit / review existing code, docs, or designs.
+  - planning_design: Request to design / draft / spec something before implementation.
+  - documentation: Update, create, or refresh documentation specifically.
+  - content_creation: Generate non-code assets — images, text/copy, audio specs, character bios, dialogue.
+  - refactor_redesign: Re-architect or redo something already built (not a small tweak).
+  - error_log_paste: User pastes raw error logs / crash reports / stack traces.
+  - configuration: Change a config value, environment variable, build flag, or registry entry.
+  - meta_workflow: Operational request not about the product itself — saving sessions, switching tools, summarizing progress.
+  - other: Use only if none of the above clearly fits.
+
+## GENE SCHEMA
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gene",
+  "description": "A reusable behavioral pattern extracted from game-development AI agent trajectories. Genes represent recurring strategies, diagnostic patterns, and workflow rhythms that can be matched to new user prompts for improved agent behavior.",
+  "type": "object",
+  "required": ["type", "id", "category", "signals_match", "preconditions", "strategy", "title_zh", "title_en", "_provenance"],
+  "properties": {
+    "type": { "const": "Gene" },
+    "id": {
+      "type": "string",
+      "pattern": "^gene_[a-z_]+$",
+      "description": "Unique identifier. Convention: gene_{intent_prefix}_{pattern_name}"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["workflow", "diagnostic", "session_rhythm", "operational", "informational"],
+      "description": "workflow=implementation pattern, diagnostic=bug/error investigation, session_rhythm=cross-turn cadence, operational=meta/build, informational=read-only"
+    },
+    "signals_match": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags and conditions that trigger this gene. Format: 'dimension:value' or bare keyword."
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Natural language conditions (Chinese) that must be true for this gene to activate."
+    },
+    "strategy": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered action steps (Chinese) the agent should follow when this gene is matched."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Hard guardrails for execution (optional)."
+    },
+    "validation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Verification checks to confirm the gene's strategy was correctly applied."
+    },
+    "title_zh": { "type": "string" },
+    "title_en": { "type": "string" },
+    "_provenance": {
+      "type": "object",
+      "required": ["source", "project", "session_hashes"],
+      "properties": {
+        "source": { "type": "string" },
+        "project": { "type": "string" },
+        "session_hashes": { "type": "array", "items": { "type": "string" } },
+        "turn_range": { "type": "string" },
+        "prompt_indices": { "type": "array", "items": { "type": "integer" } },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}
+
+
+## EXAMPLE GENE
+{
+  "type": "Gene",
+  "id": "gene_fm_visual_polish_cascade",
+  "category": "workflow",
+  "signals_match": [
+    "intent:feature_modification",
+    "target:visual_style",
+    "consecutive_same_intent_ge_4",
+    "parameter_tweak_chain",
+    "size_color_position_adjustment",
+    "cn_visual_decoration_keywords"
+  ],
+  "preconditions": [
+    "用户已有一个基本可用的视觉元素（装饰物、背景、动画），正在进行迭代打磨。",
+    "连续4+次 feature_modification 指向 visual_style 或 ui_layout，每次只调整1-2个参数。",
+    "用户的反馈模式为：观察结果→提出微调→观察→再微调，典型的视觉打磨循环。"
+  ],
+  "strategy": [
+    "每次修改限定在用户提及的单一参数（大小、颜色、速度、位置），不要预判性地调整其他视觉属性。",
+    "修改后立即 build 让用户预览，减少多轮空转。",
+    "当用户说'太小了'、'看不清'、'像是画面脏了'时，调整幅度应偏大（2x-3x），避免需要再次微调。",
+    "记录用户此前接受的参数值域，用于推断本次微调的合理范围。",
+    "如果连续3次以上同一属性的调整，主动询问用户期望的目标值，而非继续猜测性递增。"
+  ],
+  "constraints": {
+    "max_edits_per_turn": 3,
+    "must_build_after_edit": true
+  },
+  "validation": [
+    "每次修改后确认 build 成功",
+    "修改的参数值在用户描述的方向上（增大/减小/改色）"
+  ],
+  "title_zh": "视觉打磨连续微调链",
+  "title_en": "Visual Polish Cascade — Consecutive Parameter Tweaking Chain",
+  "_provenance": {
+    "source": "traj-exp-accumulate",
+    "project": "wzp",
+    "session_hashes": [
+      "9dc56f96",
+      "374e4eb7"
+    ],
+    "turn_range": "9dc56f96:T05-T12, 374e4eb7:T15-T19",
+    "prompt_indices": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "evidence": "9dc56f96: 9 consecutive visual tweaks (dots→stars→bigger→colored→moving). 374e4eb7: 5 consecutive shape/size refinements on 连连看 graphics (四角星→正三角形→加大鱼/桃心/箭头/闪电→加大螺旋加粗). Also T06→T07: preview height 180→260 in 2 turns. Pattern confirmed across sessions.",
+    "session_count": 2
+  }
+}
+
+## EXISTING GENES (check for overlaps — enhance if similar, create new if distinct)
+(No existing genes yet — this is a fresh run.)
+
+## OUTPUT INSTRUCTIONS
+For each discovered pattern:
+1. Determine which intent category it belongs to
+2. Check if a similar gene already exists in that category (compare signals, preconditions)
+3. If similar gene exists: read the existing `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/{category}/genes.json`, update the gene's `_provenance` (add `"014354fc"` to `session_hashes`, update `evidence`, increment `session_count`)
+4. If new gene: append to `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/{category}/genes.json` (create the file if it doesn't exist — it should be a JSON array)
+5. After all genes are written, run: `python3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py` with the plugins dir set appropriately, or manually update the index
+
+## GENE ID CONVENTION
+- Format: `gene_{intent_prefix}_{pattern_name}`
+- Intent prefixes: fm=feature_modification, nf=new_feature, br=bug_report, aoc=ai_output_correction, inq=inquiry, pd=planning_design, doc=documentation, cc=content_creation, cfg=configuration, mw=meta_workflow, elp=error_log_paste, meta=session_meta
+
+## IMPORTANT RULES
+- Every gene must have all required fields from the schema
+- Preconditions and strategy should be in Chinese (matching the user's language)
+- title_zh in Chinese, title_en in English
+- _provenance must include session_hashes, turn_range, prompt_indices, and evidence
+- Do NOT create genes for sessions with very few prompts (< 3) unless the pattern is highly distinctive
+- Quality over quantity: 3-5 high-quality genes per session is better than 10 weak ones
+- The plugins directory to write to is: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins`
+
+Now analyze the session and generate genes. Start by reading the .json file.

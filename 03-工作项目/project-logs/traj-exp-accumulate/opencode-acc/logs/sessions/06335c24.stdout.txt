@@ -1,0 +1,18 @@
+I detect **investigation/analysis** intent — analyzing a trajectory session to extract reusable behavioral patterns. My approach: read input files in parallel → extract trajectory summary → identify patterns → check against existing genes → write new/enhanced genes.
+Now let me check for existing gene overlaps:
+All 3 genes from this session are already in `workflow/genes.json`. Let me check other categories for any additional genes from this session:
+The session `06335c24` has already been fully analyzed. All 3 genes extracted from it exist in `workflow/genes.json`:
+
+| # | Gene ID | Category | Pattern |
+|---|---------|----------|---------|
+| 1 | `gene_ir_pre_implementation_doc_review` | workflow | 实施前文档审查 — Read doc → respond with gap/blocker assessment |
+| 2 | `gene_sr_fragmented_prompt_assembly` | session_rhythm | 碎片化输入拼接 — User's single intent split across 4 turns |
+| 3 | `gene_ir_minimal_inspection_rhythm` | session_rhythm | 轻量审查节奏 — Read+respond only, ≤2 steps/turn, 0 edits/builds |
+
+**Session profile**: 5 prompts, 3 agent runs, 2 tool calls (both Read), 0 edits, 0 builds, 6 subagents (warmup-only), ~81 min duration. The lightest session in the dataset.
+
+**No new genes to create** — all extractable patterns from this session are already captured.
+
+---
+
+**Observation**: There's a categorization inconsistency — `gene_sr_fragmented_prompt_assembly` and `gene_ir_minimal_inspection_rhythm` have `category: "session_rhythm"` but are stored in `workflow/genes.json` instead of `session_rhythm/genes.json`. Should I fix this?

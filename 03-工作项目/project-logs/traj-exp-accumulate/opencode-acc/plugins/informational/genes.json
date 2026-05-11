@@ -1,0 +1,116 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_inq_ui_status_probe",
+    "category": "informational",
+    "signals_match": [
+      "intent:inquiry",
+      "target:ui_layout",
+      "read_respond_only",
+      "no_edit_no_build",
+      "status_question_pattern",
+      "lightweight_exploration"
+    ],
+    "preconditions": [
+      "用户以疑问句形式询问当前UI/功能的现状（如'现在UI是否有自适应'、'缩放基于宽度还是高度'）。",
+      "用户未要求修改、未报告bug、未要求新增功能。",
+      "Agent的响应模式为：读取1-2个相关文件→respond_to_user回答，不执行任何编辑或build。",
+      "如果此前已有相关探索上下文（如刚完成大规模UI修改），Agent可直接回答而无需读取文件。"
+    ],
+    "strategy": [
+      "识别用户的疑问句为信息咨询类意图，不触发任何编辑操作。",
+      "如有近期相关探索的上下文记忆，直接基于已有知识回答。",
+      "如无上下文，读取1-2个最相关的文件（如layout.lua、density.lua、main.lua）。",
+      "用respond_to_user给出简洁、准确的技术回答，直接回应用户的问题。",
+      "不要主动提出'需要我帮你修改吗'——等待用户自行决定下一步。",
+      "保持响应轻量：不超过9步，理想情况1-3步。"
+    ],
+    "constraints": {
+      "no_edit_without_explicit_request": true,
+      "no_build_without_explicit_request": true,
+      "max_steps_for_simple_inquiry": 9,
+      "answer_based_on_recent_context_if_available": true
+    },
+    "validation": [
+      "未执行任何Edit、Write或Bash(build)操作",
+      "respond_to_user中包含对用户问题的直接回答",
+      "如有文件读取，读取的文件与问题直接相关",
+      "步骤数≤9"
+    ],
+    "title_zh": "UI状态轻量查询模式",
+    "title_en": "UI Status Probe — Lightweight Inquiry with Read-Respond Pattern",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "08e306a0",
+        "9df66fd4"
+      ],
+      "turn_range": "T0, T3, 9df66fd4:T00,T23,T25",
+      "prompt_indices": [
+        0,
+        3,
+        0,
+        23,
+        25
+      ],
+      "evidence": "T0: '现在UI是否有自适应'→9步(2 Glob+2 Read+4 respond)，读取layout.lua和main.lua后回答，0 edits 0 builds。T3: '现在UI缩放是基于屏幕宽度还是高度'→仅1步respond_to_user，因T2刚完成大规模UI自适应修改，Agent直接基于已有上下文回答，无需读取文件。两个turn均为纯信息查询模式，但T3展示了'利用近期上下文直接回答'的优化路径。 9df66fd4强化了此模式并展示了'inquiry→直接回答'变体：T00: '主线模式，按钮的大小是根据宽还是高计算的'→3步(2 respond+1 Task)。纯信息查询→Task探索→respond回答。0 edits 0 builds。T23: '记忆翻牌，25关的牌展示时间是多少'→11步(2 respond+8 Grep+1 Read)。纯参数查询→Grep搜索配置→Read确认→respond回答。0 edits 0 builds。T25: '现在换装是否有保存'→5步(2 respond+1 Grep+1 Read+1 build)。纯状态查询→Grep+Read确认→respond回答。1 build可能是意外触发。3个inquiry turn均为纯信息查询模式，与08e306a0的'UI自适应查询'模式一致。",
+      "session_count": 2
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_ir_narrative_game_data_consistency_check",
+    "category": "informational",
+    "signals_match": [
+      "intent:inspection_review",
+      "target:narrative",
+      "data_consistency_check",
+      "narrative_vs_game_data_comparison",
+      "grep_only_inspection",
+      "read_respond_only",
+      "no_edit_no_build"
+    ],
+    "preconditions": [
+      "用户要求检查剧情描述/文案中的数值或元素描述是否与游戏内实际数据一致。",
+      "这不是代码审查或bug修复，而是内容一致性检查。",
+      "典型场景：剧情中提到'3个石头'，需要确认游戏内该关卡确实配置了3个石头。",
+      "用户明确说明'如果没有，则不用处理'——这是一个轻量级检查，不要求主动修复。",
+      "Agent的响应模式为：Grep搜索相关文案→respond回答，不执行任何编辑或build。"
+    ],
+    "strategy": [
+      "先用Grep搜索剧情文档/文案文件中提及的相关元素和数量。",
+      "再Grep搜索游戏数据文件（如levels.lua）中对应关卡的实际配置值。",
+      "对比两者是否一致，在respond_to_user中汇报检查结果。",
+      "如果用户说'如果没有则不用处理'，只做检查报告，不主动修改。",
+      "如果发现不一致，向用户列出具体差异，等待用户确认是否需要修复。",
+      "检查范围限定在用户明确提及的元素类型（如石头、冰块），不扩展到其他未提及的内容。"
+    ],
+    "constraints": {
+      "grep_only_no_edit": true,
+      "report_only_unless_confirmed": true,
+      "scope_limited_to_mentioned_elements": true
+    },
+    "validation": [
+      "Grep搜索了剧情文档中提及的相关元素",
+      "Grep搜索了游戏数据文件中的对应配置",
+      "respond_to_user中汇报了一致性检查结果",
+      "未执行任何编辑或build操作"
+    ],
+    "title_zh": "叙事与游戏数据一致性检查",
+    "title_en": "Narrative-Game Data Consistency Check — Lightweight Cross-Reference Inspection",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": [
+        "6b8566ea"
+      ],
+      "turn_range": "6b8566ea:T17",
+      "prompt_indices": [
+        17
+      ],
+      "evidence": "T17: '检查剧情描述，是否有出现石头和冰块数量，如果有，确保和游戏内数量一致，如果没有，则不用处理'→2步(1 Grep+1 respond)。Grep搜索剧情描述中石头/冰块数量提及→respond回答检查结果。0 edits 0 builds。典型的'Grep搜索→对比报告'轻量检查模式。与gene_ir_minimal_inspection_rhythm(Read+respond纯文档审查)不同——本模式是跨文档/数据文件的一致性对比检查(narrative vs game data)，需要Grep搜索两个数据源进行对比。与gene_ir_inspection_to_investigation_cascade不同——后者是inspection后紧跟bug调查，本模式是独立的轻量一致性检查，不触发后续修复。",
+      "session_count": 1
+    }
+  }
+]

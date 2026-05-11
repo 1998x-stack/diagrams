@@ -1,0 +1,23 @@
+All changes verified. Here's a summary of what was done for session `0ea2a577`:
+
+---
+
+**Session `0ea2a577` — 3 prompts, 3 agent runs analyzed:**
+
+| Turn | Prompt | Pattern |
+|------|--------|---------|
+| T00→T01 | 根据自查方向指南.md 检查游戏… | NEW gene |
+| T02→T03 | 修复P1、P2问题 | NEW gene |
+| T04→T05 | 更新文档 | ENHANCED existing gene |
+
+---
+
+**2 new genes created:**
+
+1. **`gene_ir_checklist_guided_parallel_audit`** (informational) — User attaches a compliance checklist guide and asks for a broad game review. Agent reads the guide → TodoWrite audit dimensions → Explore subagent for project structure → 5 parallel specialist subagents per dimension (compliance, text norms, numeric consistency, structure/unlock chain, audio/perf) → outputs P0/P1/P2/P3 priority-tiered report table. Distinct from the existing `gene_inq_design_doc_preflight_review` (which reviews design docs pre-implementation, not a running product against a compliance checklist).
+
+2. **`gene_br_audit_priority_tier_batch_fix`** (workflow) — Terse `修复P1、P2问题` references a previous audit's priority tiers. Agent reconstructs the issue list from context → TodoWrite with `[P1]`/`[P2]` labels (14 tasks) → parallel reads → 52 edits across 17 files (bulk ASCII→full-width punctuation, config field fixes, sound registrations) → single build at end → structured summary table.
+
+**1 gene enhanced:**
+
+- **`gene_doc_terse_breadth_first`** — Added 0ea2a577 T05 as 4th session (session_count 3→4). New variant: uses a Task subagent for doc discovery (instead of direct Glob), and an audit-specific doc (`自查问题报告.md`) is updated alongside standard progress docs when the session was an audit/fix session.

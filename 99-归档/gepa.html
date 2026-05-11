@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEPA Pipeline — AI Agent 失败模式自动优化系统</title>
+<link rel="stylesheet" href="base-dark.css">
+<style>
+:root {
+  --c1:#1D9E75; --c1d:#0F6E56;
+  --c2:#378ADD; --c2d:#185FA5;
+  --c3:#D4A72C; --c3d:#9E7B1A;
+  --c4:#C75AE8; --c4d:#8B3AB0;
+  --c5:#E8605A; --c5d:#B03A36;
+  --c6:#59C7DB; --c6d:#3A8FA0;
+}
+.hero h1 em {
+  background:linear-gradient(90deg,var(--c1),var(--c2),var(--c4));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.pipe-row {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:16px; flex-wrap:wrap;
+}
+.pipe-node {
+  background:var(--bg2); border:1px solid var(--border); border-radius:10px;
+  padding:14px 18px; min-width:160px; flex:1;
+  transition:all .25s;
+}
+.pipe-node:hover { border-color:var(--border2); transform:translateY(-2px); background:var(--bg3); }
+.pipe-node .pn-tag {
+  font-size:10px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; margin-bottom:6px;
+}
+.pipe-node .pn-name { font-size:14px; font-weight:600; margin-bottom:4px; }
+.pipe-node .pn-sub { font-size:11px; color:var(--muted); line-height:1.6; }
+.pipe-node .pn-file {
+  margin-top:10px; padding-top:8px; border-top:1px solid var(--faint);
+  font-size:10px; font-family:var(--mono); color:var(--faint);
+}
+.pipe-arrow {
+  font-size:20px; color:var(--faint); flex-shrink:0;
+  display:flex; align-items:center; min-width:32px; justify-content:center;
+}
+
+.algo-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.algo-step {
+  background:var(--bg2); border:1px solid var(--border); border-radius:12px;
+  padding:24px; position:relative; overflow:hidden;
+  transition:all .25s;
+}
+.algo-step:hover { border-color:var(--border2); background:var(--bg3); }
+.algo-step .step-num-r {
+  position:absolute; top:16px; right:16px;
+  width:36px; height:36px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700;
+}
+.algo-step h4 { font-size:16px; font-weight:600; margin-bottom:10px; }
+.algo-step p { font-size:13px; color:var(--muted); line-height:1.7; }
+
+.score-bar-wrap { margin:8px 0; }
+.score-bar-label {
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:12px; margin-bottom:4px;
+}
+.score-bar-label .sb-name { color:var(--text); font-weight:500; }
+.score-bar-label .sb-val { font-family:var(--mono); font-size:11px; }
+.score-bar {
+  height:8px; border-radius:4px; background:var(--bg3); overflow:hidden;
+}
+.score-bar-fill {
+  height:100%; border-radius:4px;
+  transition:width .6s ease;
+}
+
+.metric-row { display:flex; gap:12px; margin:16px 0; }
+.metric-block {
+  flex:1; text-align:center; padding:16px 8px;
+  border-radius:10px; background:var(--bg2); border:1px solid var(--border);
+}
+.metric-block .mb-weight { font-size:28px; font-weight:700; margin-bottom:4px; }
+.metric-block .mb-name {
+  font-size:11px; color:var(--muted); font-weight:500;
+  text-transform:uppercase; letter-spacing:.05em;
+}
+
+.tax-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
+.tax-item {
+  background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+  padding:10px 12px; text-align:center; transition:all .2s;
+}
+.tax-item:hover { border-color:var(--border2); background:var(--bg3); }
+.tax-item .ti-pct { font-size:22px; font-weight:700; margin-bottom:2px; }
+.tax-item .ti-name {
+  font-size:10px; color:var(--muted); font-family:var(--mono);
+  word-break:break-all; line-height:1.4;
+}
+
+.evo-tree {
+  font-family:var(--mono); font-size:12px; line-height:2;
+  color:var(--muted); white-space:pre; overflow-x:auto;
+  padding:20px 24px;
+}
+.evo-tree .evo-best { color:var(--c1); font-weight:700; }
+.evo-tree .evo-fail { color:var(--c5); }
+.evo-tree .evo-good { color:var(--c2); }
+
+.results-cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.result-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:12px;
+  padding:24px; text-align:center; transition:all .25s;
+}
+.result-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+.result-card .rc-score { font-size:36px; font-weight:700; margin-bottom:4px; }
+.result-card .rc-label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+.result-card .rc-delta { font-size:14px; margin-top:8px; font-weight:600; }
+
+.workflow-steps { counter-reset:wstep; }
+.workflow-step {
+  counter-increment:wstep;
+  padding:20px 20px 20px 60px; position:relative;
+  border-left:2px solid var(--faint); margin-left:20px;
+}
+.workflow-step:last-child { border-left-color:transparent; }
+.ws-num {
+  position:absolute; left:-16px; top:18px;
+  width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700;
+}
+.workflow-step h4 { font-size:15px; font-weight:600; margin-bottom:6px; }
+.workflow-step p { font-size:13px; color:var(--muted); line-height:1.7; }
+.workflow-step code {
+  font-family:var(--mono); font-size:11px;
+  background:var(--bg3); padding:1px 6px; border-radius:4px;
+}
+
+.rule-item {
+  background:var(--bg2); border:1px solid var(--border); border-radius:10px;
+  padding:16px 20px; margin-bottom:10px;
+  display:flex; gap:14px; align-items:flex-start;
+  transition:all .2s;
+}
+.rule-item:hover { border-color:var(--border2); background:var(--bg3); }
+.rule-num {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700;
+}
+.rule-text { font-size:13px; line-height:1.7; }
+.rule-text strong { color:var(--text); }
+
+.dataflow {
+  background:var(--bg2); border:1px solid var(--border); border-radius:12px;
+  padding:28px; font-family:var(--mono); font-size:12px;
+  line-height:2.2; color:var(--code-text); white-space:pre; overflow-x:auto;
+}
+.df-input { color:var(--c2); }
+.df-process { color:var(--c4); }
+.df-output { color:var(--c1); }
+.df-arrow { color:var(--faint); }
+.df-comment { color:var(--muted); font-style:italic; }
+
+@media (max-width:900px) {
+  .algo-grid { grid-template-columns:1fr; }
+  .results-cards { grid-template-columns:1fr; }
+  .metric-row { flex-direction:column; }
+  .pipe-row { flex-direction:column; }
+  .pipe-arrow { transform:rotate(90deg); }
+}
+</style>
+</head>
+<body>
+<nav><div class="nav-inner">
+  <span class="nav-brand">GEPA <span>Pipeline Visual</span></span>
+  <a class="nl" href="#overview">概览</a>
+  <a class="nl" href="#pipeline">数据管线</a>
+  <a class="nl" href="#skill">Skill 工作流</a>
+  <a class="nl" href="#gepa">GEPA 算法</a>
+  <a class="nl" href="#results">优化结果</a>
+  <a class="nl" href="#rules">学到的规则</a>
+</div></nav>
+
+<div class="page">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span>trajectory-analysis &middot; 2026-04</div>
+  <h1>AI Agent <em>失败模式自动优化</em>系统</h1>
+  <p>从真实 Claude Code 会话轨迹中自动提取失败切片，构建训练数据集，
+    通过 DSPy GEPA 进化算法自动优化 Agent 的 next-action 决策 prompt，
+    将 baseline 0.489 提升至 0.624（+27.4%）。</p>
+  <div class="tag-row">
+    <span class="ltag" style="color:var(--c1);border-color:rgba(29,158,117,.4)">DSPy GEPA</span>
+    <span class="ltag" style="color:var(--c2);border-color:rgba(55,138,221,.4)">Failure Slicing</span>
+    <span class="ltag" style="color:var(--c4);border-color:rgba(199,90,232,.4)">Prompt Evolution</span>
+    <span class="ltag" style="color:var(--c3);border-color:rgba(212,167,44,.4)">DashScope Qwen</span>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section class="layer-sec" id="overview">
+  <div class="sec-label">系统概览</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c2d);color:#fff">WHAT</span>
+    <h2 class="layer-title">GEPA 是什么</h2>
+  </div>
+  <p class="layer-def" style="border-color:var(--c2)">
+    <strong>GEPA (Genetic Extraction of Prompt Actions)</strong> 是 DSPy 框架中的进化式 prompt 优化器。
+    它通过 reflection model 分析训练集上的错误，自动生成 prompt mutation 候选，
+    并通过 Pareto 搜索保留互补性最强的候选，最终产出优化后的 system prompt。
+  </p>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-title">核心思想</div>
+      <ul>
+        <li><strong>不构造"完美回答"</strong>，构造"失败切片"</li>
+        <li>从真实会话中提取 Agent 犯错的<strong>因果链</strong></li>
+        <li>让 GEPA 自动发现<strong>通用防错规则</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">技术栈</div>
+      <ul>
+        <li><strong>DSPy</strong> — Prompt 程序化框架</li>
+        <li><strong>DashScope Qwen</strong> — 基础 LM + Reflection</li>
+        <li><strong>Claude Code</strong> — 失败切片提取 Agent</li>
+        <li><strong>FastAPI</strong> — 可视化平台</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">当前规模</div>
+      <ul>
+        <li><strong>38</strong> 个 session 已处理</li>
+        <li><strong>90</strong> 个 GEPA 训练样本</li>
+        <li><strong>43</strong> 个候选 prompt 被探索</li>
+        <li><strong>1,152</strong> 次评估调用</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section class="layer-sec" id="pipeline">
+  <div class="sec-label">三阶段数据管线</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c1d);color:#fff">FLOW</span>
+    <h2 class="layer-title">端到端数据流</h2>
+  </div>
+  <p class="layer-def" style="border-color:var(--c1)">
+    从原始 JSONL 会话日志到优化后的 prompt，经过<strong>错误筛选 → 失败切片提取 → GEPA 进化优化</strong>三个阶段。
+    每个阶段独立运行、支持增量处理、具备幂等性。
+  </p>
+
+  <div class="dataflow"><span class="df-comment">                        ┌─ 完整数据流 ─┐</span>
+
+<span class="df-input">data/workspaces/         </span><span class="df-comment">← 原始 JSONL 会话日志</span>
+     <span class="df-arrow">↓</span> <span class="df-process">traj-extraction/convert.py</span>
+<span class="df-input">data/traj-data/{project}/</span><span class="df-comment">← v2.1 .traj + .json（分类）</span>
+     <span class="df-arrow">↓</span> <span class="df-process">target_filter.py          </span><span class="df-comment">← 筛选含错误的 session</span>
+     <span class="df-arrow">↓</span> <span class="df-process">pipeline.py → Agent        </span><span class="df-comment">← 异步调度 opencode/claude</span>
+     <span class="df-arrow">↓</span> <span class="df-process">traj-to-gepa SKILL         </span><span class="df-comment">← 5 步工作流提取失败切片</span>
+<span class="df-output">data/agent_failure_dataset/{project}/</span>
+  <span class="df-output">{hash}_slices.jsonl        </span><span class="df-comment">← 失败切片（1-5 个/session）</span>
+  <span class="df-output">{hash}_gepa.jsonl          </span><span class="df-comment">← GEPA 训练样本</span>
+     <span class="df-arrow">↓</span> <span class="df-process">gepa_run.py                </span><span class="df-comment">← DSPy GEPA 优化</span>
+<span class="df-output">data/agent_failure_dataset/runs/gepa_v1/</span>
+  <span class="df-output">optimized_program.json     </span><span class="df-comment">← 优化后的 prompt</span>
+  <span class="df-output">gepa_state.bin             </span><span class="df-comment">← 进化状态（谱系+分数）</span></div>
+
+  <!-- Stage 1 -->
+  <div style="margin-top:40px">
+    <div class="layer-hdr">
+      <span class="layer-id-badge" style="background:var(--c2d);color:#fff">S1</span>
+      <h2 class="layer-title" style="font-size:22px">错误 Session 筛选 <small>target_filter.py</small></h2>
+    </div>
+    <div class="pipe-row">
+      <div class="pipe-node" style="border-color:rgba(55,138,221,.3)">
+        <div class="pn-tag" style="color:var(--c2)">输入</div>
+        <div class="pn-name">.traj + .json</div>
+        <div class="pn-sub">v2.1 轨迹文件 + 分类元数据</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-color:rgba(199,90,232,.3)">
+        <div class="pn-tag" style="color:var(--c4)">三路召回</div>
+        <div class="pn-name">错误信号检测</div>
+        <div class="pn-sub">
+          1. intent ∈ {ai_correction, error_log, bug_report}<br>
+          2. is_correction_of_ai_work = true<br>
+          3. step.is_error = true
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-color:rgba(29,158,117,.3)">
+        <div class="pn-tag" style="color:var(--c1)">输出</div>
+        <div class="pn-name">error_hints</div>
+        <div class="pn-sub">带错误定位的 session 列表</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 2 -->
+  <div style="margin-top:32px">
+    <div class="layer-hdr">
+      <span class="layer-id-badge" style="background:var(--c4d);color:#fff">S2</span>
+      <h2 class="layer-title" style="font-size:22px">失败切片提取 <small>pipeline.py + traj-to-gepa</small></h2>
+    </div>
+    <div class="pipe-row">
+      <div class="pipe-node" style="border-color:rgba(55,138,221,.3)">
+        <div class="pn-tag" style="color:var(--c2)">调度器</div>
+        <div class="pn-name">pipeline.py</div>
+        <div class="pn-sub">
+          asyncio 并发控制<br>
+          Semaphore(5) 限流<br>
+          3 次重试 + 超时保护
+        </div>
+        <div class="pn-file">opencode run / claude -p</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-color:rgba(199,90,232,.3)">
+        <div class="pn-tag" style="color:var(--c4)">AI Agent</div>
+        <div class="pn-name">traj-to-gepa Skill</div>
+        <div class="pn-sub">
+          5 步分析工作流<br>
+          8 条多路召回规则<br>
+          ±400 行深度调查
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-color:rgba(29,158,117,.3)">
+        <div class="pn-tag" style="color:var(--c1)">输出</div>
+        <div class="pn-name">2 个 JSONL</div>
+        <div class="pn-sub">
+          _slices.jsonl — 失败切片<br>
+          _gepa.jsonl — GEPA 样本
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 3 -->
+  <div style="margin-top:32px">
+    <div class="layer-hdr">
+      <span class="layer-id-badge" style="background:var(--c3d);color:#fff">S3</span>
+      <h2 class="layer-title" style="font-size:22px">GEPA 进化优化 <small>gepa_run.py + DSPy</small></h2>
+    </div>
+    <div class="pipe-row">
+      <div class="pipe-node" style="border-color:rgba(55,138,221,.3)">
+        <div class="pn-tag" style="color:var(--c2)">加载</div>
+        <div class="pn-name">90 Examples</div>
+        <div class="pn-sub">
+          归一化 next_action<br>
+          13 种 → 6 种标准<br>
+          按 session hash 切分 71/19
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-color:rgba(212,167,44,.3)">
+        <div class="pn-tag" style="color:var(--c3)">GEPA</div>
+        <div class="pn-name">进化搜索</div>
+        <div class="pn-sub">
+          59 轮迭代<br>
+          43 个候选 prompt<br>
+          Pareto 前沿选择
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node" style="border-color:rgba(29,158,117,.3)">
+        <div class="pn-tag" style="color:var(--c1)">输出</div>
+        <div class="pn-name">Optimized Prompt</div>
+        <div class="pn-sub">
+          14,615 字符<br>
+          含 8 条精炼规则<br>
+          score: 0.489 → 0.624
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILL -->
+<section class="layer-sec" id="skill">
+  <div class="sec-label">traj-to-gepa Skill</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c4d);color:#fff">SKILL</span>
+    <h2 class="layer-title">失败切片提取工作流</h2>
+  </div>
+  <p class="layer-def" style="border-color:var(--c4)">
+    Agent 接收一个 session hash，深度分析 .traj 轨迹文件，通过 <strong>8 条多路召回规则</strong>搜索失败候选，
+    再通过 <strong>因果链追溯</strong> 确认根因，最终输出结构化的失败切片和 GEPA 训练样本。
+  </p>
+
+  <div class="workflow-steps">
+    <div class="workflow-step">
+      <span class="ws-num" style="background:var(--c2d);color:#fff">1</span>
+      <h4>概览会话结构</h4>
+      <p>读取 session 元数据（头部 ~50 行），<code>grep "role": "user"</code> 定位所有用户 turn，
+        <code>grep "is_error": true</code> 定位错误步骤。不全量读取 .traj（通常 1-3 MB）。</p>
+    </div>
+    <div class="workflow-step">
+      <span class="ws-num" style="background:var(--c4d);color:#fff">2</span>
+      <h4>多路召回 Failure Candidates</h4>
+      <p>8 条规则并行搜索——构建失败、工具错误、用户纠正、已读证据未用、大量写入后崩溃、
+        状态漂移、缺失验证、重复操作。<strong>宁多勿漏</strong>，后续过滤。</p>
+    </div>
+    <div class="workflow-step">
+      <span class="ws-num" style="background:var(--c1d);color:#fff">3</span>
+      <h4>深度调查每个 Candidate</h4>
+      <p>按 ±400 行窗口读取 .traj，构建<strong>因果链</strong>：evidence_turn → failure_turn → fix_turn。
+        回溯到第一个与 tool evidence 矛盾的假设作为根因。</p>
+    </div>
+    <div class="workflow-step">
+      <span class="ws-num" style="background:var(--c3d);color:#fff">4</span>
+      <h4>写入 _slices.jsonl</h4>
+      <p>每个 slice 对应一个失败点，包含 <code>target_module</code>（7 枚举）、<code>failure_type</code>（8 枚举）、
+        证据链、feedback（中文）和 general_rules（英文）。</p>
+    </div>
+    <div class="workflow-step" style="border-left-color:transparent">
+      <span class="ws-num" style="background:var(--c5d);color:#fff">5</span>
+      <h4>写入 _gepa.jsonl</h4>
+      <p>将每个 slice 转为 GEPA 训练样本，包含 4 个 input 字段（summary, timeline, events, evidence）
+        和 3 个 gold 字段（<code>issue_frame</code>, <code>next_action</code>, <code>should_verify</code>）。</p>
+    </div>
+  </div>
+
+  <!-- Taxonomy -->
+  <div style="margin-top:40px">
+    <h3 style="font-size:18px;font-weight:600;margin-bottom:16px">标签空间（Label Space）</h3>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">TARGET_MODULE（7 类）</div>
+        <div class="tax-grid">
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c1)">39%</div><div class="ti-name">code_generator</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c2)">22%</div><div class="ti-name">verification_planner</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c4)">10%</div><div class="ti-name">tool_selector</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c3)">10%</div><div class="ti-name">tool_failure_handler</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c5)">8%</div><div class="ti-name">codebase_knowledge</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c6)">6%</div><div class="ti-name">api_resolver</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--muted)">3%</div><div class="ti-name">plan_executor</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">FAILURE_TYPE（8 类）</div>
+        <div class="tax-grid">
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c1)">29%</div><div class="ti-name">incomplete_verify</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c2)">16%</div><div class="ti-name">evidence_unused</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c4)">14%</div><div class="ti-name">wrong_api</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c3)">11%</div><div class="ti-name">state_drift</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c5)">10%</div><div class="ti-name">tool_error</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--c6)">9%</div><div class="ti-name">missing_precheck</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--muted)">6%</div><div class="ti-name">build_failure</div></div>
+          <div class="tax-item"><div class="ti-pct" style="color:var(--faint)">1%</div><div class="ti-name">wrong_tool</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GEPA ALGORITHM -->
+<section class="layer-sec" id="gepa">
+  <div class="sec-label">GEPA 进化优化算法</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c3d);color:#fff">ALGO</span>
+    <h2 class="layer-title">DSPy GEPA 如何迭代</h2>
+  </div>
+  <p class="layer-def" style="border-color:var(--c3)">
+    GEPA 类似<strong>遗传编程</strong>：每轮迭代从当前最优候选中选择一个"父代"，
+    通过 reflection model 分析其在训练子集上的失败模式，生成改进后的"子代" prompt。
+    子代在 val 集上评估，优于父代则加入候选池，最终通过 <strong>Pareto 前沿</strong>选择最佳程序。
+  </p>
+
+  <div class="algo-grid">
+    <div class="algo-step">
+      <div class="step-num-r" style="background:var(--c2d);color:#fff">1</div>
+      <h4 style="color:var(--c2)">Baseline 评估</h4>
+      <p>零样本 <code style="font-family:var(--mono);font-size:11px;background:var(--bg3);padding:1px 6px;border-radius:4px">ChainOfThought</code> 在 valset（19 examples）上评估。
+        无任何领域知识的 baseline prompt 得分 <strong>0.489</strong>。</p>
+    </div>
+    <div class="algo-step">
+      <div class="step-num-r" style="background:var(--c4d);color:#fff">2</div>
+      <h4 style="color:var(--c4)">Reflection（反思）</h4>
+      <p>从 trainset 随机抽取 3 个 examples，用当前 prompt 预测，
+        与 gold label 对比。Reflection LM 分析失败原因，
+        并生成 <strong>prompt mutation 建议</strong>。</p>
+    </div>
+    <div class="algo-step">
+      <div class="step-num-r" style="background:var(--c1d);color:#fff">3</div>
+      <h4 style="color:var(--c1)">Mutation（变异）</h4>
+      <p>将 reflection 建议融入父代 prompt，生成子代。
+        变异类型：添加领域知识、修正规则、强化约束、
+        调整角色定位等。<strong>每轮产出 0-1 个新候选</strong>。</p>
+    </div>
+    <div class="algo-step">
+      <div class="step-num-r" style="background:var(--c3d);color:#fff">4</div>
+      <h4 style="color:var(--c3)">Evaluation + Pareto</h4>
+      <p>子代在 valset 上评估（19 tasks &times; 1 score each）。
+        计算平均分，更新 <strong>Pareto 前沿</strong>——
+        保留在任何 task 上是"最优"的候选，确保互补性。</p>
+    </div>
+  </div>
+
+  <!-- Metric -->
+  <div style="margin-top:40px">
+    <h3 style="font-size:18px;font-weight:600;margin-bottom:16px">评估指标（Metric）</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+      每个 GEPA example 评估 3 个决策字段，加权求和，总分范围 [0, 1]。
+    </p>
+    <div class="metric-row">
+      <div class="metric-block" style="border-color:rgba(55,138,221,.3)">
+        <div class="mb-weight" style="color:var(--c2)">40%</div>
+        <div class="mb-name">next_action</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">推荐动作（6 枚举）</p>
+      </div>
+      <div class="metric-block" style="border-color:rgba(29,158,117,.3)">
+        <div class="mb-weight" style="color:var(--c1)">35%</div>
+        <div class="mb-name">issue_frame</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">问题分类（6 枚举）</p>
+      </div>
+      <div class="metric-block" style="border-color:rgba(212,167,44,.3)">
+        <div class="mb-weight" style="color:var(--c3)">25%</div>
+        <div class="mb-name">should_verify</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">是否验证（布尔）</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evolution tree -->
+  <div style="margin-top:40px">
+    <h3 style="font-size:18px;font-weight:600;margin-bottom:16px">演化谱系（43 个候选 &middot; 59 轮迭代）</h3>
+    <div class="codeblock">
+      <div class="cb-head">
+        <span class="cb-dot" style="background:#ff5f57"></span>
+        <span class="cb-dot" style="background:#febc2e"></span>
+        <span class="cb-dot" style="background:#28c840"></span>
+        evolution-tree.txt &middot; 主干 + 失败分支
+      </div>
+      <div class="evo-tree">prog_0 (0.489) <span class="evo-fail">&larr; baseline (zero-shot)</span>
+  <span class="evo-good">&boxvr;&rarr; prog_1 (0.508) &larr; 添加 domain context</span>
+  <span class="evo-good">&boxv;   &boxur;&rarr; prog_2 (0.521) &larr; 添加 API-specific facts</span>
+  <span class="evo-good">&boxv;       &boxvr;&rarr; prog_8 (0.532) &larr; corrective action rules</span>
+  <span class="evo-good">&boxv;       &boxv;   &boxur;&rarr; prog_13 (0.613) &larr; feedback-derived rules</span>  <span style="color:var(--c3)">LIGHT BEST</span>
+  <span class="evo-best">&boxv;       &boxv;       &boxur;&rarr; prog_28 (0.624) &larr; 结构验证规则</span>         <span class="evo-best">&#9733; HEAVY BEST</span>
+  <span class="evo-good">&boxv;       &boxur;&rarr; prog_11 (0.571) &larr; 独立强势分支</span>
+  <span class="evo-good">&boxv;           &boxur;&rarr; prog_29 (0.595)</span>
+  <span class="evo-fail">&boxvr;&rarr; prog_3 (0.484) &larr; "behavior analyst" framing</span>
+  <span class="evo-fail">&boxv;   &boxur;&rarr; 10 个变种全部 &lt; 0.53</span>              <span class="evo-fail">&#10007; 死胡同</span>
+  <span class="evo-fail">&boxvr;&rarr; prog_4 (0.350) &larr; "troubleshooting" framing</span>   <span class="evo-fail">&#10007;</span>
+  <span class="evo-fail">&boxvr;&rarr; prog_9 (0.282) &larr; "game development" narrow</span>   <span class="evo-fail">&#10007; 最差</span>
+  <span class="evo-fail">&boxur;&rarr; prog_15 (0.392) &larr; "task analyst" framing</span>     <span class="evo-fail">&#10007;</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:12px;line-height:1.7">
+      <strong>主干路径</strong>：prog_0 → 1 → 2 → 8 → 13 → 28（6 代增量改进）。
+      失败分支（prog_3/4/9/15）尝试了不同角色定位，全部低于 baseline。
+      关键发现：<strong>"coding agent debugging assistant"</strong> 的定位远优于 "behavior analyst" 或 "task analyst"。
+    </p>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="layer-sec" id="results">
+  <div class="sec-label">优化结果</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c1d);color:#fff">RES</span>
+    <h2 class="layer-title">Light vs Heavy 对比</h2>
+  </div>
+
+  <div class="results-cards">
+    <div class="result-card">
+      <div class="rc-score" style="color:var(--muted)">0.489</div>
+      <div class="rc-label">Baseline</div>
+      <div class="rc-delta" style="color:var(--muted)">prog_0 (zero-shot)</div>
+    </div>
+    <div class="result-card" style="border-color:rgba(55,138,221,.3)">
+      <div class="rc-score" style="color:var(--c2)">0.613</div>
+      <div class="rc-label">Light Best</div>
+      <div class="rc-delta" style="color:var(--c1)">+12.37pp (+25.3%)</div>
+    </div>
+    <div class="result-card" style="border-color:rgba(29,158,117,.3)">
+      <div class="rc-score" style="color:var(--c1)">0.624</div>
+      <div class="rc-label">Heavy Best</div>
+      <div class="rc-delta" style="color:var(--c1)">+13.42pp (+27.4%)</div>
+    </div>
+  </div>
+
+  <table class="stab" style="margin-top:32px">
+    <thead>
+      <tr><th>维度</th><th>Light (auto="light")</th><th>Heavy (auto="heavy")</th><th>变化</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>数据量</td><td>38 examples</td><td><strong>90 examples</strong></td><td>+136.8%</td></tr>
+      <tr><td>迭代次数</td><td>19</td><td><strong>59</strong></td><td>3.1&times;</td></tr>
+      <tr><td>候选程序</td><td>18</td><td><strong>43</strong></td><td>2.4&times;</td></tr>
+      <tr><td>评估调用</td><td>462</td><td><strong>1,152</strong></td><td>2.5&times;</td></tr>
+      <tr><td>运行时间</td><td>~30 min</td><td><strong>~70 min</strong></td><td>2.3&times;</td></tr>
+      <tr><td style="color:var(--c1);font-weight:600">最佳分数</td><td>0.6132</td><td><strong>0.6237</strong></td><td style="color:var(--c1)">+1.05pp</td></tr>
+      <tr><td>Pareto 上限</td><td>0.8105</td><td><strong>0.8421</strong></td><td style="color:var(--c1)">+3.2pp</td></tr>
+      <tr><td>Prompt 长度</td><td>12,275 chars</td><td><strong>14,615 chars</strong></td><td>+19%</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:18px;font-weight:600;margin-bottom:16px">Per-Task Score 分布</h3>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">HEAVY BEST (prog_28) VS BASELINE — 提升</div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_1</span><span class="sb-val" style="color:var(--c1)">0.25 → 1.00 (+0.75)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--c1)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_4</span><span class="sb-val" style="color:var(--c1)">0.60 → 1.00 (+0.40)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--c1)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_10</span><span class="sb-val" style="color:var(--c1)">0.60 → 1.00 (+0.40)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--c1)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_11</span><span class="sb-val" style="color:var(--c1)">0.60 → 1.00 (+0.40)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--c1)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_15</span><span class="sb-val" style="color:var(--c1)">0.65 → 1.00 (+0.35)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--c1)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_16</span><span class="sb-val" style="color:var(--c2)">1.00 → 1.00 (保持)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--c2)"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">顽固任务（全部候选 max=0.25）</div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_0</span><span class="sb-val" style="color:var(--c5)">0.25 (43 候选中无突破)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:25%;background:var(--c5)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_3</span><span class="sb-val" style="color:var(--c5)">0.25 (43 候选中无突破)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:25%;background:var(--c5)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_5</span><span class="sb-val" style="color:var(--c5)">0.25 (43 候选中无突破)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:25%;background:var(--c5)"></div></div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-label"><span class="sb-name">task_6</span><span class="sb-val" style="color:var(--c5)">0.25 (43 候选中无突破)</span></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:25%;background:var(--c5)"></div></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.7">
+          4 个任务在全部 43 个候选中最高分仅 0.25（部分候选得 0.0），
+          占 val 集 21%。高度怀疑 gold label 标注错误。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section class="layer-sec" id="rules">
+  <div class="sec-label">GEPA 学到的规则</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c5d);color:#fff">RULES</span>
+    <h2 class="layer-title">优化后的防错规范 <small>prog_28 提炼</small></h2>
+  </div>
+  <p class="layer-def" style="border-color:var(--c5)">
+    GEPA 从 90 个失败样本中自动提炼出 <strong>8 条通用防错规则</strong>，
+    可直接注入 CLAUDE.md 或 Agent system prompt，降低编码 Agent 的犯错率。
+  </p>
+
+  <div class="rule-item">
+    <div class="rule-num" style="background:var(--c1d);color:#fff">1</div>
+    <div class="rule-text"><strong>API 验证前置</strong> — 在写任何调用自定义库（UI框架、音频、特效、NanoVG）的代码之前，
+      必须先 grep 代码库确认方法名、参数顺序和返回值类型。<span style="color:var(--muted)">源代码是唯一的 API 文档。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:var(--c2d);color:#fff">2</div>
+    <div class="rule-text"><strong>Build &ne; 正确</strong> — 构建成功不代表运行时正确。nil 引用、类型不匹配、参数缺失在构建阶段都检测不到。
+      <span style="color:var(--muted)">但 build 对结构完整性仍有意义：确认 Start() 存在、require 正确、语法无误。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:var(--c4d);color:#fff">3</div>
+    <div class="rule-text"><strong>Tool evidence > 直觉</strong> — 工具返回的结果（Read/Grep/Build 输出）是 ground truth。
+      <span style="color:var(--muted)">不要用"常识"或记忆中的 API 知识覆盖工具证据。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:var(--c3d);color:#fff">4</div>
+    <div class="rule-text"><strong>复制时复制依赖</strong> — 从一个文件复制实现逻辑到另一个文件时，必须同时复制所有 require 语句和模块导入。
+      <span style="color:var(--muted)">不要假设全局可用。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:var(--c5d);color:#fff">5</div>
+    <div class="rule-text"><strong>工具参数完整性</strong> — 调用外部工具（build、Task、CloudSave）前，检查所有必填参数。
+      <span style="color:var(--muted)">参考项目配置文件或代码库中的成功调用示例。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:var(--c6d);color:#fff">6</div>
+    <div class="rule-text"><strong>Lua 作用域纪律</strong> — local 函数必须在引用之前声明，Lua 没有 hoisting。
+      <span style="color:var(--muted)">新建模块时确认 entry-point 函数（Start()/init()）存在且导出正确。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:rgba(255,255,255,.1);color:var(--text)">7</div>
+    <div class="rule-text"><strong>UI 隐藏态安全</strong> — overlay/全屏组件隐藏时必须处理 pointer-event 拦截。
+      <span style="color:var(--muted)">SetStyle({width=nil}) 不会重置属性 — 使用显式值。</span></div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-num" style="background:rgba(255,255,255,.1);color:var(--text)">8</div>
+    <div class="rule-text"><strong>小步验证</strong> — 结构性变更（新文件、入口点修改、init.lua 改动）后立即 build 确认结构完整性。
+      <span style="color:var(--muted)">每次不超过 2-3 个编辑再验证。</span></div>
+  </div>
+</section>
+
+<!-- INSIGHTS -->
+<section class="layer-sec">
+  <div class="sec-label">关键发现与下一步</div>
+  <div class="layer-hdr">
+    <span class="layer-id-badge" style="background:var(--c6d);color:#fff">NEXT</span>
+    <h2 class="layer-title">结论与改进路径</h2>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">关键发现</div>
+      <ul>
+        <li><strong>Light 已捕获 ~92% 信号</strong>：Heavy 额外 40 分钟仅贡献 +1.05pp</li>
+        <li><strong>瓶颈在数据质量</strong>：4 个顽固任务占 val 21%，所有候选无法突破</li>
+        <li><strong>角色定位决定性能</strong>："debugging assistant" 远优于 "analyst"</li>
+        <li><strong>规则自行涌现</strong>：GEPA 发现了 3 条人工未标注的 Lua 特定规则</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">改进路径</div>
+      <ul>
+        <li style="color:var(--c5)"><strong>P0</strong> &mdash; 修正 4 个顽固任务 gold label（+2-4pp）</li>
+        <li style="color:var(--c5)"><strong>P0</strong> &mdash; 注入精简规则到 CLAUDE.md</li>
+        <li style="color:var(--c3)"><strong>P1</strong> &mdash; 扩展到 zzj 项目（跨域泛化）</li>
+        <li style="color:var(--c3)"><strong>P1</strong> &mdash; 归一化 issue_frame 到 6 类</li>
+        <li style="color:var(--c2)"><strong>P2</strong> &mdash; 后续优化用 auto="light"</li>
+        <li style="color:var(--c2)"><strong>P2</strong> &mdash; 尝试更强 LM (qwen-max)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  GEPA Pipeline Visual &middot; trajectory-analysis &middot; 2026-04-28
+</div>
+
+</div>
+</body>
+</html>
+

@@ -1,0 +1,15 @@
+Session `6b8bf0cd` analyzed. Here's what was done:
+
+**1 new gene created:**
+
+- **`gene_nf_fresh_project_planmode_split_scaffold`** (workflow) — Captures the distinctive pattern of a truly fresh project where:
+  - User says `开始制作` → agent **self-initiates PlanMode** (user didn't ask) → 4 research subagents (UI libs, templates, project config, design planning) → writes `.claude/plans/` file → exits PlanMode with **no code written**
+  - User repeats `开始制作` → actual scaffold: `mkdir -p` + 15+ `Write` calls in dependency order → Build ✓
+  - User sends `继续` → writes remaining game screens + adapter + main.lua → Build ✓
+  - Key distinction from `gene_nf_terse_start_reference_guided_scaffolding`: no reference games exist so the agent reads engine docs/templates instead; PlanMode is self-initiated not user-requested; implementation splits across two turns
+
+**2 genes enhanced:**
+
+- **`gene_inq_design_doc_preflight_review`** (informational): Added 6b8bf0cd T0 as a minimal 9-step variant — the earliest session in the project; Glob confirms almost no code exists; simpler read sequence (no Bash inspection, no Task subagents); session count → 7
+
+- **`gene_doc_new_game_devlog_creation`** (workflow): Added 6b8bf0cd T8 as an @-mention variant — trigger is `更新[@开发记录-大厅M1.md]` not `增加X的开发记录`; reads design docs (not code configs) as source of truth; Bash wc-l still present; session count → 2

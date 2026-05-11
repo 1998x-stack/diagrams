@@ -1,0 +1,21 @@
+All done. Here's a summary of what was extracted from session `4f916c20`:
+
+---
+
+## Session `4f916c20` — Gene Extraction Summary
+
+**18 prompts** covering a Sokoban level editor iteration workflow. Key patterns found:
+
+### Enhanced (1)
+- **`gene_doc_terse_breadth_first`** — Added T23 and T34 from this session. New variant documented: when a game has a dedicated **development log with file-size stats table** (`开发记录-P1推箱子M1.md`), the `更新文档` trigger includes `Bash wc-l` to measure current line counts before updating the table.
+
+### Created (3)
+
+**`gene_nf_mechanic_with_editor_integration`** (workflow)  
+User requests a new game mechanic AND level editor support for it in a single prompt ("也加入编辑器中"). Agent reads all 6 core files first, then implements both layers (game logic + editor UI) in dependency order in one 73-step turn. Triggered by the portal system implementation (T01-T02).
+
+**`gene_fm_editor_output_apply_to_level`** (workflow)  
+User pastes raw editor export data (possibly with TapTap Maker log prefix `[timestamp][pid][Script]` and UUID suffix) and specifies a target level number. Agent strips noise, locates the target level in `levels.lua`, and precisely replaces it. Three instances in this session (T07, T11, T17) with increasing data complexity (partial → full → with log noise).
+
+**`gene_br_web_platform_text_input_disabled`** (diagnostic)  
+3-prompt escalation: (1) "can't paste/input" → investigate-only, discovers NanoVG modals need `SetScreenKeyboardVisible` on web, 0 edits. (2) "build" → just builds. (3) "web can't paste" → implements fix: toggle `SetScreenKeyboardVisible(true/false)` on modal show/hide. Root cause: WASM runtime doesn't auto-route keyboard to NanoVG-drawn UI.

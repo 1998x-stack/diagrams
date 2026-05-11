@@ -1,0 +1,51 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_traj_wzp_f3phase_localization_to_editing_stable_success",
+    "category": "workflow",
+    "signals_match": [
+      "phase_transition",
+      "from:localization",
+      "to:editing",
+      "stable_success_plateau",
+      "cn_batch_ui_binding",
+      "cn_doc_sync_workflow",
+      "cn_asset_integration_cmd"
+    ],
+    "preconditions": [
+      "任务已从资源定位阶段平稳过渡至代码编辑阶段，且连续多次执行未出现错误中断。",
+      "当前场景属于高确定性修改，如批量UI音效绑定、文档同步更新或资产集成命令执行。",
+      "系统处于稳定成功平台期（stable_success_plateau），无需额外的探索性调试或复杂逻辑推理。"
+    ],
+    "strategy": [
+      "使用 Read 工具读取目标文件内容，精确定位需修改的代码行或资源配置项。",
+      "调用 Edit 工具执行批量替换或插入操作，确保UI文本、尺寸参数及按钮事件绑定的准确性。",
+      "严格遵循用户约束，如将combo文本改为“连锁”、移除多余小数点、确保UI元素不遮挡画面。",
+      "对撤销、重置等按钮统一应用 ui_tap 事件绑定，保持交互逻辑的一致性与规范性。",
+      "监听用户撤销或纠正指令，若收到如“不要遮挡画面”等反馈，立即回滚并调整编辑策略。"
+    ],
+    "constraints": {
+      "max_files": 10,
+      "forbidden_paths": [
+        ".git",
+        "node_modules"
+      ]
+    },
+    "validation": [],
+    "title_zh": "定位至编辑阶段稳定成功 plateau 模式",
+    "title_en": "Stable Success Plateau Pattern From Localization To Editing Phase",
+    "_provenance": {
+      "source": "traj-gep",
+      "project": "wzp",
+      "session_count": 49,
+      "frequency": 49,
+      "session_hashes_sample": [
+        "014354fc",
+        "0428882b",
+        "056c0fdf",
+        "07f56b0e",
+        "08e306a0"
+      ]
+    }
+  }
+]

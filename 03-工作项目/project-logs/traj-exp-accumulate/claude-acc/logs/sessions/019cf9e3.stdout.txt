@@ -1,0 +1,13 @@
+Done. Here's a summary of what was extracted from session `019cf9e3`:
+
+**Session profile:** 1 turn, 3 steps, 12.6 seconds — a minimal config patch session.
+
+**Pattern identified:** `gene_cfg_surgical_json_field_update` (operational category)
+
+The session demonstrates a precise config update pattern triggered by two simultaneous signals: (1) user specifies an exact nested field path, and (2) explicitly constrains "only update this field, keep everything else unchanged." The agent's correct response is read-first → surgical string-anchor edit (targeting surrounding context, not the full file) → one-line confirmation. The wrong alternative (rewriting the whole JSON file) risks breaking unrelated fields and formatting.
+
+**Why it qualifies despite < 3 prompts:** The preservation constraint (`只更新...保持其他字段不变`) is a highly distinctive and recurring signal in game-dev config management, and the surgical edit strategy is a non-obvious but correct behavioral choice that deserves an explicit gene.
+
+**Output written:**
+- New category: `claude-acc/plugins/operational/genes.json` (1 gene)
+- Index regenerated: `operational/index.md` added to the 3-category index

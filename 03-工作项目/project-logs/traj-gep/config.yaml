@@ -1,0 +1,46 @@
+paths:
+  evolver_dir:    ../evolver
+  traj_data_dir:  ../traj-data-new
+  output_dir:     ./output
+
+projects:
+  - id: wzp
+    name: "wzp-脑力大冒险"
+  - id: zzj
+    name: "zzj-超时空要塞"
+
+extractor:
+  node_bin: node
+  timeout_seconds: 15
+  user_corpus_max_chars:  50000
+  error_corpus_max_chars: 30000
+
+clustering:
+  min_sessions:        3
+  min_frequency:       5
+  min_distinctness:    0.4
+  top_k_per_family:    30
+  dedupe_jaccard:      0.8
+
+gene_builder:
+  max_signals_match:   8
+  max_strategy_steps:  6
+  include_provenance:  true
+  provenance_session_sample: 5
+
+cleaning:
+  prompt_max_genes_per_call: 80
+  min_titles_for_llm:        2
+
+llm:
+  model:               qwen3.6-plus
+  base_url:            https://dashscope.aliyuncs.com/compatible-mode/v1
+  api_key_env:         DASHSCOPE_API_KEY
+  temperature:         0
+  seed:                42
+  enable_thinking:     false
+  timeout_seconds:     60
+  max_retries:         3
+  retry_backoff_seconds: [1, 4, 16]
+  cluster_excerpt_count: 5
+  cluster_excerpt_max_chars: 400

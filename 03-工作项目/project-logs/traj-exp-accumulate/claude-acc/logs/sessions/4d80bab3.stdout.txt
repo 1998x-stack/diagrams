@@ -1,0 +1,7 @@
+Session `4d80bab3` had 2 prompts (preflight review → terse start). I extracted two patterns:
+
+**Enhanced (existing gene):**
+- `gene_inq_design_doc_preflight_review` — added `4d80bab3` as 4th session. New T0 variant: two docs (design spec + dev spec), agent explicitly Greps for reusable code patterns (shape drawing functions) and reads P2's card-renderer to assess whether tile rendering is a real blocker. Adds new signal `code_pattern_reusability_check`.
+
+**Created (new gene):**
+- `gene_nf_terse_start_reference_guided_scaffolding` (workflow) — T1 "开始开发" (2 chars) after a preflight review triggers an 81-step full game scaffolding: TodoWrite 15-item dependency-ordered plan → batch-read 7 reference game files → Write all 15 modules in layer order (logic → view → screens → adapter) → mid-impl re-read reference view files + already-written logic files before starting view layer → Edit game-registry → single build. Key insight: agent pre-reads ALL reference game files before writing any new files, then re-reads them again mid-session when switching layers.

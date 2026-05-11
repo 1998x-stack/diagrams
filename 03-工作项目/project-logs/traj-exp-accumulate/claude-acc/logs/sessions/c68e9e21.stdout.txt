@@ -1,0 +1,19 @@
+Done. Here's the summary of what was extracted from session `c68e9e21`:
+
+**Session pattern:** 8-turn settings UI visual polish cascade (T01–T08) bookended by a victory popup overhaul (T00) and a documentation update (T09).
+
+**Changes made:**
+
+1. **Enhanced `gene_fm_visual_polish_cascade`** (now 4 sessions, 3→4 session_hashes):
+   - Added 3 new observations to the strategy:
+     - *Cascade compression*: later turns shrink naturally (30→11→14→8→3 steps) as specific artifacts get cleaned up
+     - *Micro-cleanup sub-turns*: "remove this unwanted element/text" turns (T06: 8 steps, T07: 3 steps) are part of the cascade, not bug reports
+     - *Color exploration cost*: even a single-page warm-color change in NanoVG can cost 40–50 steps (Grep×10, Read×12) to locate all scattered color constants
+   - Added signals: `element_removal_sub_turns_in_cascade`, `cascade_compression_late_turns_shrink`
+
+2. **Created new gene `gene_fm_cross_page_ui_inconsistency_unify`** (workflow category):
+   - Triggered by: user uses a question-form sentence to surface a within-game cross-page inconsistency ("似乎用的不是同一个UI？"), then requests unification in the same prompt
+   - Strategy: Grep both pages → Read both impls → choose canonical → Write unified → Edit callers → Build
+   - Distinguished from `gene_fm_shared_component_extraction` (which is about cross-game code duplication, not within-game inconsistency)
+
+3. **Index regenerated**: workflow now has 80 genes.

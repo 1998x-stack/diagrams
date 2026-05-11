@@ -1,0 +1,42 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_cfg_debug_toggle_management",
+    "category": "workflow",
+    "signals_match": [
+      "intent:configuration",
+      "target:build_config",
+      "test_toggle_keywords",
+      "debug_visibility_control",
+      "cn_switch_on_off_keywords"
+    ],
+    "preconditions": [
+      "用户请求修改配置开关（测试开关、调试开关），控制调试功能的显示/隐藏。",
+      "通常在功能开发完成后、准备发布前执行。",
+      "可能伴随后续的条件显示需求（如'开启时显示D按钮，关闭时不显示'）。"
+    ],
+    "strategy": [
+      "定位项目配置文件中的目标开关项，修改其值。",
+      "如果用户要求开关控制UI元素的显隐，需同时修改UI初始化逻辑中的条件判断。",
+      "配置修改属于低步骤任务（5-16步），但需注意配置文件格式的正确性。",
+      "build 验证开关生效。"
+    ],
+    "constraints": {
+      "must_build_after_edit": true
+    },
+    "validation": [
+      "配置值正确修改",
+      "依赖该配置的UI/功能行为符合预期"
+    ],
+    "title_zh": "调试开关管理与条件显隐",
+    "title_en": "Debug Toggle Management — Config Switch With Conditional Visibility",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T47, T49",
+      "prompt_indices": [46, 48],
+      "evidence": "T47: close test toggle (16 steps, heavier than expected due to code search). T49: toggle controls D button visibility (5 steps)."
+    }
+  }
+]

@@ -1,0 +1,156 @@
+# HotPotQA DSPy + LangGraph Project
+
+A reference code project for **HotPotQA fullwiki hard** using:
+
+- **DSPy** for declarative, optimizable LM modules
+- **LangGraph** for graph orchestration
+- **DashScope OpenAI-compatible endpoint** with **`qwen3.6-plus`** and **`enable_thinking=false`**
+
+The project is designed to be readable first: each module has docstrings, comments, and small files.
+
+## What this project does
+
+1. Downloads **HotPotQA / fullwiki** from Hugging Face.
+2. Filters to **`level == "hard"`** only.
+3. Builds the requested data splits:
+   - official **train** split -> deterministic **70/30** split
+   - sample **300 train** examples
+   - sample **300 validation** examples
+   - sample **500 test** examples
+4. Creates a **DSPy multi-hop QA program**.
+5. Wraps the program inside a **LangGraph StateGraph** pipeline.
+6. Optimizes the DSPy program with **MIPROv2**.
+7. Evaluates both the raw DSPy module and the graph pipeline.
+
+## Important implementation note
+
+HotPotQA fullwiki is an **open-domain retrieval QA** benchmark. A fully faithful reproduction usually requires a large external Wikipedia index and a production retriever.
+
+To keep this project runnable and inspectable, the default retriever is a **local BM25 retriever over the candidate passages packaged inside each HotPotQA example's `context` field**.
+
+That means:
+
+- the **graph shape** is correct for multi-hop QA
+- the **DSPy optimization flow** is correct
+- the **dataset handling** follows your requested split/sampling recipe
+- but the default retriever is a **reproducible local stand-in**, not a full Wikipedia retrieval stack
+
+You can later swap `LocalBM25Retriever` with ElasticSearch, ColBERT, Vespa, Milvus, FAISS, etc.
+
+## Project layout
+
+```text
+hotpot_dspy_langgraph/
+├── .env.example
+├── pyproject.toml
+├── README.md
+├── scripts/
+│   ├── optimize_hotpotqa.py
+│   ├── prepare_hotpotqa.py
+│   └── run_eval.py
+├── src/hotpot_dspy_langgraph/
+│   ├── __init__.py
+│   ├── cli.py
+│   ├── config.py
+│   ├── data.py
+│   ├── data_models.py
+│   ├── dspy_program.py
+│   ├── evaluation.py
+│   ├── graph_pipeline.py
+│   ├── metrics.py
+│   └── retrieval.py
+└── tests/
+    └── test_metrics.py
+```
+
+## Environment
+
+```bash
+export DASHSCOPE_API_KEY="<your-dashscope-key>"
+export OPENAI_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
+export OPENAI_MODEL="qwen3.6-plus"
+```
+
+## Install
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install -e .
+```
+
+## Prepare dataset
+
+```bash
+python scripts/prepare_hotpotqa.py \
+  --output-dir data/processed \
+  --seed 42
+```
+
+Generated files:
+
+- `data/processed/train.jsonl`
+- `data/processed/val.jsonl`
+- `data/processed/test.jsonl`
+
+## Optimize DSPy program
+
+```bash
+python scripts/optimize_hotpotqa.py \
+  --train-path data/processed/train.jsonl \
+  --val-path data/processed/val.jsonl \
+  --artifact-dir artifacts/mipro_run
+```
+
+This writes:
+
+- `artifacts/mipro_run/compiled_program.json`
+- `artifacts/mipro_run/optimization_summary.json`
+
+## Evaluate
+
+```bash
+python scripts/run_eval.py \
+  --split-path data/processed/test.jsonl \
+  --artifact-dir artifacts/mipro_run
+```
+
+## Run from Python
+
+```python
+from hotpot_dspy_langgraph.config import Settings
+from hotpot_dspy_langgraph.data import load_prepared_examples
+from hotpot_dspy_langgraph.dspy_program import HotPotQAModule
+from hotpot_dspy_langgraph.graph_pipeline import build_hotpot_graph, invoke_graph
+
+settings = Settings.from_env()
+program = HotPotQAModule.from_settings(settings)
+graph = build_hotpot_graph(program)
+
+example = load_prepared_examples("data/processed/test.jsonl")[0]
+result = invoke_graph(graph, example)
+print(result["final_answer"])
+```
+
+## How DSPy and LangGraph are used together
+
+- **DSPy** owns the LM-facing logic:
+  - first-hop query planning
+  - follow-up query generation
+  - answer synthesis
+  - answer verification
+- **LangGraph** owns the orchestration:
+  - node transitions
+  - graph state
+  - retry routing
+  - execution traceability
+
+This separation is deliberate:
+
+- swap the model or optimizer in DSPy without changing the graph
+- swap the graph topology without rewriting the task signatures
+
+## Next upgrade path
+
+For a closer-to-paper setup, replace `LocalBM25Retriever` with a retriever over a full Wikipedia corpus and keep the rest of the code unchanged.

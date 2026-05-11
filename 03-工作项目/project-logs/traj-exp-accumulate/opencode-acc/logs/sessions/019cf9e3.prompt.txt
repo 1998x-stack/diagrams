@@ -1,0 +1,185 @@
+你是一位轨迹分析专家。你的任务是分析一个游戏开发AI Agent的会话轨迹，从中提取可复用的行为模式（"基因/Gene"）。
+
+## 目标
+分析会话 `019cf9e3`（项目: `wzp`），生成按意图分类组织的Gene对象，写入plugins目录。
+
+## 输入文件（使用工具读取）
+1. **意图分类数据**: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/examples/wzp/019cf9e3.json`
+   - 包含已分类的用户prompts，含 intent_primary, target_artifact, summaries
+2. **完整轨迹**: `/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/019cf9e3.traj`
+   - 包含完整的agent轨迹（文件可能很大，请用python/jq提取摘要，不要一次性读取整个文件）
+
+## 分析步骤
+1. 读取 .json 文件，理解意图分布和prompt序列
+2. 用工具从 .traj 文件中提取per-turn摘要：
+   - 每个turn: 步骤数、工具分布、phase、编辑数、build数、错误数
+   - 会话级: 总时长、总步骤、工具频率、phase分布
+3. 识别可复用的行为模式：
+   - 连续同intent序列（如连续5+次视觉微调）
+   - 工作流链（如设计文档→实现→打磨→文档检查点）
+   - 失败模式（重复bug报告、升级序列）
+   - 会话节奏（文档检查点频率、阶段边界）
+   - 内容创建工作流（生成→预览→应用）
+4. 检查已有基因是否有重叠
+5. 生成新基因或增强已有基因
+
+## 意图分类体系
+  - new_feature: First-time request for a new capability, system, screen, or game mechanic that does not yet exist.
+  - feature_modification: Tweak / adjust / extend an existing feature the user already accepted.
+  - bug_report: User observed broken behavior in the running product; expects diagnosis + fix.
+  - ai_output_correction: User is correcting the AI's most-recent or recent delivery.
+  - inquiry: Question seeking information, status, or judgment. Does not request code change.
+  - inspection_review: Ask the AI to inspect / audit / review existing code, docs, or designs.
+  - planning_design: Request to design / draft / spec something before implementation.
+  - documentation: Update, create, or refresh documentation specifically.
+  - content_creation: Generate non-code assets — images, text/copy, audio specs, character bios, dialogue.
+  - refactor_redesign: Re-architect or redo something already built (not a small tweak).
+  - error_log_paste: User pastes raw error logs / crash reports / stack traces.
+  - configuration: Change a config value, environment variable, build flag, or registry entry.
+  - meta_workflow: Operational request not about the product itself — saving sessions, switching tools, summarizing progress.
+  - other: Use only if none of the above clearly fits.
+
+## Gene Schema
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gene",
+  "description": "A reusable behavioral pattern extracted from game-development AI agent trajectories. Genes represent recurring strategies, diagnostic patterns, and workflow rhythms that can be matched to new user prompts for improved agent behavior.",
+  "type": "object",
+  "required": ["type", "id", "category", "signals_match", "preconditions", "strategy", "title_zh", "title_en", "_provenance"],
+  "properties": {
+    "type": { "const": "Gene" },
+    "id": {
+      "type": "string",
+      "pattern": "^gene_[a-z_]+$",
+      "description": "Unique identifier. Convention: gene_{intent_prefix}_{pattern_name}"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["workflow", "diagnostic", "session_rhythm", "operational", "informational"],
+      "description": "workflow=implementation pattern, diagnostic=bug/error investigation, session_rhythm=cross-turn cadence, operational=meta/build, informational=read-only"
+    },
+    "signals_match": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags and conditions that trigger this gene. Format: 'dimension:value' or bare keyword."
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Natural language conditions (Chinese) that must be true for this gene to activate."
+    },
+    "strategy": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered action steps (Chinese) the agent should follow when this gene is matched."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Hard guardrails for execution (optional)."
+    },
+    "validation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Verification checks to confirm the gene's strategy was correctly applied."
+    },
+    "title_zh": { "type": "string" },
+    "title_en": { "type": "string" },
+    "_provenance": {
+      "type": "object",
+      "required": ["source", "project", "session_hashes"],
+      "properties": {
+        "source": { "type": "string" },
+        "project": { "type": "string" },
+        "session_hashes": { "type": "array", "items": { "type": "string" } },
+        "turn_range": { "type": "string" },
+        "prompt_indices": { "type": "array", "items": { "type": "integer" } },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}
+
+
+## Gene示例
+{
+  "type": "Gene",
+  "id": "gene_fm_visual_polish_cascade",
+  "category": "workflow",
+  "signals_match": [
+    "intent:feature_modification",
+    "target:visual_style",
+    "consecutive_same_intent_ge_4",
+    "parameter_tweak_chain",
+    "size_color_position_adjustment",
+    "cn_visual_decoration_keywords"
+  ],
+  "preconditions": [
+    "用户已有一个基本可用的视觉元素（装饰物、背景、动画），正在进行迭代打磨。",
+    "连续4+次 feature_modification 指向 visual_style 或 ui_layout，每次只调整1-2个参数。",
+    "用户的反馈模式为：观察结果→提出微调→观察→再微调，典型的视觉打磨循环。"
+  ],
+  "strategy": [
+    "每次修改限定在用户提及的单一参数（大小、颜色、速度、位置），不要预判性地调整其他视觉属性。",
+    "修改后立即 build 让用户预览，减少多轮空转。",
+    "当用户说'太小了'、'看不清'、'像是画面脏了'时，调整幅度应偏大（2x-3x），避免需要再次微调。",
+    "记录用户此前接受的参数值域，用于推断本次微调的合理范围。",
+    "如果连续3次以上同一属性的调整，主动询问用户期望的目标值，而非继续猜测性递增。"
+  ],
+  "constraints": {
+    "max_edits_per_turn": 3,
+    "must_build_after_edit": true
+  },
+  "validation": [
+    "每次修改后确认 build 成功",
+    "修改的参数值在用户描述的方向上（增大/减小/改色）"
+  ],
+  "title_zh": "视觉打磨连续微调链",
+  "title_en": "Visual Polish Cascade — Consecutive Parameter Tweaking Chain",
+  "_provenance": {
+    "source": "traj-exp-accumulate",
+    "project": "wzp",
+    "session_hashes": [
+      "9dc56f96",
+      "374e4eb7"
+    ],
+    "turn_range": "9dc56f96:T05-T12, 374e4eb7:T15-T19",
+    "prompt_indices": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "evidence": "9dc56f96: 9 consecutive visual tweaks (dots→stars→bigger→colored→moving). 374e4eb7: 5 consecutive shape/size refinements on 连连看 graphics (四角星→正三角形→加大鱼/桃心/箭头/闪电→加大螺旋加粗). Also T06→T07: preview height 180→260 in 2 turns. Pattern confirmed across sessions.",
+    "session_count": 2
+  }
+}
+
+## 已有基因（检查重叠——相似则增强，不同则新建）
+(No existing genes yet — this is a fresh run.)
+
+## 输出规则
+对于每个发现的模式：
+1. 确定它属于哪个intent类别
+2. 检查该类别中是否已有相似的gene（比较signals, preconditions）
+3. 如果相似: 读取已有的 `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/{category}/genes.json`，更新gene的`_provenance`（添加session_hash, 更新evidence, 递增session_count）
+4. 如果是新的: 追加到 `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/{category}/genes.json`（如不存在则创建，格式为JSON数组）
+5. 完成后运行: `python3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py`（或手动更新index）
+
+## Gene ID 命名规范
+- 格式: `gene_{intent_prefix}_{pattern_name}`
+- 前缀: fm=feature_modification, nf=new_feature, br=bug_report, aoc=ai_output_correction, inq=inquiry, pd=planning_design, doc=documentation, cc=content_creation, cfg=configuration, mw=meta_workflow, elp=error_log_paste, meta=session_meta
+
+## 重要规则
+- 每个gene必须包含schema中所有必填字段
+- preconditions和strategy用中文
+- title_zh中文，title_en英文
+- _provenance必须包含session_hashes, turn_range, prompt_indices, evidence
+- prompt数少于3个的session不要生成gene（除非模式非常突出）
+- 质量优先：每个session 3-5个高质量gene比10个弱gene更好
+- 输出目录: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins`
+
+现在开始分析会话并生成基因。先读取 .json 文件。

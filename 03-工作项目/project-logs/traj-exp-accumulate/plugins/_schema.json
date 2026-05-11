@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gene",
+  "description": "A reusable behavioral pattern extracted from game-development AI agent trajectories. Genes represent recurring strategies, diagnostic patterns, and workflow rhythms that can be matched to new user prompts for improved agent behavior.",
+  "type": "object",
+  "required": ["type", "id", "category", "signals_match", "preconditions", "strategy", "title_zh", "title_en", "_provenance"],
+  "properties": {
+    "type": { "const": "Gene" },
+    "id": {
+      "type": "string",
+      "pattern": "^gene_[a-z_]+$",
+      "description": "Unique identifier. Convention: gene_{intent_prefix}_{pattern_name}"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["workflow", "diagnostic", "session_rhythm", "operational", "informational"],
+      "description": "workflow=implementation pattern, diagnostic=bug/error investigation, session_rhythm=cross-turn cadence, operational=meta/build, informational=read-only"
+    },
+    "signals_match": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags and conditions that trigger this gene. Format: 'dimension:value' or bare keyword."
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Natural language conditions (Chinese) that must be true for this gene to activate."
+    },
+    "strategy": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered action steps (Chinese) the agent should follow when this gene is matched."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Hard guardrails for execution (optional)."
+    },
+    "validation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Verification checks to confirm the gene's strategy was correctly applied."
+    },
+    "title_zh": { "type": "string" },
+    "title_en": { "type": "string" },
+    "_provenance": {
+      "type": "object",
+      "required": ["source", "project", "session_hashes"],
+      "properties": {
+        "source": { "type": "string" },
+        "project": { "type": "string" },
+        "session_hashes": { "type": "array", "items": { "type": "string" } },
+        "turn_range": { "type": "string" },
+        "prompt_indices": { "type": "array", "items": { "type": "integer" } },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}

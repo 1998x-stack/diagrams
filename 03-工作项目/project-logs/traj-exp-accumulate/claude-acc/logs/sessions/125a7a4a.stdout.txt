@@ -1,0 +1,12 @@
+Done. Session `125a7a4a` has only 1 prompt (below the <3 threshold), but the build entry config recovery pattern is specific enough to warrant extraction:
+
+**1 new gene created** — `gene_cfg_build_entry_missing_fix` (operational):
+
+- **What it captures**: When `mcp__sce-urhox__build` is called without `entry` param, it fails with `入口配置缺失`. The recovery is: Grep `.project/project.json` for `"entry"` → Glob `scripts/main*.lua` → retry build with explicit `entry="main.lua"`.
+- **Why it's distinctive**: Specific to the UrhoX/SCE build system, deterministic error → deterministic fix, no code changes needed (pure invocation parameter fix).
+
+**Skipped patterns**:
+- The UI copy text change (grep-then-edit `outfit-manager.lua`) — too generic for a 1-prompt session, not highly distinctive.
+- The 2-phase grep (exact → broader fallback when user typo causes no-match) — interesting but insufficiently distinctive as a standalone gene.
+
+Index regenerated: operational now has 2 genes.

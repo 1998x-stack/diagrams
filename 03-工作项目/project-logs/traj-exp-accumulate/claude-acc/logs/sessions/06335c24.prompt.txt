@@ -1,0 +1,426 @@
+You are a trajectory analysis expert. Your task is to analyze a game-development AI agent session and extract reusable behavioral patterns ("genes") from it.
+
+## GOAL
+Analyze session `06335c24` (project: `wzp`) and generate Gene objects organized by intent category. Write them to the plugins directory.
+
+## INPUT FILES (use Read/Bash tools to access these)
+1. **Intent classifications**: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/examples/wzp/06335c24.json`
+   - Contains classified user prompts with intent_primary, target_artifact, summaries
+2. **Full trajectory**: `/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/06335c24.traj`
+   - Contains the full agent trajectory (may be very large — use Bash with python/jq to extract summaries, don't try to read the whole file at once)
+
+## ANALYSIS STEPS
+1. Read the .json file to understand intent distribution and prompt sequences
+2. Use Bash to extract per-turn summary from the .traj file:
+   - Per turn: step count, tool distribution, phase, edit count, build count, error count
+   - Session-level: total duration, total steps, tool frequency, phase distribution
+3. Identify reusable behavioral patterns:
+   - Consecutive same-intent sequences (e.g., 5+ visual tweaks in a row)
+   - Workflow chains (e.g., design doc → implement → polish → doc checkpoint)
+   - Failure patterns (repeated bug reports, escalation sequences)
+   - Session rhythm (doc checkpoint cadence, phase boundaries)
+   - Content creation workflows (generate → preview → apply)
+4. Check existing genes (below) for overlaps
+5. Generate new genes or enhance existing ones
+
+## INTENT TAXONOMY
+  - new_feature: First-time request for a new capability, system, screen, or game mechanic that does not yet exist.
+  - feature_modification: Tweak / adjust / extend an existing feature the user already accepted.
+  - bug_report: User observed broken behavior in the running product; expects diagnosis + fix.
+  - ai_output_correction: User is correcting the AI's most-recent or recent delivery.
+  - inquiry: Question seeking information, status, or judgment. Does not request code change.
+  - inspection_review: Ask the AI to inspect / audit / review existing code, docs, or designs.
+  - planning_design: Request to design / draft / spec something before implementation.
+  - documentation: Update, create, or refresh documentation specifically.
+  - content_creation: Generate non-code assets — images, text/copy, audio specs, character bios, dialogue.
+  - refactor_redesign: Re-architect or redo something already built (not a small tweak).
+  - error_log_paste: User pastes raw error logs / crash reports / stack traces.
+  - configuration: Change a config value, environment variable, build flag, or registry entry.
+  - meta_workflow: Operational request not about the product itself — saving sessions, switching tools, summarizing progress.
+  - other: Use only if none of the above clearly fits.
+
+## GENE SCHEMA
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gene",
+  "description": "A reusable behavioral pattern extracted from game-development AI agent trajectories. Genes represent recurring strategies, diagnostic patterns, and workflow rhythms that can be matched to new user prompts for improved agent behavior.",
+  "type": "object",
+  "required": ["type", "id", "category", "signals_match", "preconditions", "strategy", "title_zh", "title_en", "_provenance"],
+  "properties": {
+    "type": { "const": "Gene" },
+    "id": {
+      "type": "string",
+      "pattern": "^gene_[a-z_]+$",
+      "description": "Unique identifier. Convention: gene_{intent_prefix}_{pattern_name}"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["workflow", "diagnostic", "session_rhythm", "operational", "informational"],
+      "description": "workflow=implementation pattern, diagnostic=bug/error investigation, session_rhythm=cross-turn cadence, operational=meta/build, informational=read-only"
+    },
+    "signals_match": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags and conditions that trigger this gene. Format: 'dimension:value' or bare keyword."
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Natural language conditions (Chinese) that must be true for this gene to activate."
+    },
+    "strategy": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered action steps (Chinese) the agent should follow when this gene is matched."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Hard guardrails for execution (optional)."
+    },
+    "validation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Verification checks to confirm the gene's strategy was correctly applied."
+    },
+    "title_zh": { "type": "string" },
+    "title_en": { "type": "string" },
+    "_provenance": {
+      "type": "object",
+      "required": ["source", "project", "session_hashes"],
+      "properties": {
+        "source": { "type": "string" },
+        "project": { "type": "string" },
+        "session_hashes": { "type": "array", "items": { "type": "string" } },
+        "turn_range": { "type": "string" },
+        "prompt_indices": { "type": "array", "items": { "type": "integer" } },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}
+
+
+## EXAMPLE GENE
+{
+  "type": "Gene",
+  "id": "gene_fm_visual_polish_cascade",
+  "category": "workflow",
+  "signals_match": [
+    "intent:feature_modification",
+    "target:visual_style",
+    "consecutive_same_intent_ge_4",
+    "parameter_tweak_chain",
+    "size_color_position_adjustment",
+    "cn_visual_decoration_keywords"
+  ],
+  "preconditions": [
+    "用户已有一个基本可用的视觉元素（装饰物、背景、动画），正在进行迭代打磨。",
+    "连续4+次 feature_modification 指向 visual_style 或 ui_layout，每次只调整1-2个参数。",
+    "用户的反馈模式为：观察结果→提出微调→观察→再微调，典型的视觉打磨循环。"
+  ],
+  "strategy": [
+    "每次修改限定在用户提及的单一参数（大小、颜色、速度、位置），不要预判性地调整其他视觉属性。",
+    "修改后立即 build 让用户预览，减少多轮空转。",
+    "当用户说'太小了'、'看不清'、'像是画面脏了'时，调整幅度应偏大（2x-3x），避免需要再次微调。",
+    "记录用户此前接受的参数值域，用于推断本次微调的合理范围。",
+    "如果连续3次以上同一属性的调整，主动询问用户期望的目标值，而非继续猜测性递增。"
+  ],
+  "constraints": {
+    "max_edits_per_turn": 3,
+    "must_build_after_edit": true
+  },
+  "validation": [
+    "每次修改后确认 build 成功",
+    "修改的参数值在用户描述的方向上（增大/减小/改色）"
+  ],
+  "title_zh": "视觉打磨连续微调链",
+  "title_en": "Visual Polish Cascade — Consecutive Parameter Tweaking Chain",
+  "_provenance": {
+    "source": "traj-exp-accumulate",
+    "project": "wzp",
+    "session_hashes": [
+      "9dc56f96",
+      "374e4eb7"
+    ],
+    "turn_range": "9dc56f96:T05-T12, 374e4eb7:T15-T19",
+    "prompt_indices": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "evidence": "9dc56f96: 9 consecutive visual tweaks (dots→stars→bigger→colored→moving). 374e4eb7: 5 consecutive shape/size refinements on 连连看 graphics (四角星→正三角形→加大鱼/桃心/箭头/闪电→加大螺旋加粗). Also T06→T07: preview height 180→260 in 2 turns. Pattern confirmed across sessions.",
+    "session_count": 2
+  }
+}
+
+## EXISTING GENES INDEX (for overlap detection)
+=== diagnostic/index.md ===
+# diagnostic — Gene Index
+
+**Gene count:** 1
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_br_new_panel_click_interception` | New Panel Click Interception — Underlying Button Becomes Unresponsive | diagnostic | 1x: 014354fc | `intent:bug_report`, `target:ui_layout`, `symptom:click_unresponsive` |
+
+---
+
+## `gene_br_new_panel_click_interception`
+
+**新增面板导致下层按钮点击失效（点击拦截 Bug）** / New Panel Click Interception — Underlying Button Becomes Unresponsive
+
+Category: `diagnostic`
+
+**Signals:**
+- `intent:bug_report`
+- `target:ui_layout`
+- `symptom:click_unresponsive`
+- `symptom:button_no_reaction`
+- `recent_ui_panel_added`
+- `cn_keywords:dianji,wufa,meiyoufanying,anniu`
+
+**Preconditions:**
+- 用户报告某个原本正常的 UI 按钮或控件点击后无响应（如「点击没有反应」、「无法点击」）。
+- 同一 session 中刚刚实现了一个新的面板组件（Panel/Layer/覆盖层），或该 bug 发生在近期新增 UI 组件之后。
+- 点击失效的控件与新增面板位于同一屏幕区域。
+
+**Evidence:** Turn 4 (11 steps): user reported debug button in top-right unresponsive after sound test panel was added in T02. Agent read sound-test-panel.lua, identified the panel was not initially hidden (intercepting clicks), fixed by setting initial state to width=0, height=0 with comment meaning 'no click interception'. Build succeeded. Pattern: new panel with non-zero initial dimensions intercepts touch events from underlying buttons.
+
+---
+
+
+=== operational/index.md ===
+# operational — Gene Index
+
+**Gene count:** 1
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_cfg_surgical_json_field_update` | Surgical JSON Config Field Update — Precision Single-Field Patch with Preservation Constraint | operational | 1x: 019cf9e3 | `intent:configuration`, `target:build_config`, `mentions_specific_file` |
+
+---
+
+## `gene_cfg_surgical_json_field_update`
+
+**单字段精准更新：外科手术式 JSON 配置修改** / Surgical JSON Config Field Update — Precision Single-Field Patch with Preservation Constraint
+
+Category: `operational`
+
+**Signals:**
+- `intent:configuration`
+- `target:build_config`
+- `mentions_specific_file`
+- `explicit_field_path_specified`
+- `preservation_constraint`
+- `cn_keywords:zhigenxin,baochi,ziduan,bubian`
+
+**Preconditions:**
+- 用户明确指定了目标文件路径（如 .project/project.json）和要更新的字段路径（如 taptap_publish.developer_id）。
+- 用户附加了明确的保留约束（如「只更新…字段，保持其他字段不变」）。
+- 这是一次单字段值的精确替换或新增，而非整体结构的重构。
+
+**Evidence:** 019cf9e3 T01 (3 steps, 12.6s): user requested update of taptap_publish.developer_id in .project/project.json to 378112, explicitly constraining 'only update developer_id, keep all other fields unchanged'. Agent: (1) Read file to confirm structure, (2) surgical Edit anchoring on the last existing field to append new developer_id at object end, (3) confirm. Diff: only 1 line added (+developer_id:378112) and 1 comma to preceding last field. No reformatting, no adjacent changes. Pattern: field-path + preservation constraint -> read-first + surgical string-anchor edit.
+
+---
+
+
+=== workflow/index.md ===
+# workflow — Gene Index
+
+**Gene count:** 6
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_nf_design_doc_system_build` | Design-Doc-Driven New System Implementation Workflow | workflow | 1x: 014354fc | `intent:new_feature`, `has_attached_doc`, `mentions_specific_file` |
+| 2 | `gene_doc_terse_breadth_first` | Terse 'Update Docs' Trigger — Breadth-First Documentation Sync | workflow | 2x: 014354fc, 056c0fdf | `intent:documentation`, `terse_prompt_le_4_tokens`, `cn_keywords:gengxin,wendang,tongbu` |
+| 3 | `gene_nf_test_feature_explore_first` | New Test/Debug Feature — Explore-First Infrastructure Integration | workflow | 1x: 014354fc | `intent:new_feature`, `target:test_ui`, `debug_panel_mentioned` |
+| 4 | `gene_fm_puzzle_level_redesign_with_simulation` | Puzzle Level Redesign with Simulation-First Solvability Verification | workflow | 1x: 056c0fdf | `intent:feature_modification`, `target:game_logic`, `puzzle_level_redesign` |
+| 5 | `gene_nf_ui_event_triggered_hint` | UI Tutorial Hint with Event-Triggered Fade — Explore Rendering First | workflow | 1x: 056c0fdf | `intent:new_feature`, `target:ui_layout`, `hint_text_mentioned` |
+| 6 | `gene_fm_conditional_element_visibility` | Conditional UI Element Visibility — Game State Driven Show/Hide | workflow | 1x: 056c0fdf | `intent:feature_modification`, `target:ui_layout`, `conditional_visibility` |
+
+---
+
+## `gene_nf_design_doc_system_build`
+
+**设计文档驱动的新系统落地工作流** / Design-Doc-Driven New System Implementation Workflow
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `has_attached_doc`
+- `mentions_specific_file`
+- `large_system_implementation`
+- `design_doc_referenced`
+- `cn_keywords:luodi,xitong,fangan`
+
+**Preconditions:**
+- 用户在提示词中引用了设计方案文档（通过 @文件名 或 file:/// 路径），要求落地某个系统或功能。
+- 这是该功能的首次实现，目标系统尚未存在于代码库。
+- 实现规模较大，涉及多个文件和子系统（音效系统、关卡系统、存档系统等）。
+
+**Evidence:** Turn 1 (145 steps): user referenced 音效系统设计方案.md via @-mention. Agent read design doc + AI开发规范.md → TodoWrite plan → Explore subagent → 34 edits + 3 writes + specialized MCP tools (batch_sound_effects, text_to_sound_effect) → build. Pattern: design doc reference at session open triggers a full read-plan-explore-implement-verify cycle.
+
+---
+
+## `gene_doc_terse_breadth_first`
+
+**简短「更新文档」指令触发的广度优先文档同步** / Terse 'Update Docs' Trigger — Breadth-First Documentation Sync
+
+Category: `workflow`
+
+**Signals:**
+- `intent:documentation`
+- `terse_prompt_le_4_tokens`
+- `cn_keywords:gengxin,wendang,tongbu`
+- `follows_feature_completion`
+- `large_file_bash_python_fallback_possible`
+
+**Preconditions:**
+- 用户发送了简短的文档更新指令（如「更新文档」，1-4个词，无具体说明哪些文档或更新什么内容）。
+- 通常发生在完成一个功能实现或修复之后，需要同步文档状态。
+
+**Evidence:** 014354fc T3 (30 steps): user prompt was exactly '更新文档' (2 tokens). First step: Glob 'docs/**/*.md'. Then read 音效系统设计方案.md, 完成记录.md, 总体进度.md, 架构决策记录.md. Then 9 edits across multiple docs. Pattern: a 2-word doc update prompt triggers full discovery + systematic multi-doc editing. | 056c0fdf T4 (50 steps): same '更新文档' prompt. Used 6x Glob to discover all .md paths (scripts/**/*.md, docs/**/*.md, memory/**/*.md, etc.), then read 3 docs (P1-推箱子关卡详细设计.md, 完成记录.md, 总体进度.md). Encountered oversized markdown file — fell back to 5x python3-via-Bash scripts (sed read, python -c, heredoc, base64 encoding) to perform surgical line replacements. Then 9 edits across 3 docs. Confirms pattern + adds large-file bash fallback variant.
+
+---
+
+## `gene_nf_test_feature_explore_first`
+
+**测试/Debug 功能新增：先探索现有基础设施再实现** / New Test/Debug Feature — Explore-First Infrastructure Integration
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:test_ui`
+- `debug_panel_mentioned`
+- `test_switch_mentioned`
+- `cn_keywords:ceshi,debug,tiaoshi,kaiguan`
+
+**Preconditions:**
+- 用户要求新增测试或调试功能（测试UI、debug面板、测试开关开启后的新功能等）。
+- 目标功能需要与已有的测试/debug框架集成，而非完全新建。
+- 提示词中提到了条件触发（如「测试开关开启时」）。
+
+**Evidence:** Turn 2 (45 steps): user asked to add sound effect test UI accessible via test toggle. First step: Task/Explore subagent to map test toggle and debug UI structure. Then read debug-panel.lua, feature-flags.lua, sound-manager.lua. Implemented by extending existing debug panel, not creating a new entry point. Pattern: test feature requests → Explore existing infra → extend, don't create from scratch.
+
+---
+
+## `gene_fm_puzzle_level_redesign_with_simulation`
+
+**益智关卡重新设计：先模拟验证再落地** / Puzzle Level Redesign with Simulation-First Solvability Verification
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:game_logic`
+- `puzzle_level_redesign`
+- `custom_game_mechanic`
+- `solvability_verification_needed`
+- `cn_keywords:chongsheji,guanka,bingkuai,yanzheng,tuidao,huaxing`
+
+**Preconditions:**
+- 用户要求重新设计益智游戏的某一关卡（推箱子、方块消除等），并要求强化特定机制（冰块、传送门等需要特殊物理规则的元素）。
+- 关卡有确定性解法约束——错误设计可能导致无解关卡（用户会直接遭遇卡关）。
+- 目标关卡已存在于数据文件中（如 levels.lua），需用新设计替换某一关的数据。
+
+**Evidence:** 056c0fdf T1 (20 main steps + 3 substantive subagents): user asked to redesign Sokoban level 6 with more ice mechanics and bigger field. Agent dispatched: (1) SA a2e60d5 — Explore subagent read levels.lua, board.lua, level-loader.lua to map tile types and ice sliding rules. (2) A design subagent (Task step 8) constructed the new level layout. (3) SA af06861 — Verification subagent wrote a Python simulator (31 steps, multiple compile-fix iterations via base64 encoding workaround) to simulate ice sliding and confirm the level is solvable. After verification passed, main agent edited levels.lua and built. Pattern: explore mechanics → design → simulate-verify → apply → build.
+
+---
+
+## `gene_nf_ui_event_triggered_hint`
+
+**游戏操作提示文字：首次事件触发渐隐消失** / UI Tutorial Hint with Event-Triggered Fade — Explore Rendering First
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `target:ui_layout`
+- `hint_text_mentioned`
+- `fade_or_disappear_mentioned`
+- `event_triggered_state_change`
+- `cn_keywords:tishi,jianyin,xiaoshi,huadong,chenggong,caozuo`
+
+**Preconditions:**
+- 用户要求在游戏屏幕中添加引导/提示文字，该文字需要在特定游戏事件后（首次成功操作、首次点击等）自动淡出或消失。
+- 提示文字需嵌入现有游戏屏幕的 UI 层，需了解当前渲染方式和事件系统才能正确实现。
+
+**Evidence:** 056c0fdf T2 (32 steps): user asked to add '滑动屏幕进行移动' hint at bottom of Sokoban screen that fades after first successful move. Agent: (1) SA a9ee6a4 — Explore subagent used Bash ls + Read to map rendering code (board-renderer.lua, screens/gameplay.lua, adapter.lua, animations.lua). (2) Main agent read 6 view files. (3) 5 edits: view/gameplay-view.lua (hint node + fade animation), screens/gameplay.lua x3 (event callback + reset), screens/gameplay-init.lua (init state). Build success. Pattern: explore rendering code → read view structure → add text node + fade animation + event-callback trigger → multi-file edit → build.
+
+---
+
+## `gene_fm_conditional_element_visibility`
+
+**条件性 UI 元素可见性：基于游戏状态的按钮显隐** / Conditional UI Element Visibility — Game State Driven Show/Hide
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `conditional_visibility`
+- `hide_when_condition_not_met`
+- `game_state_dependent_ui`
+- `cn_keywords:yincang,xianshi,tiaojian,anniu,meiyou,xiayiguan,shengli`
+
+**Preconditions:**
+- 用户要求在特定条件下（如「没有下一关」「已是最后一关」）隐藏某个 UI 元素（按钮、文字等）。
+- 该 UI 元素位于已有的胜利/结算弹窗或类似状态弹窗中，当前无条件显示。
+- 需要在数据层（关卡状态/数量）和视图层（元素显示）之间建立条件判断链。
+
+**Evidence:** 056c0fdf T3 (34 steps): user asked to hide 'Next Level' button in victory screen when no next level exists. Agent: (1) Grep for drawWinDialog → read view.lua, view-layout.lua, view-dialog.lua. (2) Grep for onRequestNextLevel event → read adapter.lua to find lastLevel flag. (3) TodoWrite 4-step plan. (4) 5 edits: view/view-dialog.lua (conditional button render), screens/gameplay.lua x3 (pass hasNextLevel param through event chain), adapter.lua (expose lastLevel data). Build success. Pattern: grep function → read view files → grep event handler → read adapter → multi-file conditional edit propagating state from data layer to view → build.
+
+---
+
+
+## OUTPUT INSTRUCTIONS — DEDUP-FIRST WORKFLOW
+
+**BEFORE creating any new gene, you MUST check for similar existing genes using this exact workflow:**
+
+### Step A: Grep for overlap
+For each pattern you want to create a gene for, run:
+```bash
+grep -r "intent:{category}" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/*/genes.json
+grep -r "{key_signal}" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/*/genes.json
+```
+where `{key_signal}` is the most distinctive signal tag (e.g., `consecutive_same_intent`, `sfx_name_in_prompt`, `stacktrace_in_prompt`).
+
+### Step B: If grep finds a match — ENHANCE, don't create
+1. Read the matching `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/{category}/genes.json`
+2. Find the specific gene object with overlapping signals
+3. Use Edit to update ONLY the `_provenance` section:
+   - Append `"06335c24"` to `session_hashes` array
+   - Append new turn/prompt references to `evidence`
+   - Set or increment `session_count`
+   - Update `turn_range` to include the new session's turns (format: `"prev_hash:T01-T03, 06335c24:T05-T08"`)
+4. If the new session reveals additional signals or preconditions not in the existing gene, you MAY also add them to `signals_match` and `preconditions` — but do NOT remove existing ones.
+
+### Step C: If grep finds no match — CREATE new gene
+1. If `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/{category}/genes.json` exists, Read it, then append your new gene to the JSON array.
+2. If the file does not exist, create it as a JSON array containing your new gene: `[ {gene} ]`
+3. Also create the category directory if needed: `mkdir -p /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins/{category}`
+
+### Step D: After all writes
+Run: `python3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins`
+
+## GENE ID CONVENTION
+- Format: `gene_{intent_prefix}_{pattern_name}`
+- Intent prefixes: fm=feature_modification, nf=new_feature, br=bug_report, aoc=ai_output_correction, inq=inquiry, pd=planning_design, doc=documentation, cc=content_creation, cfg=configuration, mw=meta_workflow, elp=error_log_paste, meta=session_meta
+
+## IMPORTANT RULES
+- Every gene must have all required fields from the schema
+- Preconditions and strategy should be in Chinese (matching the user's language)
+- title_zh in Chinese, title_en in English
+- _provenance must include session_hashes, turn_range, prompt_indices, and evidence
+- Do NOT create genes for sessions with very few prompts (< 3) unless the pattern is highly distinctive
+- Quality over quantity: 3-5 high-quality genes per session is better than 10 weak ones
+- The plugins directory to write to is: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/claude-acc/plugins`
+
+Now analyze the session and generate genes. Start by reading the .json file.

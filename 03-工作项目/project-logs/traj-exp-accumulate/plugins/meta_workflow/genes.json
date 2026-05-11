@@ -1,0 +1,41 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_mw_bare_build_command",
+    "category": "operational",
+    "signals_match": [
+      "intent:meta_workflow",
+      "target:build_config",
+      "single_word_command",
+      "build_keyword"
+    ],
+    "preconditions": [
+      "用户仅输入'build'，无其他上下文或说明。",
+      "通常出现在：前一轮修改后忘记build、想手动确认最新状态、准备开始新阶段的工作前。",
+      "极低步骤任务（2步）：调用build工具→返回结果。"
+    ],
+    "strategy": [
+      "直接调用项目的build工具（如 mcp__sce-urhox__build）。",
+      "将build结果（成功/失败+错误信息）汇报给用户。",
+      "如果build失败，展示错误信息但不主动修复（用户只要求了build）。"
+    ],
+    "constraints": {
+      "no_additional_edits": true,
+      "report_result_only": true
+    },
+    "validation": [
+      "build命令已执行",
+      "结果已返回给用户"
+    ],
+    "title_zh": "裸build命令执行",
+    "title_en": "Bare Build Command — Execute Build Only",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T41",
+      "prompt_indices": [40],
+      "evidence": "Single-word 'build' command, 2 steps total. User wanted manual build verification between audio work and level data injection phases."
+    }
+  }
+]

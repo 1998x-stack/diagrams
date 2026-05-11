@@ -1,0 +1,32 @@
+Now let me extract per-turn metrics from the .traj file:
+Let me check the actual step structure more carefully:
+Now let me check for existing gene overlaps before creating new ones:
+Let me check which genes already reference 61467d20:
+Now I have a clear picture. Let me read the existing workflow genes file to understand the format, then create new genes and enhance existing ones.
+Now let me create the new genes. I'll add 3 new genes to workflow/genes.json:
+Now add the operational gene:
+Now let me validate the JSON files and regenerate the index:
+All genes are properly created and indexed. Here's the analysis summary:
+
+## 会话 61467d20 (wzp) 分析结果
+
+**会话概览：**
+- 16 prompts, 32 turns, 319 总步骤
+- 53 Edits, 13 Writes, 10 builds
+- 6 种意图类型: planning_design(1), inquiry(3), new_feature(4), feature_modification(3), error_log_paste(1), bug_report(2), inspection_review(2)
+
+**已有基因（6个已包含 61467d20，无需新建）：**
+1. `gene_nf_read_heavy_scaffold_and_fill` — T0: 43 Read + 13 Write → 1 build（Read-heavy 全游戏实施）
+2. `gene_nf_animation_feature_cascade` — T9-T11: 连续3个粒子特效功能（消除特效→特殊方块特效→连锁触发）
+3. `gene_nf_cross_game_input_port` — T13: 推箱子鼠标滑动操作移植
+4. `gene_inq_self_correction_to_bug_cascade` — T5→T6→T7: inquiry自纠正→bug报告
+5. `gene_fm_edit_first_impulse_with_self_correction` — T7: 零定位编辑冲动（6 Edit adapter.lua 无前置Read/Grep）
+6. `gene_elp_error_log_diagnostic` — T4: 资源缺失错误诊断（Glob+Grep→Edit→build）
+
+**新建基因（3个）：**
+
+| # | ID | Category | 来源 Turns | 模式描述 |
+|---|---|---|---|---|
+| 1 | `gene_inq_completion_check_to_lightweight_integration` | workflow | T1→T2→T3 | 完成状态查询→极简确认→功能已存在发现→轻量集成 |
+| 2 | `gene_fm_reference_by_implementation` | workflow | T8 | 参考另一游戏的行为模式（非UI），Read源游戏逻辑→理解行为→应用到目标 |
+| 3 | `gene_doc_dual_inspection_rhythm` | operational | T12+T15 | 同会话中两次文档检查（中途+末尾），Edit量递减 |

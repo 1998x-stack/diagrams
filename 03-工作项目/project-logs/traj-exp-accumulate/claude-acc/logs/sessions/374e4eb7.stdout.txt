@@ -1,0 +1,20 @@
+All done. Here's a summary of what was extracted from session `374e4eb7`:
+
+---
+
+**4 new genes created:**
+
+| ID | Category | Pattern |
+|---|---|---|
+| `gene_fm_visual_polish_cascade` | workflow | Consecutive shape/size/style tweaks on same visual element (T05-T06, T14-T18); geometry changes need 2-4 build iterations |
+| `gene_pd_direct_design_doc_write_wait` | workflow | User says "先设计…写文档…等检查后开始制作" → agent reads existing code → writes design doc → waits (no PlanMode, distinct from `gene_pd_design_only_planmode_defer`) |
+| `gene_br_interactive_state_lock_one_shot` | diagnostic | Chat/popup only fires once: two-layer root cause — (1) `init()` doesn't reset state machine; (2) click-while-showing has no dismiss+re-trigger path (T19-T21) |
+| `gene_elp_nanovg_api_return_type_mismatch` | diagnostic | Error log paste with `attempt to perform arithmetic on a table value` → NanoVG bounding-box API returns `{xmin,ymin,xmax,ymax}` table, not multiple returns; fix by indexing the table (T23) |
+
+**3 existing genes enhanced:**
+
+| ID | What changed |
+|---|---|
+| `gene_br_new_panel_click_interception` | Added T13 — fox mascot touch area intercepts page-turn button (now 2 sessions) |
+| `gene_doc_terse_breadth_first` | Added T07/T11/T26 — three new "更新文档" instances; new variants: design doc included when session added it; design doc omitted when session was bug-fixes only (now 9 sessions) |
+| `gene_pd_terse_approval_batch_rewrite` | Added T01 "开始制作" — terse approval also fires after direct-doc-write turns (not just PlanMode); added `follows_design_doc_write_turn` signal (now 2 sessions) |

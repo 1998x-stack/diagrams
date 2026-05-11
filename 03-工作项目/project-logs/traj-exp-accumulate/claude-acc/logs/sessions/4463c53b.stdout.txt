@@ -1,0 +1,25 @@
+All updates are verified. Here's a summary of what was generated for session `4463c53b`:
+
+---
+
+**1 new gene created:**
+
+**`gene_ir_issue_report_sequential_triage`** (informational) — T1 pattern
+- User attaches an existing issue report doc (已有状态的自查问题报告) and asks "what needs fixing"
+- Agent reads the report, TodoWrites each open issue, then **sequentially reads source files** per issue to verify current code state
+- Uses Glob/Grep to check for missing external dependencies (SDK)
+- Outputs structured triage: ✓ can-fix (with file path) / ✗ cannot-fix (reason) — **zero code edits in this turn**
+- Natural handoff: sets context so the next terse "修复5.3,5.4" lands directly in implementation
+
+---
+
+**2 existing genes enhanced:**
+
+**`gene_br_audit_priority_tier_batch_fix`** — T2 confirms the pattern at small scale
+- Added `4463c53b` to session_hashes (now 2 sessions)
+- Added `specific_issue_id_reference` signal — user can reference specific IDs (5.3, 5.4) not just priority tiers (P1/P2)
+- Evidence: 3-edit small-scale variant vs. the 52-edit large-scale version; no parallel reads needed when T1 already established context
+
+**`gene_doc_terse_breadth_first`** — T4 confirms minimal variant (now 10 sessions)
+- Added `4463c53b` to session_hashes  
+- Evidence: "更新文档" after an audit-fix session → only `自查问题报告.md` updated (5 edits, version bump), skipping `完成记录` and `总体进度`; even the non-numbered T3 chat style change was captured in the issue report's changelog table

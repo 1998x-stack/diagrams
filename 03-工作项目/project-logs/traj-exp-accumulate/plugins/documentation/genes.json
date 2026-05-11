@@ -1,0 +1,45 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_doc_checkpoint_cadence",
+    "category": "session_rhythm",
+    "signals_match": [
+      "intent:documentation",
+      "target:documentation",
+      "cn_update_docs_keyword",
+      "periodic_in_session",
+      "phase_boundary_marker"
+    ],
+    "preconditions": [
+      "用户在一个session中周期性地发出'更新文档'指令，通常间隔8-12轮。",
+      "文档更新出现在功能开发阶段的边界（完成一批修改后、开始新主题前）。",
+      "用户将文档更新视为'检查点'，标记一组工作的完成。"
+    ],
+    "strategy": [
+      "识别文档更新请求为阶段边界标记，更新项目文档以反映最近完成的功能。",
+      "扫描最近一批修改涉及的功能模块，在文档中添加或更新对应章节。",
+      "不要过度扩展文档范围，只更新本轮工作涉及的内容。",
+      "如果项目有'完成记录'类文档，按日期追加当天完成的功能列表。"
+    ],
+    "constraints": {
+      "scope_to_recent_changes_only": true,
+      "preserve_existing_doc_structure": true
+    },
+    "validation": [
+      "文档内容反映最近完成的功能",
+      "未删除或修改之前的文档内容",
+      "文档格式与项目规范一致"
+    ],
+    "title_zh": "阶段性文档检查点更新",
+    "title_en": "Periodic Documentation Checkpoint — Phase Boundary Marker",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96", "374e4eb7"],
+      "turn_range": "9dc56f96:T14/T34/T40/T50, 374e4eb7:T08/T12/T27",
+      "prompt_indices": [13, 33, 39, 49],
+      "evidence": "9dc56f96: 4x '更新文档' every ~10 turns. 374e4eb7: 3x '更新文档' at T08/T12/T27 every ~8 turns. Pattern confirmed: users consistently checkpoint docs at phase boundaries. Intervals range 6-12 turns.",
+      "session_count": 2
+    }
+  }
+]

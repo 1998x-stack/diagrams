@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基因累积器 — 行为模式观测台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="observatory-header">
+  <h1>基因<em>累积器</em></h1>
+  <p class="observatory-subtitle">行为模式观测台</p>
+  <div class="pulse-count">
+    <span class="pulse-dot"></span>
+    已收录 <span id="totalCount">—</span> 条基因
+  </div>
+</header>
+
+<main class="stats-section">
+  <div id="app">
+    <div class="loading-state">
+      <div class="loading-helix"></div>
+      <span class="loading-text">正在扫描基因仓库…</span>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = window.location.port === '8011'
+  ? ''
+  : 'http://localhost:8011';
+
+const CAT_COLORS = {
+  workflow:'#58a6ff', diagnostic:'#f778ba',
+  session_rhythm:'#bc8cff', operational:'#ffa657',
+  informational:'#00d4aa'
+};
+const CAT_LABELS = {
+  workflow:'工作流', diagnostic:'诊断',
+  session_rhythm:'会话节奏', operational:'运维',
+  informational:'信息获取'
+};
+const SRC_COLORS = { 'claude-acc':'#00d4aa', 'opencode-acc':'#bc8cff' };
+const SRC_LABELS = { 'claude-acc':'Claude', 'opencode-acc':'OpenCode' };
+
+async function loadData() {
+  try {
+    const [genesRes, statsRes] = await Promise.all([
+      fetch(`${API}/api/genes`).then(r => r.json()),
+      fetch(`${API}/api/stats`).then(r => r.json()),
+    ]);
+    render(genesRes, statsRes);
+  } catch (e) {
+    document.getElementById('app').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠</div>
+        <p>无法连接到 API (端口 8011)</p>
+        <p style="margin-top:.5rem;font-size:.8rem">${e.message}</p>
+      </div>`;
+  }
+}
+
+function render({ total, genes }, stats) {
+  document.getElementById('totalCount').textContent = total;
+  const app = document.getElementById('app');
+
+  app.innerHTML = `
+    ${renderStats(stats)}
+    ${renderSourceBars(stats)}
+    ${renderHeatmap(stats)}
+    ${renderCategoryFilter(stats)}
+    <div class="genes-grid" id="genesGrid">
+      ${genes.map((g, i) => renderGeneCard(g, i)).join('')}
+    </div>
+  `;
+
+  setupInteractions(genes);
+}
+
+function renderStats(stats) {
+  const categories = Object.keys(stats.by_category);
+  const sources = Object.keys(stats.by_source);
+  return `<div class="stats-grid">
+    <div class="stat-card" style="--card-accent:var(--accent-cyan)">
+      <div class="label">基因总数</div>
+      <div class="value">${stats.total}</div>
+      <div class="detail">${sources.length} 个来源，${categories.length} 个分类</div>
+    </div>
+    ${sources.map(s => `
+    <div class="stat-card" style="--card-accent:${SRC_COLORS[s] || 'var(--accent-blue)'}">
+      <div class="label">${SRC_LABELS[s] || s}</div>
+      <div class="value">${stats.by_source[s]}</div>
+      <div class="detail">${Object.keys(stats.by_source_category[s] || {}).length} 个活跃分类</div>
+    </div>`).join('')}
+    <div class="stat-card" style="--card-accent:var(--accent-amber)">
+      <div class="label">信号维度</div>
+      <div class="value">${Object.keys(stats.signal_dimensions).length}</div>
+      <div class="detail">独立触发维度</div>
+    </div>
+  </div>`;
+}
+
+function renderSourceBars(stats) {
+  const allCats = Object.keys(stats.by_category);
+  const sources = Object.keys(stats.by_source);
+  const maxCat = Math.max(...Object.values(stats.by_category));
+  return `<div class="source-bars">
+    ${sources.map(src => {
+      const cats = stats.by_source_category[src] || {};
+      return `<div class="source-bar">
+        <div class="source-name">
+          <span class="dot" style="background:${SRC_COLORS[src]}"></span>
+          <span style="color:${SRC_COLORS[src]}">${SRC_LABELS[src] || src}</span>
+        </div>
+        ${allCats.map(cat => {
+          const count = cats[cat] || 0;
+          const pct = maxCat ? (count / maxCat * 100) : 0;
+          return `
+          <div class="bar-label">
+            <span style="color:${CAT_COLORS[cat]}">${CAT_LABELS[cat] || cat}</span>
+            <span>${count}</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${CAT_COLORS[cat]}"></div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderHeatmap(stats) {
+  const dims = stats.signal_dimensions;
+  const entries = Object.entries(dims).slice(0, 30);
+  if (!entries.length) return '';
+  const maxCount = Math.max(...entries.map(e => e[1]));
+  return `<div class="heatmap-section">
+    <div class="heatmap-title">信号维度频率</div>
+    <div class="heatmap-grid">
+      ${entries.map(([dim, count]) => {
+        const intensity = .06 + (count / maxCount) * .15;
+        return `<div class="heatmap-cell" style="background:rgba(0,212,170,${intensity})">
+          ${dim}<span class="count">×${count}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderCategoryFilter(stats) {
+  const cats = ['all', ...Object.keys(stats.by_category)];
+  return `<div class="category-filter" id="catFilter">
+    ${cats.map(cat => `
+      <button class="chip ${cat === 'all' ? 'active' : ''}"
+              data-cat="${cat}">
+        ${cat === 'all' ? '全部' : (CAT_LABELS[cat] || cat)}
+        ${cat !== 'all' ? `<span style="opacity:.5;margin-left:.3rem">${stats.by_category[cat]}</span>` : ''}
+      </button>
+    `).join('')}
+  </div>`;
+}
+
+function renderGeneCard(gene, index) {
+  const catColor = CAT_COLORS[gene.category] || '#58a6ff';
+  const srcColor = SRC_COLORS[gene._source] || '#888';
+  const catLabel = CAT_LABELS[gene.category] || gene.category;
+  const srcLabel = SRC_LABELS[gene._source] || gene._source;
+  const signals = (Array.isArray(gene.signals_match) ? gene.signals_match : []).slice(0, 8);
+  const strategy = Array.isArray(gene.strategy) ? gene.strategy : [];
+  const validation = Array.isArray(gene.validation) ? gene.validation : [];
+  const prov = gene._provenance || {};
+
+  return `<div class="gene-card" data-cat="${gene.category}" data-src="${gene._source}"
+               style="--gene-cat-color:${catColor};--gene-src-color:${srcColor};animation-delay:${index * 40}ms">
+    <div class="gene-card-head">
+      <div class="gene-badges">
+        <span class="badge badge-cat">${catLabel}</span>
+        <span class="badge badge-src">${srcLabel}</span>
+      </div>
+      <div class="gene-title-zh">${gene.title_zh || ''}</div>
+      <div class="gene-title-en">${gene.title_en || gene.id}</div>
+      <div class="gene-id">${gene.id}</div>
+    </div>
+    <div class="expand-indicator">▾ 展开详情</div>
+    <div class="gene-card-body">
+      <div class="gene-section">
+        <div class="gene-section-label">匹配信号</div>
+        <div class="gene-signals">
+          ${signals.map(s => `<span class="signal-tag">${escHtml(s)}</span>`).join('')}
+          ${(gene.signals_match || []).length > 8 ? `<span class="signal-tag" style="opacity:.5">+${(gene.signals_match || []).length - 8}</span>` : ''}
+        </div>
+      </div>
+      ${strategy.length ? `
+      <div class="gene-section">
+        <div class="gene-section-label">应对策略</div>
+        <ol class="strategy-list">
+          ${strategy.map(s => `<li>${escHtml(s)}</li>`).join('')}
+        </ol>
+      </div>` : ''}
+      ${validation.length ? `
+      <div class="gene-section">
+        <div class="gene-section-label">验证条件</div>
+        <ul class="validation-list">
+          ${validation.map(v => `<li>${escHtml(v)}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+      ${prov.evidence ? `
+      <div class="provenance-block">
+        <strong>来源</strong> · ${prov.project || '—'} ·
+        会话: ${(prov.session_hashes || []).join(', ')} ·
+        轮次: ${prov.turn_range || '—'}<br>
+        ${escHtml(prov.evidence)}
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function setupInteractions(genes) {
+  document.querySelectorAll('.gene-card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('expanded'));
+  });
+
+  const filter = document.getElementById('catFilter');
+  if (!filter) return;
+  filter.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    filter.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const cat = chip.dataset.cat;
+    document.querySelectorAll('.gene-card').forEach(card => {
+      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+    });
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>

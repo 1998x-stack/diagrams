@@ -1,0 +1,631 @@
+你是一位轨迹分析专家。你的任务是分析一个游戏开发AI Agent的会话轨迹，从中提取可复用的行为模式（"基因/Gene"）。
+
+## 目标
+分析会话 `0997e370`（项目: `wzp`），生成按意图分类组织的Gene对象，写入plugins目录。
+
+## 输入文件（使用工具读取）
+1. **意图分类数据**: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/examples/wzp/0997e370.json`
+   - 包含已分类的用户prompts，含 intent_primary, target_artifact, summaries
+2. **完整轨迹**: `/Users/xd/Desktop/work/project-logs/traj-data-new/wzp/0997e370.traj`
+   - 包含完整的agent轨迹（文件可能很大，请用python/jq提取摘要，不要一次性读取整个文件）
+
+## 分析步骤
+1. 读取 .json 文件，理解意图分布和prompt序列
+2. 用工具从 .traj 文件中提取per-turn摘要：
+   - 每个turn: 步骤数、工具分布、phase、编辑数、build数、错误数
+   - 会话级: 总时长、总步骤、工具频率、phase分布
+3. 识别可复用的行为模式：
+   - 连续同intent序列（如连续5+次视觉微调）
+   - 工作流链（如设计文档→实现→打磨→文档检查点）
+   - 失败模式（重复bug报告、升级序列）
+   - 会话节奏（文档检查点频率、阶段边界）
+   - 内容创建工作流（生成→预览→应用）
+4. 检查已有基因是否有重叠
+5. 生成新基因或增强已有基因
+
+## 意图分类体系
+  - new_feature: First-time request for a new capability, system, screen, or game mechanic that does not yet exist.
+  - feature_modification: Tweak / adjust / extend an existing feature the user already accepted.
+  - bug_report: User observed broken behavior in the running product; expects diagnosis + fix.
+  - ai_output_correction: User is correcting the AI's most-recent or recent delivery.
+  - inquiry: Question seeking information, status, or judgment. Does not request code change.
+  - inspection_review: Ask the AI to inspect / audit / review existing code, docs, or designs.
+  - planning_design: Request to design / draft / spec something before implementation.
+  - documentation: Update, create, or refresh documentation specifically.
+  - content_creation: Generate non-code assets — images, text/copy, audio specs, character bios, dialogue.
+  - refactor_redesign: Re-architect or redo something already built (not a small tweak).
+  - error_log_paste: User pastes raw error logs / crash reports / stack traces.
+  - configuration: Change a config value, environment variable, build flag, or registry entry.
+  - meta_workflow: Operational request not about the product itself — saving sessions, switching tools, summarizing progress.
+  - other: Use only if none of the above clearly fits.
+
+## Gene Schema
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gene",
+  "description": "A reusable behavioral pattern extracted from game-development AI agent trajectories. Genes represent recurring strategies, diagnostic patterns, and workflow rhythms that can be matched to new user prompts for improved agent behavior.",
+  "type": "object",
+  "required": ["type", "id", "category", "signals_match", "preconditions", "strategy", "title_zh", "title_en", "_provenance"],
+  "properties": {
+    "type": { "const": "Gene" },
+    "id": {
+      "type": "string",
+      "pattern": "^gene_[a-z_]+$",
+      "description": "Unique identifier. Convention: gene_{intent_prefix}_{pattern_name}"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["workflow", "diagnostic", "session_rhythm", "operational", "informational"],
+      "description": "workflow=implementation pattern, diagnostic=bug/error investigation, session_rhythm=cross-turn cadence, operational=meta/build, informational=read-only"
+    },
+    "signals_match": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags and conditions that trigger this gene. Format: 'dimension:value' or bare keyword."
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Natural language conditions (Chinese) that must be true for this gene to activate."
+    },
+    "strategy": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered action steps (Chinese) the agent should follow when this gene is matched."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Hard guardrails for execution (optional)."
+    },
+    "validation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Verification checks to confirm the gene's strategy was correctly applied."
+    },
+    "title_zh": { "type": "string" },
+    "title_en": { "type": "string" },
+    "_provenance": {
+      "type": "object",
+      "required": ["source", "project", "session_hashes"],
+      "properties": {
+        "source": { "type": "string" },
+        "project": { "type": "string" },
+        "session_hashes": { "type": "array", "items": { "type": "string" } },
+        "turn_range": { "type": "string" },
+        "prompt_indices": { "type": "array", "items": { "type": "integer" } },
+        "evidence": { "type": "string" }
+      }
+    }
+  }
+}
+
+
+## Gene示例
+{
+  "type": "Gene",
+  "id": "gene_fm_visual_polish_cascade",
+  "category": "workflow",
+  "signals_match": [
+    "intent:feature_modification",
+    "target:visual_style",
+    "consecutive_same_intent_ge_4",
+    "parameter_tweak_chain",
+    "size_color_position_adjustment",
+    "cn_visual_decoration_keywords"
+  ],
+  "preconditions": [
+    "用户已有一个基本可用的视觉元素（装饰物、背景、动画），正在进行迭代打磨。",
+    "连续4+次 feature_modification 指向 visual_style 或 ui_layout，每次只调整1-2个参数。",
+    "用户的反馈模式为：观察结果→提出微调→观察→再微调，典型的视觉打磨循环。"
+  ],
+  "strategy": [
+    "每次修改限定在用户提及的单一参数（大小、颜色、速度、位置），不要预判性地调整其他视觉属性。",
+    "修改后立即 build 让用户预览，减少多轮空转。",
+    "当用户说'太小了'、'看不清'、'像是画面脏了'时，调整幅度应偏大（2x-3x），避免需要再次微调。",
+    "记录用户此前接受的参数值域，用于推断本次微调的合理范围。",
+    "如果连续3次以上同一属性的调整，主动询问用户期望的目标值，而非继续猜测性递增。"
+  ],
+  "constraints": {
+    "max_edits_per_turn": 3,
+    "must_build_after_edit": true
+  },
+  "validation": [
+    "每次修改后确认 build 成功",
+    "修改的参数值在用户描述的方向上（增大/减小/改色）"
+  ],
+  "title_zh": "视觉打磨连续微调链",
+  "title_en": "Visual Polish Cascade — Consecutive Parameter Tweaking Chain",
+  "_provenance": {
+    "source": "traj-exp-accumulate",
+    "project": "wzp",
+    "session_hashes": [
+      "9dc56f96",
+      "374e4eb7"
+    ],
+    "turn_range": "9dc56f96:T05-T12, 374e4eb7:T15-T19",
+    "prompt_indices": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "evidence": "9dc56f96: 9 consecutive visual tweaks (dots→stars→bigger→colored→moving). 374e4eb7: 5 consecutive shape/size refinements on 连连看 graphics (四角星→正三角形→加大鱼/桃心/箭头/闪电→加大螺旋加粗). Also T06→T07: preview height 180→260 in 2 turns. Pattern confirmed across sessions.",
+    "session_count": 2
+  }
+}
+
+## 已有基因索引（用于重叠检测）
+=== diagnostic/index.md ===
+# diagnostic — Gene Index
+
+**Gene count:** 2
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_br_minimal_bug_fix` | Minimal Bug Fix — Read-Edit-Build Cycle for UI Defects | diagnostic | 1x: 014354fc | `intent:bug_report`, `target:ui_layout`, `single_file_fix` |
+| 2 | `gene_nf_subagent_fallback_to_direct` | Subagent Delegation Failure to Direct Tool Fallback | diagnostic | 1x: 0428882b | `intent:new_feature`, `subagent_404_error`, `Task_tool_failure` |
+
+---
+
+## `gene_br_minimal_bug_fix`
+
+**最小化Bug修复模式** / Minimal Bug Fix — Read-Edit-Build Cycle for UI Defects
+
+Category: `diagnostic`
+
+**Signals:**
+- `intent:bug_report`
+- `target:ui_layout`
+- `single_file_fix`
+- `read_edit_build_cycle`
+- `minimal_change`
+
+**Preconditions:**
+- 用户报告一个具体的UI交互bug（如按钮无法点击、UI位置异常）。
+- 问题范围明确，指向单一文件或组件。
+- 不需要大规模重构，只需定位并修复具体问题。
+
+**Evidence:** T3: debug按钮无法点击→读取sound-test-panel.lua→3次edit→1次build→修复。T4: 音效测试UI位置异常→读取sound-test-panel.lua→2次edit→1次build→修复。两个bug均为read→edit→build的简洁循环，无多余操作。
+
+---
+
+## `gene_nf_subagent_fallback_to_direct`
+
+**子Agent失败降级为直接探索** / Subagent Delegation Failure to Direct Tool Fallback
+
+Category: `diagnostic`
+
+**Signals:**
+- `intent:new_feature`
+- `subagent_404_error`
+- `Task_tool_failure`
+- `fallback_to_glob`
+- `fallback_to_direct_read`
+- `localization_without_edit`
+
+**Preconditions:**
+- 用户提出新功能需求，Agent 尝试通过 Task 子 Agent 探索代码库。
+- 子 Agent 因 404 错误全部失败（环境限制或平台不支持子 Agent 恢复）。
+- Agent 需要自行完成代码定位工作，无法委托给子 Agent。
+
+**Evidence:** 4 subagents launched (a53e615, a5ca1be, a9418bf, a9b1bff). a9b1bff partially explored /workspace/scripts/ via Bash before also hitting 404. Agent then fell back to Glob (steps 3-4, 9-10) and mcp__mkr__Read (steps 6-8, 11-12), reading 6 files: router.lua, storyline/init.lua, adventure-sfx.lua, adventure/init.lua, home/init.lua, main menu. Session terminated by API error before any edit could be made. Pattern: 404 -> Glob -> Read -> terminate.
+
+---
+
+
+=== informational/index.md ===
+# informational — Gene Index
+
+**Gene count:** 1
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_inq_ui_status_probe` | UI Status Probe — Lightweight Inquiry with Read-Respond Pattern | informational | 1x: 08e306a0 | `intent:inquiry`, `target:ui_layout`, `read_respond_only` |
+
+---
+
+## `gene_inq_ui_status_probe`
+
+**UI状态轻量查询模式** / UI Status Probe — Lightweight Inquiry with Read-Respond Pattern
+
+Category: `informational`
+
+**Signals:**
+- `intent:inquiry`
+- `target:ui_layout`
+- `read_respond_only`
+- `no_edit_no_build`
+- `status_question_pattern`
+- `lightweight_exploration`
+
+**Preconditions:**
+- 用户以疑问句形式询问当前UI/功能的现状（如'现在UI是否有自适应'、'缩放基于宽度还是高度'）。
+- 用户未要求修改、未报告bug、未要求新增功能。
+- Agent的响应模式为：读取1-2个相关文件→respond_to_user回答，不执行任何编辑或build。
+- 如果此前已有相关探索上下文（如刚完成大规模UI修改），Agent可直接回答而无需读取文件。
+
+**Evidence:** T0: '现在UI是否有自适应'→9步(2 Glob+2 Read+4 respond)，读取layout.lua和main.lua后回答，0 edits 0 builds。T3: '现在UI缩放是基于屏幕宽度还是高度'→仅1步respond_to_user，因T2刚完成大规模UI自适应修改，Agent直接基于已有上下文回答，无需读取文件。两个turn均为纯信息查询模式，但T3展示了'利用近期上下文直接回答'的优化路径。
+
+---
+
+
+=== operational/index.md ===
+# operational — Gene Index
+
+**Gene count:** 3
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_mw_todo_driven_workflow` | TODO-Driven Task Management — Progress Tracking for Multi-Step Work | operational | 1x: 014354fc | `intent:new_feature`, `intent:documentation`, `TodoWrite_frequent` |
+| 2 | `gene_op_batch_build_verify` | Batch-Build-Verify — Single Build After All Edits Per Turn | operational | 1x: 056c0fdf | `intent:feature_modification`, `intent:new_feature`, `build_once_per_turn` |
+| 3 | `gene_doc_post_implementation_sync` | Post-Implementation Documentation Sync — Multi-Document Update After Code Changes | operational | 1x: 08e306a0 | `intent:documentation`, `post_code_change_doc_update`, `multi_doc_sync` |
+
+---
+
+## `gene_mw_todo_driven_workflow`
+
+**Todo驱动的任务管理工作流** / TODO-Driven Task Management — Progress Tracking for Multi-Step Work
+
+Category: `operational`
+
+**Signals:**
+- `intent:new_feature`
+- `intent:documentation`
+- `TodoWrite_frequent`
+- `task_decomposition`
+- `progress_tracking`
+
+**Preconditions:**
+- 用户提出一个需要多步骤完成的任务（新功能、文档更新等）。
+- 任务涉及多个文件或模块的修改。
+- 需要跟踪进度，避免遗漏步骤。
+
+**Evidence:** 整个会话共13次TodoWrite调用：T0(音效系统)使用13次，T1(测试UI)使用6次，T2(文档)使用4次，T3(debug按钮)使用1次。Agent在每个复杂任务开始前都用TodoWrite分解步骤，是典型的todo驱动工作模式。
+
+---
+
+## `gene_op_batch_build_verify`
+
+**批量编辑后统一构建** / Batch-Build-Verify — Single Build After All Edits Per Turn
+
+Category: `operational`
+
+**Signals:**
+- `intent:feature_modification`
+- `intent:new_feature`
+- `build_once_per_turn`
+- `build_after_all_edits`
+- `no_intermediate_build`
+- `edit_then_build_sequence`
+
+**Preconditions:**
+- 用户提出需要修改代码的功能需求（非纯文档任务）。
+- Agent 在一个 turn 内需要多次编辑多个文件。
+- Agent 选择在所有编辑完成后统一 build 一次，而非每次编辑后都 build。
+
+**Evidence:** Turn 1: 1 edit + 1 build (build at step 18/20, after all edits). Turn 2: 6 edits across 2 files (board-renderer.lua + gameplay.lua) + 1 build at step 50/32 (last but one step). Turn 3: 7 edits across 3 files (board-renderer.lua + gameplay.lua + adapter.lua) + 1 build at step 84/34. Pattern: all edits batched, single build at end. Turn 4 (documentation): 0 builds — correct, doc-only turn.
+
+---
+
+## `gene_doc_post_implementation_sync`
+
+**代码变更后文档同步更新** / Post-Implementation Documentation Sync — Multi-Document Update After Code Changes
+
+Category: `operational`
+
+**Signals:**
+- `intent:documentation`
+- `post_code_change_doc_update`
+- `multi_doc_sync`
+- `grep_for_context_before_doc_edit`
+- `architecture_doc_update`
+- `progress_doc_update`
+
+**Preconditions:**
+- 用户在完成代码修改后，要求'更新文档'。
+- 项目存在多个文档文件（架构决策记录、完成记录、总体进度、AI开发规范等）。
+- Agent需要识别哪些文档受到了代码修改的影响，并同步更新。
+- 文档更新不涉及代码文件，仅修改docs/下的.md文件。
+
+**Evidence:** T5: '更新文档'→16步(7 Edit+4 Read+2 Grep+1 respond)。S0-S1: Grep搜索density/PHONE_REF/缩放因子确认相关文档→S2: Glob列出所有.md→S3-S6: 读取4个文档(架构决策记录.md、AI开发规范.md、完成记录.md、总体进度.md)→S8-S14: 编辑3个文档(架构决策记录.md×3处、完成记录.md×1处、总体进度.md×3处)→S15: respond确认。整个turn纯文档更新，无build，涉及4个文档文件中的3个。
+
+---
+
+
+=== session_rhythm/index.md ===
+# session_rhythm — Gene Index
+
+**Gene count:** 2
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_nf_edit_drift_without_verification` | Edit Drift Pattern — Consecutive Unverified Multi-File Edits | session_rhythm | 1x: 014354fc | `intent:new_feature`, `consecutive_edits_ge_10`, `no_build_between_edits` |
+| 2 | `gene_sr_respond_think_before_act` | Think-Announce-Act Cycle — respond_to_user as Thinking Buffer | session_rhythm | 1x: 056c0fdf | `intent:feature_modification`, `intent:new_feature`, `intent:documentation` |
+
+---
+
+## `gene_nf_edit_drift_without_verification`
+
+**批量编辑漂移模式（无验证连续修改）** / Edit Drift Pattern — Consecutive Unverified Multi-File Edits
+
+Category: `session_rhythm`
+
+**Signals:**
+- `intent:new_feature`
+- `consecutive_edits_ge_10`
+- `no_build_between_edits`
+- `multi_file_scatter_edit`
+- `drift_marker_present`
+
+**Preconditions:**
+- 用户提出一个涉及多文件修改的新功能需求。
+- Agent在没有build验证的情况下连续编辑10+次。
+- 修改分散在多个文件（如gameplay.lua、board-renderer.lua、adapter.lua等）。
+- 会话标记中出现 drift-start 警告。
+
+**Evidence:** T0: 最大连续编辑19次无build（drift-start at step 4）。另有8次、5次、4次连续编辑漂移。整个T0共95次tool calls、37次edit、仅2次build。Phase标记显示editing占step 1-98。这是典型的edit drift模式——agent沉浸于批量修改而忘记验证。
+
+---
+
+## `gene_sr_respond_think_before_act`
+
+**思考-宣布-执行循环** / Think-Announce-Act Cycle — respond_to_user as Thinking Buffer
+
+Category: `session_rhythm`
+
+**Signals:**
+- `intent:feature_modification`
+- `intent:new_feature`
+- `intent:documentation`
+- `respond_to_user_ratio_ge_0.30`
+- `announce_before_edit`
+- `confirm_after_edit`
+- `think_act_verify_cycle`
+
+**Preconditions:**
+- 用户提出需要修改代码或文档的任务（feature_modification、new_feature、documentation）。
+- Agent 在每次编辑前，先用 respond_to_user 向用户说明即将做什么、为什么这样做。
+- 编辑完成后再次用 respond_to_user 确认结果并预告下一步。
+
+**Evidence:** Turn 1: 6/20 steps (30%) respond_to_user — 'Let me first look at existing code' → Read levels.lua/board.lua → 'Now I'll design the new level' → Edit → 'Now let me find build params' → build → done. Turn 2: 12/32 steps (38%) — each of 6 edits preceded by explain-what-I-will-do. Turn 3: 13/34 steps (38%) — '思路清晰了，改动涉及三个文件，从底向上逐层修改' then systematic per-file announce/edit. Turn 4: 17/50 steps (34%) — doc update with per-doc announce. Pattern consistent across all 4 implementation turns.
+
+---
+
+
+=== workflow/index.md ===
+# workflow — Gene Index
+
+**Gene count:** 7
+
+| # | ID | Title | Category | Sessions | Signals (top 3) |
+|---|---|---|---|---|---|
+| 1 | `gene_nf_feature_already_exists` | Feature Already Exists Discovery — Exploration-to-Report Without Code Changes | workflow | 1x: 07f56b0e | `intent:new_feature`, `zero_edits_zero_builds`, `feature_already_exists` |
+| 2 | `gene_ir_pre_implementation_doc_review` | Pre-Implementation Document Review — Gap & Blocker Assessment | workflow | 1x: 06335c24 | `intent:inspection_review`, `target:documentation`, `mentions_specific_file` |
+| 3 | `gene_sr_fragmented_prompt_assembly` | Fragmented Prompt Assembly — Reassembling Split User Input Across Turns | session_rhythm | 1x: 06335c24 | `intent:inspection_review`, `intent:inquiry`, `fragmented_user_input` |
+| 4 | `gene_ir_minimal_inspection_rhythm` | Minimal Inspection Rhythm — Read-Respond-Only Review Pattern | session_rhythm | 1x: 06335c24 | `intent:inspection_review`, `read_respond_only`, `no_edit_no_build_no_explore` |
+| 5 | `gene_fm_ui_responsive_adaptation_cascade` | UI Responsive Adaptation Cascade — Multi-Module Read-Edit-Verify-Build Pipeline | workflow | 1x: 08e306a0 | `intent:feature_modification`, `target:ui_layout`, `multi_file_cascade_ge_5` |
+| 6 | `gene_fm_layout_param_surgical` | Layout Parameter Surgical Edit — Heavy Localization, Minimal Edit | workflow | 1x: 08e306a0 | `intent:feature_modification`, `target:ui_layout`, `heavy_localization_light_edit` |
+| 7 | `gene_fm_shared_util_targeted_edit` | Shared Utility Targeted Edit — Single File Change with Cascading Impact | workflow | 1x: 08e306a0 | `intent:feature_modification`, `target:ui_layout`, `single_shared_utility_file` |
+
+---
+
+## `gene_nf_feature_already_exists`
+
+**功能已存在发现模式** / Feature Already Exists Discovery — Exploration-to-Report Without Code Changes
+
+Category: `workflow`
+
+**Signals:**
+- `intent:new_feature`
+- `zero_edits_zero_builds`
+- `feature_already_exists`
+- `exploration_then_report`
+- `existing_module_discovery`
+- `multi_file_scan_no_edit`
+- `cross_page_integration_audit`
+
+**Preconditions:**
+- 用户提出新增功能的需求，但该功能可能已在项目中部分或完全实现。
+- Agent 在探索阶段发现目标功能的核心模块已存在（如 PlayTimeGuard）。
+- Agent 需要跨多个页面/模块审计该功能的集成情况，而非从头实现。
+- 最终结论是功能已就绪或只需少量补充，不需要大规模编码。
+
+**Evidence:** T0: 用户要求增加未成年人游戏时间限制。Agent先Task子agent探索→6次Glob→7次Read（router.lua, storyline/init.lua, adventure-sfx.lua, adventure/init.lua, home/init.lua, play-time-guard.lua, game/init.lua）→发现PlayTimeGuard模块已完整实现（isPlayable()、getRestrictedMessage()），且adventure页面已在两处集成（关卡点击拦截+中间弹窗提示）→Grep确认全项目集成情况→TodoWrite列出审计清单→向用户报告现状。T1: 用户要求增加测试开关，Agent读取settings-save.lua后API 404终止。整个会话0次edit、0次build，纯探索+报告模式。
+
+---
+
+## `gene_ir_pre_implementation_doc_review`
+
+**实施前文档审查模式** / Pre-Implementation Document Review — Gap & Blocker Assessment
+
+Category: `workflow`
+
+**Signals:**
+- `intent:inspection_review`
+- `target:documentation`
+- `mentions_specific_file`
+- `has_attached_doc`
+- `pre_implementation_gate`
+- `blocker_identification_request`
+- `completeness_check`
+
+**Preconditions:**
+- 用户在开始制作某功能前，要求AI检查对应的设计文档。
+- 用户明确询问'是否有需要补充的内容'和'是否有阻碍点'。
+- 目标产物是设计文档（.md），而非代码。
+- 用户意图是风险评估和完整性确认，而非直接开始编码。
+
+**Evidence:** T0: 用户附带P3-消消乐.md，要求检查是否有补充内容和阻碍点。Agent读取文档(1步mcp__mkr__Read)→respond_to_user回复(1步)。T1: 用户说'检查'(2字)，Agent再次读取同一文档→respond。T2: 用户再次附上同一文档。整个会话3次agent run，每次仅Read+respond，无编辑、无build、无探索。典型的'审阅文档→给结论'轻量模式。
+
+---
+
+## `gene_sr_fragmented_prompt_assembly`
+
+**碎片化用户输入拼接模式** / Fragmented Prompt Assembly — Reassembling Split User Input Across Turns
+
+Category: `session_rhythm`
+
+**Signals:**
+- `intent:inspection_review`
+- `intent:inquiry`
+- `fragmented_user_input`
+- `multi_turn_assembly_required`
+- `single_word_turns`
+- `attached_doc_separate_turn`
+
+**Preconditions:**
+- 用户的完整意图被拆分成多个连续的turn发送（如T0完整句→T1'检查'→T2文档链接→T3后半句）。
+- 拆分后的每个turn单独看语义不完整（如单独的'检查'、单独的文档链接）。
+- 这些turn连续出现且中间没有agent run介入，或agent run仅做最小响应。
+- 常见于用户复制粘贴长文本时被分段发送，或语音输入被切分。
+
+**Evidence:** T0: '检查[@P3-消消乐.md]，如果要开始制作，是否有需要补充的内容，是否有阻碍点'(完整句)。T1: '检查'(2字，语义不完整)。T2: '[@P3-消消乐.md]'(仅文档链接)。T3: '，如果要开始制作，是否有需要补充的内容，是否有阻碍点'(T0的后半句，以逗号开头)。这四个turn明显是同一句话被拆分发送。T4才出现独立意图'调整'。模式：1个完整意图→被拆成4个turn→agent逐turn响应而非等待拼接。
+
+---
+
+## `gene_ir_minimal_inspection_rhythm`
+
+**轻量审查节奏模式** / Minimal Inspection Rhythm — Read-Respond-Only Review Pattern
+
+Category: `session_rhythm`
+
+**Signals:**
+- `intent:inspection_review`
+- `read_respond_only`
+- `no_edit_no_build_no_explore`
+- `steps_per_turn_le_2`
+- `single_doc_focus`
+- `lightweight_review_mode`
+
+**Preconditions:**
+- 用户要求检查/审阅某文档或代码，但不要求修改。
+- Agent的响应模式为：读取目标文件→respond_to_user给出结论。
+- 整个turn不超过2个步骤，无编辑、无build、无glob、无子agent。
+- 这是典型的'轻量审查'模式——用户只需要一个判断，不需要深度分析。
+
+**Evidence:** Agent Run 1(T0): 2 steps (mcp__mkr__Read + respond_to_user)。Agent Run 5(T4): 2 steps (mcp__mkr__Read + respond_to_user)。Agent Run 7(T5): 1 step (respond_to_user only)。3个agent run共5步，0次编辑、0次build、0次glob、0次子agent。这是最轻量级的会话模式——纯读取+纯响应。
+
+---
+
+## `gene_fm_ui_responsive_adaptation_cascade`
+
+**UI自适应多文件级联修改** / UI Responsive Adaptation Cascade — Multi-Module Read-Edit-Verify-Build Pipeline
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `multi_file_cascade_ge_5`
+- `adapter_pattern`
+- `read_all_edit_all_build_once`
+- `iterative_refinement_waves`
+- `cross_game_consistency`
+
+**Preconditions:**
+- 用户要求修改UI适配逻辑（如从手机适配扩展到平板适配、从竖屏改为横屏基准）。
+- 项目包含多个游戏模块（adapter.lua）和多个页面（init.lua），需要统一修改。
+- 改动涉及底层布局逻辑，影响所有游戏和页面。
+- 需要确保所有模块的适配行为一致。
+
+**Evidence:** T2: '现在的UI尺寸是按照手机设计的，修改自适应，让它能适配如平板'→128步(34 Read+32 Edit+11 Grep+7 TodoWrite+2 Build)。涉及文件：4个游戏adapter.lua(p1-puzzle-land, p2-memory-flip, p3-match-3, p4-link-match)+3个页面init.lua(home, adventure, profile)+density.lua。模式：全面读取(S7-S44)→首批编辑(S46-S52)→读取验证(S54-S60)→第二轮编辑(S62-S69)→p1深度迭代(S71-S87)→其余游戏修正(S90-S96)→再次验证(S98-S103)→最终读取+编辑(S105-S116)→build。典型的多文件级联+迭代修正模式。
+
+---
+
+## `gene_fm_layout_param_surgical`
+
+**布局参数精准修改模式** / Layout Parameter Surgical Edit — Heavy Localization, Minimal Edit
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `heavy_localization_light_edit`
+- `read_ge_5_edit_1`
+- `surgical_parameter_change`
+- `cross_module_impact_check`
+
+**Preconditions:**
+- 用户要求修改一个布局参数（如边距、间距、缩放因子），但该参数可能被多个模块引用。
+- Agent需要确认该参数的定义位置和所有引用位置，避免遗漏。
+- 最终修改量很小（1-2个文件的1-2处修改），但需要先做充分的定位工作。
+- 用户描述了具体的问题场景（如'游戏主体较高时会顶到边'）。
+
+**Evidence:** T6: '增加上下边距至少50的设定'→12步(5 Read+2 Grep+1 Edit+3 respond)。先读取layout.lua(S0)→Grep搜索BOARD_Y_TOP_WEIGHT/BOARD_Y_BOTTOM_WEIGHT/BOARD_TOP(S1-S2)→读取4个游戏的board/card-renderer.lua确认引用方式(S4-S7)→在layout.lua中精准修改1处(S9)→respond确认(S11)。典型的'大量定位+精准一击'模式——12步中仅1步是Edit，但前11步确保修改位置正确。
+
+---
+
+## `gene_fm_shared_util_targeted_edit`
+
+**共享工具文件精准修改** / Shared Utility Targeted Edit — Single File Change with Cascading Impact
+
+Category: `workflow`
+
+**Signals:**
+- `intent:feature_modification`
+- `target:ui_layout`
+- `single_shared_utility_file`
+- `cascading_impact_all_screens`
+- `read_edit_edit_respond`
+- `no_build_shared_util`
+
+**Preconditions:**
+- 用户要求修改一个影响所有游戏画面的核心参数（如UI缩放基准、屏幕适配策略）。
+- 该参数定义在一个共享工具文件中（如density.lua），被所有游戏模块引用。
+- 修改该文件会影响所有游戏，因此需要谨慎但只需改一个文件。
+- 用户已在前序turn中完成了大规模的多文件适配修改，本次是对核心参数的最终调整。
+
+**Evidence:** T4: '这是一个竖屏游戏，修改为基于长边'→5步(1 Read+2 Edit+1 respond)。在T2完成32处多文件适配后，T4精准修改density.lua中的缩放基准：S0读取density.lua→S1第一次Edit改缩放逻辑→S2第二次Edit微调相关参数→S4 respond确认。整个turn仅修改一个共享文件，但影响所有4个游戏+3个页面。典型的'改一处、生效全局'模式。
+
+---
+
+
+## 输出规则 — 去重优先工作流
+
+**在创建任何新gene之前，必须先用以下流程检查是否已有相似的gene：**
+
+### 步骤A：Grep检查重叠
+对于每个你想创建的gene模式，先运行：
+```bash
+grep -r "intent:{category}" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json
+grep -r "{关键signal}" /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/*/genes.json
+```
+其中 `{关键signal}` 是最具辨识性的signal标签（如 `consecutive_same_intent`、`sfx_name_in_prompt`、`stacktrace_in_prompt`）。
+
+### 步骤B：如果grep匹配到 — 增强，不要新建
+1. 读取匹配到的 `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/{category}/genes.json`
+2. 找到signals重叠的那个gene对象
+3. 用Edit工具只更新 `_provenance` 部分：
+   - 在 `session_hashes` 数组中追加 `"0997e370"`
+   - 在 `evidence` 中追加新session的turn/prompt引用
+   - 设置或递增 `session_count`
+   - 更新 `turn_range`，格式: `"旧hash:T01-T03, 0997e370:T05-T08"`
+4. 如果新session揭示了额外的signals或preconditions，可以追加到 `signals_match` 和 `preconditions`——但不要删除已有的。
+
+### 步骤C：如果grep无匹配 — 创建新gene
+1. 如果 `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/{category}/genes.json` 已存在，先Read，然后向JSON数组追加新gene。
+2. 如果文件不存在，创建为包含你新gene的JSON数组: `[ {gene} ]`
+3. 如果分类目录不存在，先创建: `mkdir -p /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins/{category}`
+
+### 步骤D：全部写入完成后
+运行: `python3 /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/gen_index.py --plugins-dir /Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins`
+
+## Gene ID 命名规范
+- 格式: `gene_{intent_prefix}_{pattern_name}`
+- 前缀: fm=feature_modification, nf=new_feature, br=bug_report, aoc=ai_output_correction, inq=inquiry, pd=planning_design, doc=documentation, cc=content_creation, cfg=configuration, mw=meta_workflow, elp=error_log_paste, meta=session_meta
+
+## 重要规则
+- 每个gene必须包含schema中所有必填字段
+- preconditions和strategy用中文
+- title_zh中文，title_en英文
+- _provenance必须包含session_hashes, turn_range, prompt_indices, evidence
+- prompt数少于3个的session不要生成gene（除非模式非常突出）
+- 质量优先：每个session 3-5个高质量gene比10个弱gene更好
+- 输出目录: `/Users/xd/Desktop/work/project-logs/traj-exp-accumulate/opencode-acc/plugins`
+
+现在开始分析会话并生成基因。先读取 .json 文件。

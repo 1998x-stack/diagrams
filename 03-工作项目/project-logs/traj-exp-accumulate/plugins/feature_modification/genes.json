@@ -1,0 +1,297 @@
+[
+  {
+    "type": "Gene",
+    "id": "gene_fm_visual_polish_cascade",
+    "category": "workflow",
+    "signals_match": [
+      "intent:feature_modification",
+      "target:visual_style",
+      "consecutive_same_intent_ge_4",
+      "parameter_tweak_chain",
+      "size_color_position_adjustment",
+      "cn_visual_decoration_keywords"
+    ],
+    "preconditions": [
+      "用户已有一个基本可用的视觉元素（装饰物、背景、动画），正在进行迭代打磨。",
+      "连续4+次 feature_modification 指向 visual_style 或 ui_layout，每次只调整1-2个参数。",
+      "用户的反馈模式为：观察结果→提出微调→观察→再微调，典型的视觉打磨循环。"
+    ],
+    "strategy": [
+      "每次修改限定在用户提及的单一参数（大小、颜色、速度、位置），不要预判性地调整其他视觉属性。",
+      "修改后立即 build 让用户预览，减少多轮空转。",
+      "当用户说'太小了'、'看不清'、'像是画面脏了'时，调整幅度应偏大（2x-3x），避免需要再次微调。",
+      "记录用户此前接受的参数值域，用于推断本次微调的合理范围。",
+      "如果连续3次以上同一属性的调整，主动询问用户期望的目标值，而非继续猜测性递增。"
+    ],
+    "constraints": {
+      "max_edits_per_turn": 3,
+      "must_build_after_edit": true
+    },
+    "validation": [
+      "每次修改后确认 build 成功",
+      "修改的参数值在用户描述的方向上（增大/减小/改色）"
+    ],
+    "title_zh": "视觉打磨连续微调链",
+    "title_en": "Visual Polish Cascade — Consecutive Parameter Tweaking Chain",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96", "374e4eb7"],
+      "turn_range": "9dc56f96:T05-T12, 374e4eb7:T15-T19",
+      "prompt_indices": [4, 5, 6, 7, 8, 10, 11, 12],
+      "evidence": "9dc56f96: 9 consecutive visual tweaks (dots→stars→bigger→colored→moving). 374e4eb7: 5 consecutive shape/size refinements on 连连看 graphics (四角星→正三角形→加大鱼/桃心/箭头/闪电→加大螺旋加粗). Also T06→T07: preview height 180→260 in 2 turns. Pattern confirmed across sessions.",
+      "session_count": 2
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_game_param_batch_tune",
+    "category": "workflow",
+    "signals_match": [
+      "intent:feature_modification",
+      "target:game_logic",
+      "numeric_parameter_in_prompt",
+      "level_config_keywords",
+      "cn_game_mechanic_tuning"
+    ],
+    "preconditions": [
+      "用户正在调整已有游戏机制的数值参数（关卡需求数量、道具数量、难度曲线）。",
+      "请求中包含明确的数值范围或数列（如1/2/3、3/5/7），属于确定性修改。",
+      "目标文件通常为关卡配置或游戏逻辑文件，修改集中在数组或配置表中。"
+    ],
+    "strategy": [
+      "精确定位关卡配置数据结构，使用 Read→Edit 直接修改目标数值。",
+      "批量修改多关卡参数时，遍历所有关卡配置项，根据关卡序号映射用户给出的数值序列。",
+      "修改后 build 并检查关卡加载是否正常，防止数据格式错误导致崩溃。",
+      "当用户说'降低为1/2/3，最高到3'时，理解为按关卡序号递增的数列，高于数列长度的关卡使用上限值。"
+    ],
+    "constraints": {
+      "must_build_after_edit": true,
+      "preserve_data_structure": true
+    },
+    "validation": [
+      "修改后的数值严格匹配用户给出的数列",
+      "数据结构（Lua table/JSON）语法无错误"
+    ],
+    "title_zh": "游戏参数批量调优",
+    "title_en": "Game Parameter Batch Tuning — Numeric Config Adjustment",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T15-T16, T19-T20, T45",
+      "prompt_indices": [14, 15, 19, 45],
+      "evidence": "Multiple prompts adjusting match-3 level win requirements (explosion counts 1/2/3, line 3/5/7, rainbow 2/3/4) and game mechanic rules (boom/line can destroy stone/ice)"
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_cross_game_sfx_binding",
+    "category": "workflow",
+    "signals_match": [
+      "intent:feature_modification",
+      "target:audio",
+      "sfx_name_in_prompt",
+      "multi_game_scope",
+      "event_trigger_binding",
+      "cn_sound_apply_keywords"
+    ],
+    "preconditions": [
+      "用户指定一个已存在的音效名称，要求将其绑定到多个游戏的特定事件上。",
+      "请求中明确列出了多个游戏名（推箱子、消消乐、连连看、记忆翻牌）及对应事件。",
+      "属于高编辑量任务：每个游戏需定位事件处理逻辑并插入音效调用。"
+    ],
+    "strategy": [
+      "先列出所有涉及的游戏模块文件，确定每个游戏的事件处理函数位置。",
+      "逐个游戏定位目标事件（如箱子正确位置、消除成功、连线成功、匹配成功），插入音效播放调用。",
+      "使用项目已有的音效播放API（如 SoundManager:playEffect），保持调用方式一致。",
+      "此类任务通常 steps 较多（22-91步），因为需要 Read→Grep→Edit 多个文件。",
+      "修改完所有游戏后统一 build 一次，而非每个游戏 build。"
+    ],
+    "constraints": {
+      "must_build_after_all_edits": true,
+      "consistent_api_usage": true
+    },
+    "validation": [
+      "每个指定游戏的指定事件都已绑定音效",
+      "音效名称在 assets 中存在",
+      "build 通过无报错"
+    ],
+    "title_zh": "跨游戏音效事件绑定",
+    "title_en": "Cross-Game SFX Event Binding — Apply Sound to Multiple Games",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T24-T28",
+      "prompt_indices": [23, 24, 25, 26, 27],
+      "evidence": "5 prompts applying SFX (wrong_buzzer, bounce_boing, success_fanfare, bubble_pop_cute, level_complete) across 4 games, 22-91 steps per turn"
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_asset_cleanup_selective",
+    "category": "workflow",
+    "signals_match": [
+      "intent:feature_modification",
+      "target:asset_resource|audio",
+      "delete_keyword",
+      "exception_list_in_prompt",
+      "cn_cleanup_keywords"
+    ],
+    "preconditions": [
+      "用户要求删除一批资源文件，但保留指定的例外项。",
+      "请求模式为'删除X分类下的Y，除了A/B/C以外'。",
+      "需要同时清理代码中对被删除资源的引用，防止运行时错误。"
+    ],
+    "strategy": [
+      "先列出目标分类下的所有文件，确认用户要保留的例外项确实存在。",
+      "删除非例外文件后，使用 Grep 搜索项目中对已删除文件的引用。",
+      "如果发现引用，逐个清理或替换，确保没有残留的 require/import/path 指向已删除的文件。",
+      "build 验证删除后无加载失败。"
+    ],
+    "constraints": {
+      "must_grep_references_after_delete": true,
+      "must_build_after_edit": true
+    },
+    "validation": [
+      "例外列表中的文件全部保留",
+      "被删文件在代码中无残留引用",
+      "build 通过"
+    ],
+    "title_zh": "选择性资源清理（带例外保留）",
+    "title_en": "Selective Asset Cleanup With Exception Preservation",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["9dc56f96"],
+      "turn_range": "T21-T22",
+      "prompt_indices": [20, 21],
+      "evidence": "Delete unused audio except 3 specified files; delete all Sokoban audio + references. 17-35 steps with Grep-heavy reference cleanup"
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_prompt_restatement_precision",
+    "category": "workflow",
+    "signals_match": [
+      "intent:new_feature|feature_modification",
+      "consecutive_similar_prompt",
+      "added_precision_in_restatement",
+      "zero_steps_on_first_attempt",
+      "cn_scope_clarification"
+    ],
+    "preconditions": [
+      "用户提交了一个请求，但AI未执行（0 steps）或执行结果不符预期。",
+      "用户在下一轮重新提交了内容相似但更精确的请求，增加了范围限定或条件。",
+      "例如：第一次'在主线模式和自由模式下，点击立绘聊天'→第二次增加'主页面不在游戏内'的限定。"
+    ],
+    "strategy": [
+      "对比当前prompt与前一轮prompt，识别用户新增的限定条件。",
+      "新增条件通常是用户认为AI上次理解错误的关键区分点，应作为实现的核心约束。",
+      "不要合并两次请求为一个大需求——以最新一轮的表述为准，它包含了用户想要的完整意图。",
+      "如果前一轮有0步（AI未执行），不需要回顾前一轮的输出，直接从当前prompt开始。"
+    ],
+    "constraints": {
+      "use_latest_prompt_as_ground_truth": true,
+      "must_build_after_edit": true
+    },
+    "validation": [
+      "实现范围精确匹配最新prompt中的限定条件",
+      "新增的限定条件被正确体现在代码中"
+    ],
+    "title_zh": "用户重述精化（渐进式意图澄清）",
+    "title_en": "Prompt Restatement With Precision — Progressive Intent Clarification",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["374e4eb7"],
+      "turn_range": "T10-T11, T17-T18",
+      "prompt_indices": [9, 10, 16, 17],
+      "evidence": "T10→T11: user restated chat feature request, adding '主页面不在游戏内' constraint. T10 had 0 steps, T11 had 43 steps. T17→T18: user restated '加大连连看图形' with slightly different item list. T17 had 0 steps, T18 had 10 steps."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_ui_text_overflow_fix",
+    "category": "workflow",
+    "signals_match": [
+      "intent:feature_modification",
+      "target:ui_layout",
+      "text_overflow_keywords",
+      "bubble_chat_container",
+      "cn_text_exceeds_boundary"
+    ],
+    "preconditions": [
+      "用户报告文字内容超出了容器边界（气泡、按钮、标签）。",
+      "问题类型：换行后文字超出容器高度、单行文字超出容器宽度、文字紧贴边框无间距。",
+      "属于UI布局修复，不是功能bug。"
+    ],
+    "strategy": [
+      "定位容器的尺寸计算逻辑，检查是否基于固定高度还是动态高度。",
+      "对于文字超出气泡：改为动态高度计算（基于文字行数×行高+padding）。",
+      "对于文字紧贴边框：增加容器的内边距(padding)。",
+      "修改后用多种长度的文字测试（短、中、长、多行），确保自适应正确。"
+    ],
+    "constraints": {
+      "must_build_after_edit": true
+    },
+    "validation": [
+      "长文字换行后不超出容器",
+      "容器大小随内容自适应",
+      "短文字时容器不会过大"
+    ],
+    "title_zh": "UI文字溢出容器修复",
+    "title_en": "UI Text Overflow Fix — Container Boundary Adaptation",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["374e4eb7"],
+      "turn_range": "T23, T25",
+      "prompt_indices": [22, 24],
+      "evidence": "T23: chat bubble text wrapping beyond bubble boundary (14 steps). T25: tab button text too close to edges (8 steps). Both are container sizing issues."
+    }
+  },
+  {
+    "type": "Gene",
+    "id": "gene_fm_delete_asset_plus_fix_visual_glitch",
+    "category": "workflow",
+    "signals_match": [
+      "intent:feature_modification",
+      "intent_secondary:bug_report",
+      "delete_asset_keywords",
+      "white_square_rendering",
+      "cn_delete_and_fix_compound"
+    ],
+    "preconditions": [
+      "用户在一个prompt中同时提出两个请求：删除某资源 + 修复删除后/相关的视觉异常。",
+      "视觉异常通常是白色方块（纹理缺失）或显示不正确（引用了不存在的资源）。",
+      "属于复合请求：feature_modification（删除）+ bug_report（白色方块）。"
+    ],
+    "strategy": [
+      "先执行资源删除（文件删除+引用清理）。",
+      "然后定位白色方块/视觉异常的原因：通常是代码中引用了被删除资源或从未设置过的资源路径。",
+      "检查 fallback 逻辑：删除某资源后，使用该资源的代码是否有默认值/回退选项。",
+      "两个修复可能有因果关系（白色方块可能正是因为该资源路径错误），一并处理更高效。"
+    ],
+    "constraints": {
+      "must_grep_references_after_delete": true,
+      "must_build_after_edit": true
+    },
+    "validation": [
+      "目标资源及文件已删除",
+      "无白色方块或视觉异常",
+      "build 通过"
+    ],
+    "title_zh": "删除资源并修复关联视觉异常",
+    "title_en": "Delete Asset Plus Fix Visual Glitch — Compound Cleanup",
+    "_provenance": {
+      "source": "traj-exp-accumulate",
+      "project": "wzp",
+      "session_hashes": ["374e4eb7"],
+      "turn_range": "T03",
+      "prompt_indices": [2],
+      "evidence": "T03: '删除学生装及图片资源 + 修复左下角白色方块'. Compound request, 32 steps, 2 builds. Delete triggered the visual fix investigation."
+    }
+  }
+]

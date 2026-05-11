@@ -1,0 +1,52 @@
+The `.traj` file has 0 turns with the key `turns`. Let me check the actual structure:
+Now I understand the structure. Let me extract proper per-turn summaries:
+Now let me get deeper details about each turn's behavior:
+Excellent! Now I have a thorough understanding. Let me check for existing gene overlaps:
+Now I have a thorough understanding of all existing genes. Let me analyze session `0ea2a577` and identify the unique patterns:
+
+**Session 0ea2a577 Summary:**
+- **3 turns only** (prompt_count=3) — below the threshold of 3+ prompts, but the patterns are strong
+- **Turn 1** (inspection_review): Self-check guideline driven audit. 6 parallel subagents dispatched for systematic inspection across 6 dimensions (structure, compliance, text norms, numerical consistency, logic, audio/performance). TodoWrite with 8-item checklist. 0 edits, 0 builds — pure exploration→report.
+- **Turn 2** (bug_report): "修复P1、p2问题" — massive multi-bug fix turn. 170 steps, 52 edits across 14 unique files, 58 reads, 8 greps, 1 build. TodoWrite with 14 P1/P2 prioritized items. Systematic todo-driven bug fixing: P1 (3 items: title inconsistency, dev status, missing SFX) → P2 (2 items: ASCII→fullwidth punctuation, English dots→Chinese ellipsis). 5 drift-start markers. Heavy edit drift pattern.
+- **Turn 3** (documentation): "更新文档" — 45 steps, 18 edits across 4 doc files, 6 reads, 1 Task, 6 TodoWrite. Multi-document sync after bug fixes.
+
+**Unique patterns to extract:**
+
+1. **Self-check guideline driven systematic audit** (inspection_review) — Turn 1: User provides a self-check guideline document, agent dispatches 6 parallel subagents each targeting a specific inspection dimension. This is different from existing `gene_ir_pre_implementation_doc_review` (which is lightweight read-respond) and `gene_inq_pre_implementation_blocker_probe` (which checks blockers before implementation). This is a **comprehensive pre-launch audit** driven by an attached guideline document.
+
+2. **P1/P2 prioritized multi-bug batch fix** (bug_report) — Turn 2: User says "修复P1、p2问题" referencing a prior audit's findings. Agent creates a 14-item todo list with explicit P1/P2 priority tags, then systematically fixes all bugs across 14 files with only 1 build at the end. Different from `gene_br_minimal_bug_fix` (single bug, single file). This is **batch multi-bug fix with priority-ordered todo list**.
+
+3. **Guideline-driven subagent parallel inspection** (workflow) — Turn 1's pattern of reading a guideline doc → creating a todo checklist → dispatching parallel subagents each mapped to a guideline section → aggregating results. This is a distinct workflow pattern.
+
+4. **Post-audit documentation sync** (documentation) — Turn 3: After completing self-check fixes, user says "更新文档". Agent updates 4 doc files (完成记录, 自查问题报告, 总体进度, 主线关卡总览). Similar to `gene_doc_post_implementation_sync` but specifically after an audit/fix cycle, not after feature implementation.
+
+Let me create the genes. I'll check for the most unique patterns:
+No overlaps. Now let me create the new genes. I'll create 4 high-quality genes:
+Now I'll add the new genes. Let me add 2 to workflow, 1 to diagnostic, and enhance the operational gene:
+Now let me add the documentation gene and check if the existing `gene_doc_post_implementation_sync` should be enhanced:
+Now let me also enhance the existing `gene_mw_todo_driven_workflow` with this session's evidence since it also demonstrates strong todo-driven patterns:
+Now update the session_hashes and turn_range:
+Now let me regenerate the index files:
+Let me verify the generated indexes look correct:
+All genes are properly created and indexed. Here's the summary:
+
+## 会话 `0ea2a577` 分析完成
+
+**会话概况**: 3 turns, 235 steps, 172 tool calls, 10 subagents, 36分钟
+
+### 生成/增强 4 个 Gene:
+
+| # | ID | Category | Title | 来源 Turn |
+|---|---|---|---|---|
+| 1 | `gene_ir_guideline_driven_parallel_audit` | workflow | 指南驱动的并行审计管线 | T0: 自查指南→6路并行subagent审计 |
+| 2 | `gene_br_p1p2_prioritized_batch_fix` | diagnostic | P1/P2优先级批量Bug修复 | T1: 170步系统性修复14项P1/P2问题 |
+| 3 | `gene_doc_post_audit_report_sync` | operational | 审计后文档报告同步 | T2: 更新4个文档(含自查问题报告) |
+| 4 | `gene_mw_todo_driven_workflow` | operational | Todo驱动任务管理 **(增强)** | 追加0ea2a577的19次TodoWrite证据 |
+
+### 核心模式提取:
+
+1. **T0 → 指南驱动并行审计**: 用户提供自查指南文档 → Agent分解为6个检查维度 → 6个并行subagent各负责一个维度 → 汇总P1/P2/P3报告。这是与现有轻量审查模式(`gene_ir_minimal_inspection_rhythm`)完全不同的重型审计管线。
+
+2. **T1 → P1/P2优先级批量修复**: 14项问题(3个P1+2个P2)、14个文件、52次编辑、仅1次build。与现有`gene_br_minimal_bug_fix`(单文件单bug)形成鲜明对比——这是"审计结果→优先级排序→系统性修复"的完整链路。
+
+3. **T2 → 审计后文档同步**: 除常规的完成记录/总体进度更新外，特有的是**自查问题报告.md**的创建/更新和**主线关卡总览.md**的大规模更新(13次Edit)，反映本轮审计修复对关卡配置的影响。

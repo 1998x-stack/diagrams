@@ -1,0 +1,5 @@
+Done. Created `gene_cc_multi_ref_parallel_doc_synthesis` in workflow category (now 92 genes total).
+
+**What the gene captures**: When a user attaches N sibling design docs (e.g., P1, P2) and asks for a new parallel doc (P4), the agent's key behavior is to **proactively expand beyond what was referenced** — it reads the unreferenced P3 doc, checks the filesystem for naming patterns, and reads global context docs (ADR, main design spec) before synthesizing the new document in a single Write call. This "read the full sibling set, not just what the user pointed to" is the distinctive, reusable behavior.
+
+The single-prompt rule exception applies here because the 18-step agent run is substantive and the proactive sibling discovery behavior is not covered by any existing gene (`gene_pd_design_doc_generation_workflow` requires `no_attached_doc` + `read_code_before_write`; `gene_cc_source_doc_to_summary_distillation` is for single-source distillation, not multi-reference parallel synthesis).
