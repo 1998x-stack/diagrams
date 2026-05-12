@@ -6,7 +6,10 @@ import sys
 import websockets
 
 async def transcribe_audio(audio_path):
-    api_key = os.environ.get('DASHSCOPE_API_KEY', 'REDACTED_KEY')
+    api_key = os.environ.get('DASHSCOPE_API_KEY')
+    if not api_key:
+        print("Error: DASHSCOPE_API_KEY environment variable is not set.", file=sys.stderr)
+        sys.exit(1)
     url = 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/'
     
     async with websockets.connect(url, additional_headers={'Authorization': f'bearer {api_key}'}) as ws:
